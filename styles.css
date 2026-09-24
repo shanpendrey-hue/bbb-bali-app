@@ -162,3 +162,20 @@
 .pickup-cash-copy{margin:24px 0 0;line-height:1.5}.pickup-cash-copy+.actions{margin-top:28px}.pickup-confirmation-clean .pickup-cash-copy{margin:26px 0 28px}.pickup-confirmation-clean .actions{margin-top:0}
 .pickup-profile-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}.pickup-profile-actions .btn{width:100%;min-width:0;justify-content:center;text-align:center;margin:0}
 @media(max-width:520px){.weather-top{align-items:flex-start}.weather-top .temp{margin-bottom:14px}.pickup-live-total.compact{padding:20px 18px;margin-bottom:26px}.pickup-live-total.compact strong{font-size:29px}}
+
+
+/* Final interaction + layout fixes */
+.stamp.stamp-logo{border:0;background:transparent;overflow:visible;width:62px;height:62px}
+.stamp.stamp-logo img{width:62px;height:62px;object-fit:contain;display:block}
+.profile-card .avatar img{width:100%;height:100%;object-fit:cover}
+.profile-photo-input{display:none!important}
+.combined-flight-form + .actions{display:grid;grid-template-columns:1fr;gap:14px}
+.combined-flight-form + .actions .text-close{justify-self:center;text-align:center;margin:0 auto}
+.fx-note{margin-top:20px!important;margin-bottom:4px!important}
+.travel-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.travel-card-head h3{margin-top:8px}
+.travel-brand-logo{width:52px;height:52px;object-fit:contain;flex:none;border-radius:12px;padding:5px;background:#fff}
+.travel-card-option{position:relative}
+.modal-close-row{display:flex;justify-content:center;margin-top:24px;padding-top:2px}
+.modal-close-row .btn{min-width:120px;justify-content:center}
+@media(max-width:760px){.stamp.stamp-logo,.stamp.stamp-logo img{width:58px;height:58px}.travel-brand-logo{width:46px;height:46px}.modal-close-row{margin-top:22px}}
