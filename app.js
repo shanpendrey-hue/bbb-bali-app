@@ -17,6 +17,7 @@ const CFG={
   doctorAri:'628123924814',
   mobileMedicine:'6281252638533',
   drive:'https://drive.google.com/drive/folders/1RYiTM9qjW5V2a5BqU3W_jYM4suv-54Pi',
+  mediaUpload:'https://script.google.com/macros/s/AKfycby5V0h758EFmjZIjKIy_ed4j1B_r5VC32kE-xVoPwqiqE7xaimdMI84IyeMPV68ulCcoA/exec',
   spotify:'https://open.spotify.com/s/P6rY4T0',
   visa:'https://evisa.imigrasi.go.id/',
   levy:'https://lovebali.baliprov.go.id/',
@@ -97,7 +98,7 @@ function money(n,c='IDR'){return c==='AUD'?`$${Number(n).toFixed(2)}`:`Rp${Math.
 function toast(msg){const el=qs('#toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
 function navigate(route){state.route=route;state.modal=null;state.cartOpen=false;state.drinkCartOpen=false;location.hash='#/'+route;window.scrollTo({top:0,behavior:'instant'});render()}
 window.go=navigate;
-window.addEventListener('hashchange',()=>{stopNicolleHomeShow();state.route=location.hash.replace('#/','')||'home';render()});
+window.addEventListener('hashchange',()=>{state.route=location.hash.replace('#/','')||'home';render()});
 
 function renderHeader(){return `<header class="topbar"><div class="brand-mini"><div class="stamp">B.B.B</div><div class="brand-copy"><strong>Nicolle's 50th</strong><span>BALI 2027</span></div></div><button class="btn light" data-action="nav" data-route="profile">${escapeHtml(state.profile?.name||'Guest profile')}</button></header>`}
 function renderNav(){const items=[['home','⌂','Home'],['bbb','♠','B.B.B'],['travel','✈','Travel'],['bali','☀','Bali'],['profile','☺','Me']];return `<nav class="navbar" aria-label="Main navigation">${items.map(([r,icon,label])=>`<button class="navitem ${state.route===r?'active':''}" data-action="nav" data-route="${r}"><span class="ico">${icon}</span><span>${label}</span></button>`).join('')}</nav>`}
@@ -108,14 +109,14 @@ function homeView(){return page(`
 <section class="hero"><div class="eyebrow">23–27 January 2027 · Bali</div><h1 class="home-title">Nicolle's<br>50th</h1><div class="bbbline">B.B.B — THE BIG BALI BASH</div><div class="script">Better. Bolder. Boujier.</div><div class="hero-actions"><button class="btn olive" data-action="nav" data-route="bbb">Enter the Big Bali Bash</button><button class="btn outline" data-action="nav" data-route="ready">Get Bali Ready</button></div><div class="countdown" id="countdown">${countdown()}</div></section>
 <section class="section"><div class="section-head"><div><h2 class="section-title">Next up</h2><p class="section-sub">The trip, bookings and reminders in one place.</p></div></div><article class="card sunset-card"><img src="/assets/sunset-beanbags.png" alt="Bali beach at sunset with colourful beanbags"><div class="inner"><div class="meta">Sunday 24 January · From 4:00 PM</div><h3>Beanbags, Beers & Sunset</h3><p>The unofficial start to the Bali weekend. Beachside beanbags, sunset drinks and an easy first catch-up.</p><div class="actions"><button class="btn" data-action="modal" data-modal="sunset">View details</button><button class="btn light" data-action="calendar" data-title="Beanbags, Beers & Sunset" data-start="2027-01-24T16:00:00+08:00" data-duration="180">Add to calendar</button></div></div></article></section>
 <section class="section"><div class="grid two"><article class="card event-card bbb"><div class="meta">Monday 25 January</div><div style="font-family:'Cormorant Garamond',serif;font-size:64px;line-height:.8;color:var(--brown);margin:22px 0 14px">B.B.B</div><div style="font-size:13px;font-weight:700;letter-spacing:.18em">THE BIG BALI BASH</div><div class="script">Better. Bolder. Boujier.</div><p>Nicolle's 50th. Cocktails, catered food, mystery games and a few surprises.</p><div class="actions"><button class="btn olive" data-action="nav" data-route="bbb">Enter B.B.B</button></div></article><article class="card event-card recovery"><div class="meta">Tuesday 26 January</div><h3>The Great Aussie Recovery</h3><p>Pizza · Pool · Triple J · Massages · Floaties. Same sun. Less effort.</p><div class="actions"><button class="aus-btn red" data-action="nav" data-route="recovery">Enter the Recovery →</button></div></article></div></section>
-<section class="section"><div class="grid two"><article class="card"><div class="meta">Bali Ready</div><h3>Travel wallet & reminders</h3><p>Flights, visa, tourist levy, arrival card and the practical things you need before Bali.</p><div class="actions"><button class="btn" data-action="nav" data-route="ready">Open Bali Ready</button></div></article><article class="card"><div class="meta">The B.B.B Camera Roll</div><h3>Share the Bali photos</h3><p>Keep everyone's photos together in the shared trip folder.</p><div class="actions"><a class="btn olive" href="${CFG.drive}" target="_blank" rel="noopener">Open shared album</a></div></article></div></section>`)}
+<section class="section"><div class="grid two"><article class="card"><div class="meta">Bali Ready</div><h3>Travel wallet & reminders</h3><p>Flights, visa, tourist levy, arrival card and the practical things you need before Bali.</p><div class="actions"><button class="btn" data-action="nav" data-route="ready">Open Bali Ready</button></div></article><article class="card"><div class="meta">The B.B.B Media Roll</div><h3>Share the Bali media</h3><p>Keep everyone's photos and videos together in the shared trip folder.</p><div class="actions"><a class="btn olive" href="${CFG.drive}" target="_blank" rel="noopener">View media</a></div></article></div></section>`)}
 
 function bbbView(){return page(`
 <section class="bbb-hero"><div class="eyebrow bbb-eyebrow-top">Nicolle's 50th</div><div class="bbbmark">B.B.B</div><div class="submark">THE BIG BALI BASH</div><div class="script">Better. Bolder. Boujier.</div><div class="eyebrow bbb-eyebrow-bottom">Bali 2027</div></section>
 <section class="section"><div class="section-head itinerary-head"><div><div class="eyebrow">Monday 25 January</div><h2 class="section-title">The B.B.B itinerary</h2><p class="section-sub">Bring on the big 5-OH.</p></div><button class="btn light itinerary-calendar" data-action="calendar" data-title="Nicolle’s 50th — The Big Bali Bash" data-start="2027-01-25T13:00:00+08:00" data-duration="600">Add to calendar</button></div><div class="timeline">${ITINERARY.map(x=>`<div class="timeline-row"><div class="time">${x[0]}</div><div><h4>${x[1]}</h4><p>${x[2]}</p></div></div>`).join('')}</div></section>
 <section class="section cocktail-section"><div class="section-head cocktail-head"><div><div class="eyebrow">Good drinks. Great company.</div><h2 class="section-title">Cocktails</h2><p class="section-sub">Included. Add your drinks to My Order.</p></div><button class="drink-basket-btn ${state.drinkCart.length?'has-items':''}" data-action="drink-cart" aria-label="Open My Order"><span class="drink-basket-icon" aria-hidden="true">🍸</span><span class="drink-basket-label">MY ORDER</span><span class="drink-basket-count" id="drinkCartCount">${state.drinkCart.reduce((n,x)=>n+x.qty,0)}</span></button></div><div class="cocktail-grid">${COCKTAILS.map(c=>{const inOrder=state.drinkCart.find(x=>x.id===c.id),qty=inOrder?.qty||0;return `<article class="cocktail ${inOrder?'in-order':''}" data-cocktail-id="${c.id}"><div class="cocktail-art">${drinkSvg(c.art)}</div><div class="cocktail-body"><h3>${c.name}</h3><div class="type">${c.type}</div><p>${c.desc}</p><div class="orderbar"><div class="qty"><button data-action="drink" data-id="${c.id}" data-delta="-1">−</button><b id="q-${c.id}">${qty}</b><button data-action="drink" data-id="${c.id}" data-delta="1">+</button></div><button class="btn olive add-drink-btn ${inOrder?'added':''}" data-action="order" data-id="${c.id}">${inOrder?'<span class="order-check">✓</span><span>IN MY ORDER</span>':'Add to order'}</button></div></div></article>`}).join('')}</div></section>
 <section class="section"><div class="grid two"><article class="card menu-placeholder"><div><div class="eyebrow">2:30 PM</div><h3>Afternoon Canapés</h3><p>Little bites. Bali style.<br><strong>Menu coming soon.</strong></p></div></article><article class="card menu-placeholder"><div><div class="eyebrow">7:00 PM</div><h3>Tonight's Feast</h3><p>A taste of Bali.<br><strong>Full menu coming soon.</strong></p></div></article></div></section>
-<section class="section"><div class="grid two"><article class="card"><div class="meta">The B.B.B Playlist</div><h3>Add to the soundtrack</h3><p>Open the shared Spotify playlist and add a song for Bali.</p><div class="actions"><a class="btn olive" href="${CFG.spotify}" target="_blank" rel="noopener">Open Spotify</a></div></article><article class="card bbb-photo-card"><div class="meta">The B.B.B Camera Roll</div><h3>Share your photos</h3><p>Add your photos to the B.B.B camera roll or see what everyone’s been up to.</p><div class="bbb-photo-actions"><button class="btn photo-upload-btn full" data-action="photo-upload">Upload a photo</button><a class="btn light full" href="${CFG.drive}" target="_blank" rel="noopener">View photos</a></div><input id="bbb-photo-upload" class="bbb-photo-input" type="file" accept="image/*" hidden></article></div></section>
+<section class="section"><div class="grid two"><article class="card"><div class="meta">The B.B.B Playlist</div><h3>Add to the soundtrack</h3><p>Open the shared Spotify playlist and add a song for Bali.</p><div class="actions"><a class="btn olive" href="${CFG.spotify}" target="_blank" rel="noopener">Open Spotify</a></div></article><article class="card bbb-photo-card"><div class="meta">The B.B.B Media Roll</div><h3>Share your media</h3><p>Add your photos and videos to the B.B.B media roll or see what everyone’s been up to.</p><div class="bbb-photo-actions"><button class="btn photo-upload-btn full" data-action="photo-upload" id="bbbMediaUploadBtn">Upload media</button><a class="btn light full" href="${CFG.drive}" target="_blank" rel="noopener">View media</a></div><div class="media-upload-status" id="bbbMediaStatus" aria-live="polite"></div><input id="bbb-photo-upload" class="bbb-photo-input" type="file" accept="image/*,video/*" multiple hidden></article></div></section>
 <section class="section"><article class="card"><div class="meta">Location</div><h3>${CFG.villa}</h3><p>${CFG.address}</p><div class="actions"><button class="btn" data-action="maps" data-query="${encodeURIComponent(CFG.address)}">Open in Maps</button><a class="btn light" href="tel:${CFG.villaPhone}">Call villa</a></div></article></section>`)}
 
 function travelView(){return page(`
@@ -168,7 +169,7 @@ function renderCart(){qsa('.drawer,.cart-overlay').forEach(x=>x.remove());if(!st
 
 function renderDrinkCart(){qsa('.drink-drawer,.drink-cart-overlay').forEach(x=>x.remove());if(!state.drinkCartOpen)return;const photo=state.profile.photo?`<img src="${state.profile.photo}" alt="${escapeAttr(state.profile.name||'Guest')} profile photo">`:'☺',total=state.drinkCart.reduce((n,x)=>n+x.qty,0);document.body.insertAdjacentHTML('beforeend',`<div class="overlay drink-cart-overlay" data-action="close-drink-cart"></div><aside class="drawer drink-drawer"><div class="section-head"><div><div class="eyebrow">B.B.B cocktails</div><h2 class="section-title">My Order</h2></div><button class="btn light" data-action="close-drink-cart">Close</button></div><div class="drink-profile"><div class="drink-profile-photo">${photo}</div><div><div class="meta">Ordering as</div><h3>${escapeHtml(state.profile.name||'Guest')}</h3></div></div>${state.drinkCart.length?state.drinkCart.map((x,i)=>`<div class="drink-cartline"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.type)}</small></div><div class="drink-cart-controls"><button data-action="drink-cart-qty" data-index="${i}" data-delta="-1">−</button><b>${x.qty}</b><button data-action="drink-cart-qty" data-index="${i}" data-delta="1">+</button><button class="remove-drink" data-action="remove-drink-cart" data-index="${i}">Remove</button></div></div>`).join(''):'<p>Your cocktail order is empty.</p>'}${state.drinkCart.length?`<div class="actions drink-place-actions"><button class="btn olive full" data-action="place-drink-order">Send order to the bar</button></div><p class="drink-order-note">Your order will open directly in WhatsApp to the B.B.B bartenders.</p>${state.drinkClearConfirm?`<div class="clear-order-confirm"><div class="clear-order-icon">↺</div><h3>Clear your order?</h3><p>This will remove all ${total} drink${total===1?'':'s'} from My Order.</p><div class="clear-order-actions"><button class="btn light" data-action="cancel-clear-drink-order">Keep order</button><button class="btn clear-confirm-btn" data-action="clear-drink-order">Yes, clear it</button></div></div>`:`<button class="clear-drink-order clear-attention" data-action="confirm-clear-drink-order"><span class="clear-order-symbol">↺</span><span>CLEAR MY ORDER</span></button>`}`:''}</aside>`) }
 
-function render(){const app=qs('#app');if(!app)return;try{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}renderModal();renderCart();renderDrinkCart();if(state.route==='home')scheduleNicolleHomeShow()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
+function render(){const app=qs('#app');if(!app)return;try{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}renderModal();renderCart();renderDrinkCart()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
 
 function openModal(type){state.modal=type;renderModal()}
 function closeModal(){state.modal=null;renderModal()}
@@ -212,48 +213,29 @@ Guest: ${name}
 Total drinks: ${total}`;state.drinkOrders.unshift({id:'o'+Date.now(),sentAt:new Date().toISOString(),items});state.drinkCart=[];state.drinkCartOpen=false;persist();renderDrinkCart();syncDrinkQuantities();toast('Order sent to the bar 🍸');window.location.href=`https://wa.me/${CFG.whatsappOrder}?text=${encodeURIComponent(msg)}`}
 
 
-let nicolleHomeRun=0;
-function stopNicolleHomeShow(){
-  nicolleHomeRun++;
-  qsa('.nicolle-home-show').forEach(x=>x.remove());
+
+function fileToDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read file'));reader.readAsDataURL(file)})}
+async function uploadOneBbbMedia(file){
+  const dataUrl=await fileToDataUrl(file);
+  await fetch(CFG.mediaUpload,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({file:dataUrl,fileName:file.name||`bbb-media-${Date.now()}`,mimeType:file.type||'application/octet-stream'})});
 }
-function partyAudio(){
+async function handleBbbMediaUpload(files){
+  const list=[...(files||[])];if(!list.length)return;
+  const btn=qs('#bbbMediaUploadBtn'),status=qs('#bbbMediaStatus');
+  const tooLarge=list.find(f=>f.size>20*1024*1024);
+  if(tooLarge){toast(`${tooLarge.name} is over 20 MB`);if(status)status.textContent='For now, choose photos or shorter videos under 20 MB each.';return}
+  if(btn){btn.disabled=true;btn.textContent=list.length===1?'Uploading…':`Uploading 1 of ${list.length}…`}
+  if(status)status.innerHTML='<span class="media-upload-spinner" aria-hidden="true"></span><span>Sending to the B.B.B media roll…</span>';
   try{
-    const a=new Audio('/assets/bbb-party.wav');
-    a.volume=.75;
-    a.play().catch(()=>{});
-  }catch{}
-  try{
-    const u=new SpeechSynthesisUtterance('Yay!');
-    u.rate=1.18;u.pitch=1.35;u.volume=.65;
-    speechSynthesis.cancel();speechSynthesis.speak(u);
-  }catch{}
+    for(let i=0;i<list.length;i++){
+      if(btn)btn.textContent=list.length===1?'Uploading…':`Uploading ${i+1} of ${list.length}…`;
+      await uploadOneBbbMedia(list[i]);
+    }
+    if(status)status.innerHTML=`<span class="media-upload-check">✓</span><span>${list.length===1?'Uploaded to the B.B.B media roll':'Media uploaded to the B.B.B media roll'}</span>`;
+    toast(list.length===1?'Media uploaded ✓':`${list.length} items uploaded ✓`);
+  }catch(err){console.error('BBB media upload failed',err);if(status)status.innerHTML='<span class="media-upload-error">!</span><span>Upload failed. Check your connection and try again.</span>';toast('Upload failed — please try again')}
+  finally{if(btn){btn.disabled=false;btn.textContent='Upload media'}}
 }
-function runNicolleHomeShow(){
-  stopNicolleHomeShow();
-  if(state.route!=='home')return;
-  const run=++nicolleHomeRun;
-  document.body.insertAdjacentHTML('beforeend',`<div class="nicolle-home-show" aria-hidden="true"><div class="nicolle-runway"><img class="nicolle-mini" id="nicolleMini" src="/assets/nicolle-walk-a.png" alt=""><div class="nicolle-streamers" id="nicolleStreamers">${Array.from({length:28},(_,i)=>{const a=(i/28)*Math.PI*2,dx=Math.round(Math.cos(a)*(70+(i%5)*12)),dy=Math.round(-80-(i%7)*11);return `<i style="--i:${i};--dx:${dx}px;--dy:${dy}px"></i>`}).join('')}</div></div></div>`);
-  const wrap=qs('.nicolle-home-show'),char=qs('#nicolleMini'),stream=qs('#nicolleStreamers');
-  if(!wrap||!char)return;
-  const alive=()=>run===nicolleHomeRun&&document.body.contains(wrap)&&state.route==='home';
-  // 0–3s: actual stepping cycle while moving in.
-  let step=0;
-  const walker=setInterval(()=>{if(!alive()){clearInterval(walker);return}char.src=step++%2?'/assets/nicolle-walk-a.png':'/assets/nicolle-walk-b.png'},180);
-  char.classList.add('walk-in');
-  setTimeout(()=>{if(!alive())return;clearInterval(walker);char.src='/assets/nicolle-wave.png';char.className='nicolle-mini at-party wave'},3000);
-  // 3–4.4s wave / welcome gesture.
-  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-welcome.png';char.className='nicolle-mini at-party welcome'},3900);
-  // 4.4–6.3s cracker + sound + streamers.
-  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-party.png';char.className='nicolle-mini at-party party';stream?.classList.add('go');partyAudio()},4400);
-  // 6.3–7s giggle pose.
-  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-giggle.png';char.className='nicolle-mini at-party giggle'},6300);
-  // 7–10s step off-screen.
-  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-walk-b.png';char.className='nicolle-mini walk-out';let k=0;const outWalker=setInterval(()=>{if(!alive()){clearInterval(outWalker);return}char.src=k++%2?'/assets/nicolle-walk-a.png':'/assets/nicolle-walk-b.png'},180);setTimeout(()=>clearInterval(outWalker),2950)},7000);
-  setTimeout(()=>{if(run===nicolleHomeRun)wrap.remove()},10000);
-}
-function scheduleNicolleHomeShow(){setTimeout(()=>{if(state.route==='home')runNicolleHomeShow()},120)}
-async function handleBbbPhotoUpload(file){if(!file)return;const shareData={title:'B.B.B Camera Roll',text:'Add this photo to the shared B.B.B camera roll.',files:[file]};try{if(navigator.share&&navigator.canShare?.(shareData)){await navigator.share(shareData);setTimeout(()=>window.open(CFG.drive,'_blank'),350);return}}catch(err){if(err?.name==='AbortError')return}toast('Photo selected — opening the shared camera roll');window.open(CFG.drive,'_blank')}
 
 function confirmMassage(){const id=qs('#mtreat')?.value,slot=qs('#mslot')?.value;if(!slot)return toast('Choose a time');if(state.bookings.filter(b=>b.slot===slot&&b.status!=='cancelled').length>=4)return toast('That block is full');const t=MASSAGES.find(x=>x.id===id),bid='b'+Date.now();state.bookings.push({id:bid,slot,treatment:t.name,status:'booked'});state.plans.push({title:t.name,meta:`26 Jan · ${slot} · ${t.mins} min · ${money(t.price)} cash`,pay:'cash',type:'massage',bookingId:bid});persist();navigate('profile');toast('Massage booked')}
 function saveCartPlans(){state.cart.forEach(x=>state.plans.push(x));state.cart=[];state.cartOpen=false;persist();renderCart();toast('Saved to My Plans')}
@@ -297,7 +279,7 @@ function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return
 }
 document.addEventListener('click',handleClick);
 document.addEventListener('input',e=>{if(e.target.id==='aud')convertFx('aud');if(e.target.id==='idr')convertFx('idr')});
-document.addEventListener('change',e=>{if(e.target.id==='bbb-photo-upload'){const file=e.target.files?.[0];if(file)handleBbbPhotoUpload(file);e.target.value=''}});
+document.addEventListener('change',e=>{if(e.target.id==='bbb-photo-upload'){const files=[...(e.target.files||[])];if(files.length)handleBbbMediaUpload(files);e.target.value=''}});
 
 window.addEventListener('error',e=>console.error('BBB app error',e.error||e.message));
 setInterval(()=>{const c=qs('#countdown');if(c)c.innerHTML=countdown()},1000);
