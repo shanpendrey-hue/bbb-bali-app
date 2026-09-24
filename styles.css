@@ -553,3 +553,74 @@ body.guide-active .guide-end{padding:14px 0 10px}
   .bash-compose-tools{gap:6px}.bash-tool{padding:9px 10px;font-size:10px}.bash-comment-count{margin-left:0}.bash-share-link{margin-left:auto}
   .navbar .navitem>span:last-child{font-size:10px}.bash-navitem .bash-nav-ico{margin-top:-10px}
 }
+
+/* ===== Bash Board v2 polish ===== */
+.bash-navitem{display:flex!important;flex-direction:column;align-items:center;justify-content:center}
+.bash-navitem .bash-nav-ico{width:42px;height:42px;margin:-10px auto 3px;border:0!important;background:var(--olive)!important;color:var(--cream)!important;box-shadow:0 7px 18px rgba(46,55,32,.28);font-size:21px;letter-spacing:-.08em}
+.bash-navitem.active .bash-nav-ico{background:var(--olive)!important;color:var(--cream)!important;transform:translateY(-2px)}
+.bash-navitem.active{background:transparent!important}
+.bash-navitem>span:last-child{text-align:center;white-space:nowrap}
+.bash-nav-badge{background:#9d5a48;border:2px solid var(--cream);right:-5px;top:-6px}
+
+.bash-board-hero{background:
+ radial-gradient(circle at 88% 18%,rgba(217,184,156,.28),transparent 24%),
+ linear-gradient(145deg,rgba(247,241,230,.99),rgba(247,241,230,.92));
+ border-color:rgba(85,107,63,.3);box-shadow:0 16px 40px rgba(107,78,61,.08)}
+.bash-board-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 0 64%,rgba(85,107,63,.035) 64% 100%);pointer-events:none}
+.bash-board-logo,.bash-feature-logo,.bash-mini-logo,.bash-group-avatar,.bash-empty-logo{background:var(--olive);color:var(--cream);border:1px solid rgba(247,241,230,.48)}
+.bash-board-logo{box-shadow:0 14px 30px rgba(85,107,63,.2)}
+
+.bash-tabs{margin-top:18px;background:rgba(217,184,156,.13);padding:6px;border-radius:22px}
+.bash-tabs button{padding:14px;border-radius:17px;letter-spacing:.04em}
+.bash-tabs button.active{background:var(--olive);color:var(--cream);box-shadow:0 7px 16px rgba(85,107,63,.17)}
+.bash-tabs button.active i{background:var(--cream);color:var(--olive)}
+
+.bash-crew-strip{background:linear-gradient(135deg,rgba(85,107,63,.11),rgba(217,184,156,.13));border:1px solid rgba(85,107,63,.17);border-radius:26px;padding:16px 17px;overflow:hidden}
+.bash-crew-label{display:flex;align-items:center;gap:8px;margin-bottom:13px;color:var(--olive)}
+.bash-crew-label b{font:800 11px/1 Montserrat,Arial,sans-serif;text-transform:uppercase;letter-spacing:.1em}
+.bash-crew-label small{margin-left:auto;color:var(--muted);font-size:10px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--olive);box-shadow:0 0 0 5px rgba(85,107,63,.11)}
+.bash-crew-avatars{display:flex;gap:12px;overflow-x:auto;padding:2px 1px 4px;scrollbar-width:none}.bash-crew-avatars::-webkit-scrollbar{display:none}
+.bash-crew-person{min-width:56px;text-align:center}.bash-crew-person .bash-avatar{width:50px;height:50px;margin:auto;border:2px solid var(--cream);box-shadow:0 0 0 2px rgba(85,107,63,.27)}.bash-crew-person span{display:block;font-size:9px;font-weight:700;margin-top:6px;color:var(--brown);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.bash-composer{border-color:rgba(85,107,63,.17)!important;background:linear-gradient(145deg,#fffdf9,#f7f1e6)!important;box-shadow:0 14px 34px rgba(107,78,61,.07)!important}
+.bash-compose-kicker{font:800 10px/1 Montserrat,Arial,sans-serif;letter-spacing:.16em;color:var(--olive);margin:0 0 14px 61px}
+.bash-compose-top textarea{min-height:98px;background:rgba(255,255,255,.78);border:1px solid rgba(107,78,61,.12);font-size:16px;border-radius:22px;padding:17px}
+.bash-compose-top textarea::placeholder{color:#a59b91}
+.bash-compose-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}
+.bash-tool{padding:12px 8px;background:rgba(255,255,255,.6);border-color:rgba(107,78,61,.13);font-size:10px}
+.bash-tool.selected{background:rgba(85,107,63,.11);border-color:rgba(85,107,63,.35);box-shadow:inset 0 0 0 1px rgba(85,107,63,.05)}
+.bash-compose-option{background:#fffdf9;border-color:rgba(85,107,63,.14);box-shadow:0 8px 20px rgba(107,78,61,.04)}
+.bash-option-head{display:flex;align-items:center;justify-content:space-between}.bash-option-head button{border:0;background:transparent;color:var(--muted);font-size:22px;padding:0 4px;cursor:pointer}
+.bash-location-actions{display:flex;gap:8px}.bash-location-current{width:100%;border:1px solid rgba(85,107,63,.2);border-radius:14px;background:rgba(85,107,63,.08);padding:11px 12px;color:var(--olive);font:800 11px Montserrat,Arial,sans-serif;cursor:pointer}
+.bash-selected-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:999px;background:rgba(85,107,63,.1);padding:9px 12px;color:var(--olive);font-size:11px;font-weight:800}.bash-selected-chip button{border:0;background:transparent;color:inherit;font-size:18px;line-height:1;cursor:pointer}.bash-map-link{font-size:10px;font-weight:800;color:var(--brown);text-decoration:none}
+.bash-feeling-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:250px;overflow:auto;padding-right:2px}.bash-feeling-choice{border:1px solid rgba(107,78,61,.11);border-radius:14px;background:#fff;padding:10px;text-align:left;color:var(--brown);font:700 10px/1.3 Montserrat,Arial,sans-serif;cursor:pointer}.bash-feeling-choice span{font-size:16px;margin-right:6px}.bash-feeling-choice.selected{background:rgba(85,107,63,.09);border-color:rgba(85,107,63,.32);color:var(--olive)}
+.bash-media-preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.bash-media-preview{margin:0;aspect-ratio:1/1}.bash-media-preview img,.bash-media-preview video{width:100%;height:100%;object-fit:cover;display:block}
+.bash-compose-footer{border-top:1px solid rgba(107,78,61,.09);padding-top:13px}.bash-compose-footer span{color:var(--muted);font-size:10px}.bash-compose-footer b{color:var(--olive)}
+
+.bash-post{position:relative;overflow:hidden;border-color:rgba(85,107,63,.15)!important;background:#fffdf9!important;box-shadow:0 14px 32px rgba(107,78,61,.065)!important}
+.bash-post-accent{position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--olive),rgba(217,184,156,.4))}
+.bash-post-author{padding-left:4px}.bash-post-author strong{font-size:15px}.bash-post-author a{display:inline-block;margin-left:2px;padding:2px 7px;border-radius:999px;background:rgba(85,107,63,.08);font-size:11px}
+.bash-feeling-line{margin-top:4px}.bash-feeling-line b{display:inline-block;background:rgba(217,184,156,.18);padding:3px 8px;border-radius:999px}
+.bash-post-text{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;line-height:1.35;color:var(--brown);margin:19px 4px 17px}
+.bash-post-media{display:grid;grid-template-columns:1fr;margin:16px -4px 14px;border:0;border-radius:22px;gap:3px;background:transparent}.bash-post-media.multi{grid-template-columns:repeat(2,1fr)}
+.bash-media-tile{position:relative;border:0;padding:0;background:#eee;overflow:hidden;min-height:210px;cursor:pointer}.bash-post-media:not(.multi) .bash-media-tile{border-radius:22px}.bash-post-media.multi .bash-media-tile:first-child{border-radius:22px 0 0 0}.bash-post-media.multi .bash-media-tile:nth-child(2){border-radius:0 22px 0 0}.bash-media-tile img,.bash-media-tile video{width:100%;height:100%;min-height:210px;max-height:520px;object-fit:cover;display:block}.bash-media-play{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(247,241,230,.92);color:var(--olive);font-size:18px;padding-left:3px}
+.bash-post-social{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;padding:2px 4px 9px}.bash-reaction-summary{display:flex;gap:6px;align-items:center}.bash-reaction-summary span{letter-spacing:-2px}.bash-reaction-summary b{font-size:10px}.bash-comment-count{margin-left:auto}
+.bash-reactions{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;border-top:1px solid rgba(107,78,61,.08);border-bottom:1px solid rgba(107,78,61,.08);padding:8px 0}.bash-reaction{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px!important}.bash-reaction span{font-size:18px}.bash-reaction em{font-style:normal;font-size:8px;font-weight:800}.bash-reaction.selected{background:rgba(85,107,63,.09)!important}
+.bash-comments{margin-top:14px}.bash-comment>div:last-child{background:rgba(217,184,156,.16)}
+.bash-comment-compose{margin-top:14px}.bash-comment-compose input{background:#fff}
+
+.bash-chat-card{border-color:rgba(85,107,63,.16)!important;box-shadow:0 18px 40px rgba(107,78,61,.08)!important}.bash-chat-head{background:linear-gradient(135deg,rgba(85,107,63,.1),rgba(217,184,156,.13));padding:18px 20px}.bash-message-list{background:radial-gradient(circle at 85% 10%,rgba(217,184,156,.12),transparent 24%),linear-gradient(180deg,#fffdf9,#f7f1e6)}
+.bash-message-stack{max-width:100%}.bash-bubble{border-radius:20px 20px 20px 7px}.bash-message.mine .bash-bubble{background:var(--olive);border-color:var(--olive);color:var(--cream);border-radius:20px 20px 7px 20px}.bash-message.mine .bash-bubble b,.bash-message.mine .bash-bubble small{color:rgba(247,241,230,.78)}.bash-message.mine .bash-bubble span{color:var(--cream)}
+.bash-message-reacts{display:flex;gap:3px;margin-top:4px}.bash-message.mine .bash-message-reacts{justify-content:flex-end}.bash-message-reacts button{border:1px solid rgba(107,78,61,.1);background:#fffaf2;border-radius:999px;padding:4px 6px;font-size:12px;cursor:pointer}.bash-message-reacts button.selected{background:rgba(85,107,63,.14);border-color:rgba(85,107,63,.25)}.bash-message-reacts b{font-size:8px;color:var(--olive)}
+.bash-chat-media,.bash-chat-video{display:block;max-width:260px;margin-top:7px;border:0;border-radius:14px;overflow:hidden;background:#eee;padding:0}.bash-chat-media img{width:100%;display:block;max-height:260px;object-fit:cover}.bash-chat-file{display:block;margin-top:7px;padding:10px 12px;border-radius:12px;background:rgba(217,184,156,.15);color:inherit;font-size:11px;text-decoration:none;font-weight:700}
+.bash-chat-compose-wrap{position:relative;background:#fffdf9;border-top:1px solid var(--line)}.bash-chat-compose{border-top:0}.bash-chat-plus.active{background:var(--olive);color:#fff;transform:rotate(45deg)}
+.bash-chat-attach-menu{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 0}.bash-chat-attach-menu button{border:1px solid rgba(107,78,61,.12);border-radius:16px;background:#fffaf2;color:var(--brown);padding:12px 7px;display:grid;gap:5px;place-items:center;font-size:20px;cursor:pointer}.bash-chat-attach-menu span{font:700 9px Montserrat,Arial,sans-serif}
+
+.bash-viewer-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.bash-viewer-head h2{margin:5px 0 0}.bash-media-viewer{display:grid;gap:16px;margin-top:14px}.bash-media-viewer img,.bash-media-viewer video{width:100%;max-height:68vh;object-fit:contain;border-radius:18px;background:#181511}.bash-media-viewer .btn{margin-top:0}
+
+@media(max-width:540px){
+  .bash-compose-tools{grid-template-columns:1fr 1fr 1fr}.bash-tool{font-size:9px;padding:11px 5px}
+  .bash-compose-kicker{margin-left:59px}.bash-post-text{font-size:22px}.bash-feeling-grid{grid-template-columns:1fr}.bash-media-tile,.bash-media-tile img,.bash-media-tile video{min-height:180px}.bash-reaction em{display:none}
+  .bash-crew-label small{display:none}.bash-navitem .bash-nav-ico{width:39px;height:39px;margin-top:-8px}
+}
