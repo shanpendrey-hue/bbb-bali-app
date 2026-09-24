@@ -77,3 +77,27 @@
   .drink-basket-btn.has-items{position:fixed;right:18px;bottom:96px;top:auto;z-index:49;background:rgba(255,253,248,.97);color:var(--brown);border-color:rgba(107,78,61,.38);box-shadow:0 14px 34px rgba(58,43,36,.20)}
   .drink-basket-label{font-size:11px}
 }
+
+/* B.B.B cocktail order status + clear-order polish */
+.add-drink-btn.added{background:rgba(255,253,248,.96)!important;color:var(--olive)!important;border:1.5px solid rgba(85,107,63,.55)!important;box-shadow:none!important;gap:9px;min-height:46px;padding:10px 16px}
+.add-drink-btn.added:hover{transform:none}
+.order-check{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;background:var(--olive);color:#fff;font-size:14px;font-weight:800;line-height:1;flex:none}
+.add-drink-btn.added span:last-child{font-size:12px;letter-spacing:.08em;font-weight:800}
+
+.clear-drink-order{width:100%;min-height:60px;margin-top:22px;border:2px solid var(--brown);border-radius:999px;background:#fffaf2;color:var(--brown);display:flex;align-items:center;justify-content:center;gap:10px;font:inherit;font-weight:800;letter-spacing:.08em;cursor:pointer;box-shadow:0 9px 22px rgba(107,78,61,.08)}
+.clear-order-symbol{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(107,78,61,.10);font-size:20px;line-height:1}
+.clear-attention{animation:clearOrderPulse 1.05s ease-in-out 2}
+@keyframes clearOrderPulse{0%,100%{box-shadow:0 9px 22px rgba(107,78,61,.08);transform:scale(1)}50%{box-shadow:0 0 0 6px rgba(217,184,156,.22),0 12px 28px rgba(107,78,61,.13);transform:scale(1.018)}}
+
+.clear-order-confirm{margin-top:22px;padding:22px;border:1px solid var(--line);border-radius:22px;background:#fffaf2;text-align:center}
+.clear-order-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:0 auto 10px;background:rgba(107,78,61,.10);color:var(--brown);font-size:24px}
+.clear-order-confirm h3{margin:0 0 7px;font-size:28px}
+.clear-order-confirm p{margin:0;color:var(--muted)}
+.clear-order-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.clear-confirm-btn{background:var(--brown);color:#fff}
+
+@media(max-width:430px){
+  .add-drink-btn.added{padding:9px 14px;gap:7px}
+  .add-drink-btn.added span:last-child{font-size:11px}
+  .clear-order-actions{grid-template-columns:1fr}
+}
