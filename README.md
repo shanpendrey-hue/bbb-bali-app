@@ -1,83 +1,61 @@
-# Nicolle's 50th — The Big Bali Bash
+# Nicolle's 50th · Bali 2027 — App v2
 
-A mobile-first PWA for the January 2027 Bali birthday trip.
+This is the rebuilt mobile-first PWA for Nicolle's 50th.
 
 ## Included now
+- Official BBB colour palette: Olive #556B3F, Nude #D9B89C, Cream #F7F1E6, Brown #6B4E3D.
+- Cormorant Garamond + Montserrat hierarchy, with restrained editorial styling.
+- Guest-facing Big Bali Bash page only: final itinerary, mystery games wording, cocktail menu, live drink-order test via WhatsApp, catered menu placeholders.
+- Sunday 24 Jan sunset RSVP.
+- Separate Great Aussie Recovery visual identity and booking section.
+- Pizza cart, float cart, massage booking with 2 bookings per 90-minute block.
+- Cancel, reschedule and refund-request controls in My Plans.
+- Guest profile: name, 4-digit PIN, profile image.
+- Bali Ready checklist + document/QR uploads stored locally on the device for this demo.
+- Flight details, sharing, airline links and Add to Calendar.
+- Live Seminyak weather (Open-Meteo), AUD/IDR converter (Frankfurter), Find Near Me via Google Maps.
+- Bali guide accordions and essential app links.
+- Browser notification permission + milestone reminders while the PWA/browser is active.
+- Installable PWA/offline cache.
 
-- BBB branded home screen and countdown
-- Chandra Villas details + one-tap maps/call/copy address
-- 24 Jan: Beanbags, Beers & Sunset RSVP
-- 25 Jan: Big Bali Bash guest page, current food menu, cocktails, games
-- 26 Jan: separate Great Aussie Recovery mini-brand
-- Australia Day cart with pizza, massage reservations and float hire
-- Get Float Bali catalogue sample with real supplier imagery
-- Guest profile: name + 4 digit PIN + photo upload
-- My Plans + Bali Ready checklist saved on-device
-- Live Seminyak weather using Open-Meteo (no API key)
-- Live AUD/IDR exchange converter using open.er-api.com (no API key)
-- Find-near-me shortcuts for pharmacy, ATM, clinic, supermarket, money changer etc.
-- Essential app/logo cards (Gojek, Grab, Bluebird, WhatsApp, Wise, Google Translate)
-- Condensed Bali Bearings information in expandable sections
-- Official visa / All Indonesia / tourist levy / Smartraveller links and walkthrough videos
-- Installable PWA + offline app shell
-- Stripe Checkout serverless endpoint ready for Vercel
+## Important production upgrades still required
+This demo is intentionally usable without accounts or paid infrastructure, but the following features need a shared backend before guests rely on them:
 
-## Important before live payments
+1. **Shared bookings / inventory**
+   - Right now massage inventory is local to one device.
+   - To guarantee that a slot cannot be double-booked across guests, connect Supabase/Firebase/another database.
 
-### 1. Choose ONE Stripe settlement currency
-Stripe Checkout Sessions cannot contain mixed-currency line items. At the moment:
-- Pizza working price is IDR 249,000 pp
-- Float working guest price is shown from AUD $8/day
+2. **Private travel-wallet storage**
+   - Demo uploads are stored on each person's device.
+   - Production should use private authenticated object storage. Do not store passport/visa documents in public GitHub/Vercel assets.
 
-Before launch, choose whether the paid cart should charge everything in AUD or everything in IDR. Update the prices/currency in `app.js` accordingly.
+3. **Email receipts / refund emails**
+   - Connect Resend/Postmark/SendGrid or similar.
+   - Stripe can also send payment receipts.
 
-### 2. Add Stripe to Vercel
-Create your Stripe account, then in Vercel add:
+4. **Background push notifications**
+   - Browser notifications work in-session now.
+   - Reliable scheduled push when the app is closed requires a push service/backend (e.g. Firebase Cloud Messaging or Web Push + scheduled jobs).
 
-`STRIPE_SECRET_KEY=sk_live_...` (or `sk_test_...` while testing)
+5. **WhatsApp automatic staff messages**
+   - Current test opens WhatsApp to +61 432 095 292 with the guest's order text prefilled.
+   - Automatic messages and sending the guest profile image require WhatsApp Business Cloud API / approved provider and secure backend credentials.
 
-Never put the secret key in `app.js` or GitHub.
+6. **Stripe**
+   - Checkout code is included but `CONFIG.stripe` in `app.js` is `false` by default.
+   - Add `STRIPE_SECRET_KEY` in Vercel Environment Variables.
+   - Lock final prices and decide on a single checkout currency strategy before enabling payments. The current API only whitelists the pizza test item.
+   - Refund actions require an authenticated admin endpoint before production.
 
-The current checkout sends paid items to Stripe. Massage and RSVP selections are included as metadata but are not charged.
+## Upload to GitHub
+Replace your existing app files with everything in this folder, but **do not delete the `.git` folder** in your existing repo.
 
-## Shared bookings / admin dashboard
-The current build saves guest profile, checklist, cart and My Plans in that guest's browser (`localStorage`). This is perfect for the visual build and testing, but it is NOT yet a shared booking database.
+Then in GitHub Desktop:
+1. Review changed files.
+2. Commit to `main`.
+3. Push origin.
+4. Vercel will redeploy automatically.
 
-Before launch, connect a database (Supabase/Firebase are suitable) so:
-- massage time slots cannot be double-booked across different phones
-- Nicolle/Shannon can see all RSVPs and bookings in one admin dashboard
-- guests can restore plans on another device
-- paid Stripe bookings can be reconciled automatically via webhook
-
-The UI has already been designed for this workflow.
-
-## Content still to lock
-
-- Final Sunday 24 beach location / beanbag supplier details
-- Final 25 Jan guest timetable
-- Final food/menu status if it changes
-- Current pharmacy-delivery WhatsApp number
-- Current doctor-to-villa WhatsApp number
-- Preferred clinic/hospital
-- Final float inventory and guest prices
-- Final Stripe checkout currency
-- Therapist capacity / time-slot rules
-- Any shared photo album link
-- Any host/admin contacts you want shown
-
-## Deploy
-
-1. Upload all files/folders in this project to the root of the GitHub repository.
-2. Make sure `api/create-checkout-session.js` stays inside the `api` folder.
-3. Import the GitHub repository into Vercel.
-4. Deploy.
-5. Add Stripe environment variable later when ready.
-
-## Branding
-
-The CSS uses:
-- Cormorant Garamond — headings
-- Montserrat — supporting text
-- `Brittany Signature` if available, falling back to Allura for script text
-
-The app does not distribute the Brittany font file. If you hold a web licence for it, you can add your licensed font privately later.
+## Test WhatsApp number
+Cocktail orders currently open WhatsApp to: **+61 432 095 292**.
+The guest's profile photo remains visible in the app only; a normal `wa.me` link cannot automatically attach that image.

@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="118" fill="#f4eee4"/>
-<circle cx="256" cy="256" r="170" fill="none" stroke="#77734f" stroke-width="10"/>
-<text x="256" y="215" text-anchor="middle" font-size="62" font-family="serif" fill="#3e3029">NICOLLE'S</text>
-<text x="256" y="292" text-anchor="middle" font-size="88" font-family="serif" font-weight="700" fill="#3e3029">BBB</text>
-<text x="256" y="338" text-anchor="middle" font-size="32" font-family="sans-serif" letter-spacing="7" fill="#77734f">BALI 2027</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#F7F1E6"/><circle cx="256" cy="256" r="174" fill="none" stroke="#6B4E3D" stroke-width="10"/><text x="256" y="245" text-anchor="middle" font-family="Georgia,serif" font-size="84" fill="#6B4E3D">B.B.B</text><text x="256" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" letter-spacing="7" fill="#556B3F">BALI 2027</text></svg>
