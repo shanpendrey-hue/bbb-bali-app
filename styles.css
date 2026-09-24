@@ -8,7 +8,7 @@ button,input,select{font:inherit}button,a{-webkit-tap-highlight-color:transparen
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 26px}.brand-mini{display:flex;align-items:center;gap:12px}.stamp{width:54px;height:54px;border:1.5px solid var(--brown);border-radius:50%;display:grid;place-items:center;font-family:'Cormorant Garamond';font-size:22px}.brand-copy{display:flex;flex-direction:column}.brand-copy strong{font-family:'Cormorant Garamond';font-size:27px;line-height:1}.brand-copy span{font-size:12px;letter-spacing:.16em;margin-top:5px;color:var(--brown)}
 .navbar{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(calc(100% - 24px),760px);background:#3a2a22;border-radius:30px;padding:9px;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 14px 38px rgba(0,0,0,.2)}.navitem{border:0;background:transparent;color:#f8f0e7;border-radius:22px;min-height:68px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;font-size:12px;cursor:pointer}.navitem .ico{font-size:23px;line-height:1}.navitem.active{background:#fff;color:var(--ink)}
 .hero,.bbb-hero,.pagehead,.card{background:rgba(255,252,247,.94);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.hero{position:relative;overflow:hidden;padding:42px 34px}.hero:before,.hero:after,.bbb-home-card:before{content:"";position:absolute;border-radius:50%;pointer-events:none}.hero:before{width:270px;height:380px;background:#ead6c3;right:-120px;top:-120px}.hero:after{width:240px;height:240px;background:#e3e3d1;right:-100px;bottom:-90px}.eyebrow,.meta{font-size:13px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--olive)}h1,h2,h3,h4{margin:0;font-family:'Cormorant Garamond',serif}h1{font-size:clamp(54px,13vw,88px);line-height:.88}h2{font-size:clamp(40px,10vw,62px);line-height:.95}h3{font-size:32px;line-height:1.04}.bbbline{font-weight:700;letter-spacing:.2em;margin:12px 0}.script{font-family:Allura,cursive;color:var(--brown);font-size:clamp(38px,8vw,58px);line-height:1}.hero-actions,.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.btn,.aus-btn{border:0;border-radius:999px;min-height:52px;padding:0 22px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700;cursor:pointer;white-space:nowrap}.btn{background:var(--brown);color:#fff}.btn.olive{background:var(--olive)}.btn.light{background:#fffaf1;color:var(--brown);border:1px solid var(--line)}.btn.outline{background:transparent;color:var(--brown);border:1.5px solid var(--brown)}.btn.full{width:100%}.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}.count{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:20px;padding:14px 8px;text-align:center}.count b{font-family:'Cormorant Garamond';font-size:30px}.count span{display:block;margin-top:4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.section{margin-top:34px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-title{font-size:48px}.section-sub,p{color:var(--muted);line-height:1.65}.grid{display:grid;gap:18px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:28px}.card p{margin:14px 0 0}.card h3{margin-top:8px}.event-card{min-height:300px;position:relative;overflow:hidden}.bbb-home-card{background:linear-gradient(135deg,#fffaf2 0%,#f1ddc9 100%);min-height:390px;padding:34px;display:flex;flex-direction:column;justify-content:center}.bbb-home-card:before{width:230px;height:230px;background:rgba(85,107,63,.09);right:-80px;bottom:-80px}.bbb-home-card .bbbmark{font-size:96px}.bbb-home-card .submark{font-size:15px}.bbb-home-card .script{font-size:48px}.bbbmark{font-family:'Cormorant Garamond';font-size:clamp(80px,20vw,150px);line-height:.8;color:var(--brown)}.submark{letter-spacing:.28em;font-weight:700;margin-top:18px}.bbb-hero{padding:52px 26px;text-align:center;background:radial-gradient(circle at 20% 20%,rgba(85,107,63,.08),transparent 32%),linear-gradient(145deg,#fffaf2,#eedac5)}
+.section{margin-top:34px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-title{font-size:48px}.section-sub,p{color:var(--muted);line-height:1.65}.grid{display:grid;gap:18px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:28px}.card p{margin:14px 0 0}.card h3{margin-top:8px}.event-card{min-height:300px;position:relative;overflow:hidden}.bbb-home-card{background:linear-gradient(135deg,#fffaf2 0%,#f1ddc9 100%);min-height:390px;padding:34px;display:flex;flex-direction:column;justify-content:center}.bbb-home-feature{border:3px solid var(--brown);box-shadow:0 18px 42px rgba(71,48,37,.18),inset 0 0 0 1px rgba(255,255,255,.72)}.bbb-home-feature .bbbmark{font-weight:700;letter-spacing:.02em}.bbb-home-feature .submark{font-weight:800}.bbb-home-feature .btn.olive{box-shadow:0 8px 18px rgba(85,107,63,.24)}.bbb-home-card:before{width:230px;height:230px;background:rgba(85,107,63,.09);right:-80px;bottom:-80px}.bbb-home-card .bbbmark{font-size:96px}.bbb-home-card .submark{font-size:15px}.bbb-home-card .script{font-size:48px}.bbbmark{font-family:'Cormorant Garamond';font-size:clamp(80px,20vw,150px);line-height:.8;color:var(--brown)}.submark{letter-spacing:.28em;font-weight:700;margin-top:18px}.bbb-hero{padding:52px 26px;text-align:center;background:radial-gradient(circle at 20% 20%,rgba(85,107,63,.08),transparent 32%),linear-gradient(145deg,#fffaf2,#eedac5)}
 .pillrow{display:grid;grid-template-columns:repeat(var(--pill-count,2),minmax(0,1fr));gap:10px;margin-top:20px}.pillrow .btn,.pillrow .aus-btn{width:100%;padding:0 12px;font-size:13px}.pillrow.one{--pill-count:1}.pillrow.two{--pill-count:2}.pillrow.three{--pill-count:3}
 .timeline{display:grid;gap:12px}.timeline-row{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;background:#fffdf8;border:1px solid var(--line);border-radius:22px;padding:20px}.timeline-row .time{font-family:'Cormorant Garamond';font-weight:700;font-size:25px;color:var(--olive);white-space:nowrap}.timeline-row h4{font-family:Montserrat;font-size:18px;text-transform:uppercase;letter-spacing:.02em}.timeline-row p{margin:6px 0 0}.timeline-row.mystery{background:#fffdf8;border-style:solid}
 .cocktail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.cocktail{background:#fffdf8;border:1px solid var(--line);border-radius:28px;overflow:hidden}.cocktail-art{height:220px;display:grid;place-items:center;background:linear-gradient(145deg,#f4e7d6,#fffaf2);font-size:92px;position:relative}.cocktail-art:after{content:"";position:absolute;inset:20px;border:1px solid rgba(107,78,61,.18);border-radius:50%}.cocktail-body{padding:24px}.cocktail-body h3{font-family:Montserrat;font-size:23px}.cocktail-body .type{font-family:'Cormorant Garamond';font-size:31px;color:var(--olive);margin-top:6px}.orderbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}.qty{display:flex;align-items:center;gap:12px}.qty button{width:42px;height:42px;border:1px solid var(--line);background:#fff;border-radius:50%;font-size:20px}.qty b{min-width:18px;text-align:center}
@@ -22,103 +22,3 @@ button,input,select{font:inherit}button,a{-webkit-tap-highlight-color:transparen
 .camera-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}.camera-actions .btn{width:100%}.status-badge{display:inline-flex;border-radius:999px;padding:7px 10px;font-size:11px;text-transform:uppercase;font-weight:700;letter-spacing:.08em;background:#eee6dc;color:var(--brown)}
 @media(max-width:720px){.grid.two,.cocktail-grid,.help-grid,.guide-grid,.pizza-grid,.productgrid{grid-template-columns:1fr}.hero{padding:34px 26px}.pagehead{padding:26px}.card{padding:24px}.timeline-row{grid-template-columns:112px 1fr;padding:18px 16px}.timeline-row .time{font-size:23px}.timeline-row h4{font-size:17px}.section-title{font-size:42px}.forecast{grid-template-columns:repeat(4,1fr)}.findgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.bbb-home-card{min-height:360px}.bbb-home-card .bbbmark{font-size:82px}.recovery-hero{padding:28px 24px}.recovery-title{font-size:50px}.toast{font-size:13px}.modal-card{padding:28px 22px}.modal-card h2{font-size:44px}.video-actions{grid-template-columns:1fr}.pillrow.three .btn,.pillrow.three .aus-btn{font-size:11px;padding:0 7px}.pillrow{gap:7px}.recovery-itinerary .timeline-row{grid-template-columns:112px 1fr}}
 @media(max-width:430px){.shell{padding-left:14px;padding-right:14px}.topbar{margin-bottom:18px}.brand-copy strong{font-size:23px}.stamp{width:48px;height:48px}.hero{padding:30px 22px}.countdown{gap:7px}.count{padding:12px 5px}.card{padding:22px}.pillrow.three{gap:6px}.pillrow.three .btn,.pillrow.three .aus-btn{font-size:10px;min-height:48px}.timeline-row{grid-template-columns:100px 1fr;gap:12px}.timeline-row .time{font-size:21px}.timeline-row h4{font-size:16px}.timeline-row p{font-size:14px}.orderbar{align-items:flex-end}.camera-actions{grid-template-columns:1fr 1fr}.recovery-itinerary .timeline-row{grid-template-columns:100px 1fr}.recovery-itinerary .timeline-row h4{font-size:15px}.navbar{width:calc(100% - 20px)}}
-
-
-/* v6.1 mobile/responsive hardening */
-html,body{max-width:100%;overflow-x:hidden}
-.shell,.hero,.card,.bbb-home-card,.recovery-hero,.pagehead,.modal-card,.timeline-row,.pillrow,.countdown,.grid>*{min-width:0;max-width:100%}
-.hero>*:not(:before):not(:after),.bbb-home-card>*{position:relative;z-index:1;min-width:0;max-width:100%}
-.eyebrow,.meta,.bbbline,.script,h1,h2,h3,h4,p{overflow-wrap:break-word;word-break:normal}
-.bbbline{max-width:100%;line-height:1.35}
-.countdown{width:100%;min-width:0}.count{min-width:0}.count b{font-size:clamp(24px,7vw,30px)}
-.modal{width:100%;max-width:100vw;overflow:hidden}.modal-card{box-sizing:border-box;overflow-x:hidden}.modal-card>*{min-width:0;max-width:100%}
-.modal-card p{white-space:normal}
-.sunset-photo{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:24px;margin:20px 0 18px}
-.pillrow .btn,.pillrow .aus-btn{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-
-@media(max-width:520px){
-  .hero{padding:28px 20px}
-  .hero .eyebrow{font-size:11px;letter-spacing:.12em;line-height:1.45}
-  .hero h1{font-size:clamp(50px,16vw,68px);line-height:.86}
-  .hero .bbbline{font-size:13px;letter-spacing:.12em;line-height:1.45;margin:12px 0 10px}
-  .hero .script{font-size:clamp(34px,10vw,46px);line-height:1.05}
-  .hero-actions{display:grid;grid-template-columns:1fr;gap:10px}
-  .hero-actions .btn{width:100%}
-  .countdown{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-  .count{padding:11px 3px;border-radius:17px}
-  .count b{font-size:clamp(22px,7vw,28px)}
-  .count span{font-size:8px;letter-spacing:.1em}
-  .bbb-home-card{padding:28px 24px;min-height:0}
-  .bbb-home-card .bbbmark{font-size:clamp(70px,24vw,92px)}
-  .bbb-home-card .submark{font-size:13px;letter-spacing:.18em;line-height:1.45}
-  .bbb-home-card .script{font-size:clamp(36px,11vw,48px);line-height:1.05}
-  .modal{padding:12px}
-  .modal-card{width:100%;max-height:calc(100dvh - 24px);padding:28px 20px;border-radius:30px}
-  .modal-card h2{font-size:clamp(42px,12vw,54px);line-height:.95}
-  .modal-card .eyebrow{font-size:11px;letter-spacing:.14em;line-height:1.4}
-  .modal-card p{font-size:16px;line-height:1.55}
-  .pillrow.three{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-  .pillrow.three .btn,.pillrow.three .aus-btn{min-height:48px;padding:0 6px;font-size:11px;line-height:1.1;white-space:nowrap}
-}
-
-@media(max-width:380px){
-  .pillrow.three .btn,.pillrow.three .aus-btn{font-size:10px;padding:0 4px}
-  .hero .bbbline{font-size:12px;letter-spacing:.09em}
-  .count span{font-size:7px}
-}
-
-/* v6.2 polish, spacing, cart, guide depth and mobile safety */
-:root{--space-1:8px;--space-2:12px;--space-3:16px;--space-4:22px;--space-5:30px;--space-6:40px}
-.topbar{min-width:0}.brand-mini{min-width:0}.brand-copy{min-width:0}.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}.cart-chip{border:1px solid var(--brown);background:var(--brown);color:#fff;border-radius:999px;min-height:48px;padding:0 16px;font-weight:700;white-space:nowrap;cursor:pointer}.profile-chip{min-height:48px;max-width:140px;overflow:hidden;text-overflow:ellipsis}.itinerary-sub{white-space:nowrap!important;overflow-wrap:normal!important}.section-head>div{min-width:0}.section-head .btn{flex:0 0 auto}
-
-/* Cocktail illustrations keep the original premium card structure, replacing clip-art. */
-.cocktail-art{height:236px;padding:14px;background:radial-gradient(circle at 50% 35%,#fffdf8 0,#f6eadb 60%,#f0dfcb 100%)}
-.cocktail-art:after{inset:22px;border-color:rgba(107,78,61,.14)}.cocktail-art svg{position:relative;z-index:1;width:min(86%,390px);height:210px;display:block}.cocktail-body{padding:26px}.cocktail-body p{min-height:78px}.orderbar{margin-top:24px}.orderbar .btn{min-width:150px}
-
-/* Driver artwork */
-.driver-art{height:auto;min-height:250px;padding:18px;background:linear-gradient(180deg,#e8f4f6 0 58%,#dfd0bd 58% 100%);border:1px solid #d8c9b8}.driver-art svg{width:100%;height:auto;max-width:620px}
-
-/* Currency formatting */
-.money-input input{text-align:left;min-width:0}.money-input span{padding-left:10px;flex:0 0 auto}.fx-rate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* Full Bali guide pages */
-.guide-head{margin-bottom:26px}.guide-content{padding:32px}.guide-content h3{font-size:22px;margin:34px 0 10px;color:var(--ink)}.guide-content h3:first-child{margin-top:0}.guide-content p{margin:8px 0 0}.guide-content ul{margin:8px 0 0;padding-left:22px}.guide-content li{padding-left:3px}.learn-more{padding:28px}.learn-more h3{margin-top:8px}.link-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}.link-grid .btn{width:100%;min-width:0;padding:0 12px;white-space:normal;line-height:1.2;text-align:center}.guide-back{margin-top:24px;margin-bottom:18px}.guide-back .btn{min-width:210px}
-
-/* Travel-card modal spacing */
-.travel-card-modal>h2{margin-top:8px;margin-bottom:26px}.travel-card-modal>.grid{gap:18px}.travel-card-modal .card{padding:26px}.travel-card-modal .card h3{margin-top:0}.travel-card-modal .card p{margin:14px 0 20px}.travel-card-modal .card .btn{margin-top:2px}.travel-card-close{margin-top:24px}
-
-/* Massage and forms spacing */
-.modal-card>.eyebrow+h2{margin-top:8px}.modal-card h2+p{margin-top:20px;margin-bottom:26px}.modal-card .field+.field{margin-top:8px}.modal-card .field label{margin-bottom:2px}.modal-card select{padding-right:46px;text-overflow:ellipsis}.slotgrid{gap:12px;margin-top:4px}.slot{padding:18px 16px;min-height:92px}.slot b{font-size:18px}.modal-card .slotgrid+.pillrow,.modal-card .field+.pillrow{margin-top:26px}.modal-card>.pillrow:last-child{margin-bottom:2px}
-
-/* Home/event card spacing */
-.bbb-home-card{gap:0}.bbb-home-card .meta{margin-bottom:26px}.bbb-home-card .bbbmark{margin-bottom:18px}.bbb-home-card .submark{margin-top:0;margin-bottom:20px}.bbb-home-card .script{margin:0 0 20px}.bbb-home-card p{margin:0 0 4px}.bbb-home-card .pillrow{margin-top:24px}.recovery.card .meta{margin-bottom:20px}.recovery.card h3{margin-top:0;margin-bottom:18px}.recovery.card p{margin-top:0}.section+.section{margin-top:38px}
-
-/* Checkout page */
-.checkout-card{max-width:720px;margin:0 auto}.cart-line{display:flex;justify-content:space-between;gap:18px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:24px}.cart-line strong{font-size:22px}.payment-note{margin:24px 0;padding:22px;border-radius:22px;background:#f3eadf;border:1px solid var(--line)}.payment-note p{margin:10px 0 0;color:var(--ink)}.stripe-pay{min-height:58px;font-size:17px}.checkout-fine{font-size:13px;margin:14px 0 20px}.checkout-card>.btn+.checkout-fine{margin-top:14px}
-
-/* Keep all content inside the mobile viewport. */
-.card,.pagehead,.hero,.bbb-hero,.recovery-hero,.cocktail,.modal-card,.guide-btn,.find-btn{overflow:hidden}.card h3,.card p,.pagehead h1,.pagehead p,.modal-card h2,.modal-card p{max-width:100%}.pillrow{align-items:stretch}.pillrow .btn,.pillrow .aus-btn{height:100%;min-height:52px}.plan>div{min-width:0}
-
-@media(max-width:720px){
-  .link-grid{grid-template-columns:1fr}.guide-content{padding:26px}.learn-more{padding:24px}
-  .cocktail-body p{min-height:0}.cocktail-art{height:220px}.cocktail-art svg{height:195px}
-  .travel-card-modal .card{padding:24px}
-}
-@media(max-width:520px){
-  .topbar{gap:8px;align-items:center}.brand-mini{gap:9px}.stamp{flex:0 0 auto}.header-actions{gap:6px}.cart-chip{min-height:44px;padding:0 11px;font-size:11px}.profile-chip{min-height:44px;padding:0 12px;font-size:12px;max-width:94px}
-  .section-head{align-items:flex-start}.section-head .btn{margin-top:2px}.itinerary-sub{font-size:14px;letter-spacing:-.01em}
-  .timeline-row{grid-template-columns:92px minmax(0,1fr);gap:14px;padding:20px 16px}.timeline-row .time{font-size:20px}.timeline-row h4{font-size:15px;line-height:1.25}.timeline-row p{font-size:14px;line-height:1.55}
-  .cocktail{border-radius:26px}.cocktail-art{height:205px}.cocktail-art svg{height:180px}.cocktail-body{padding:24px 22px}.cocktail-body h3{font-size:22px}.cocktail-body .type{font-size:30px}.orderbar{gap:10px}.orderbar .btn{min-width:0;padding:0 16px}.qty{gap:9px}.qty button{width:44px;height:44px}
-  .driver-art{min-height:210px;padding:10px}
-  .modal-card{padding:30px 22px}.modal-card h2+p{margin-top:18px;margin-bottom:24px}.slot{min-height:88px;padding:16px 14px}.slot b{font-size:17px}.modal-card .pillrow.two{gap:10px}.modal-card .pillrow.two .aus-btn{font-size:12px;padding:0 9px}
-  .travel-card-modal>h2{margin-bottom:22px}.travel-card-modal .grid{gap:16px}.travel-card-close{margin-top:22px}
-  .guide-content{padding:24px 22px}.guide-content h3{font-size:20px;margin-top:30px}.guide-content ul{padding-left:20px}.learn-more{padding:22px}
-  .checkout-card{padding:24px 22px}.payment-note{padding:18px}.cart-line{font-size:14px}.cart-line strong{font-size:19px}
-}
-@media(max-width:390px){
-  .brand-copy strong{font-size:20px}.brand-copy span{font-size:9px}.stamp{width:44px;height:44px;font-size:19px}.profile-chip{max-width:78px;padding:0 9px}.cart-chip{padding:0 9px}
-  .itinerary-sub{font-size:13px}.section-head{gap:8px}.section-head .btn{padding:0 13px;font-size:12px}
-  .timeline-row{grid-template-columns:82px minmax(0,1fr);gap:11px}.timeline-row .time{font-size:18px}.timeline-row h4{font-size:14px}.timeline-row p{font-size:13px}
-  .modal-card .pillrow.two .aus-btn{font-size:11px}
-}
-.itinerary-heading{margin-bottom:4px}.itinerary-heading+.itinerary-sub{margin:0 0 18px;display:block;width:100%}
