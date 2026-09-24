@@ -432,3 +432,14 @@ body.guide-active .guide-end{padding:14px 0 10px}
   .recovery-itinerary-item{grid-template-columns:74px 14px 1fr!important;gap:8px!important}.recovery-itinerary-timeline:before{left:88px}.recovery-itinerary-item .time{font-size:11px!important}.recovery-itinerary-signoff{margin-left:97px}
   .recovery-plan-actions{display:grid;grid-template-columns:1fr 1fr}.recovery-plan-actions .recovery-cancel-link{grid-column:1/-1}
 }
+
+/* Recovery refinements v3 */
+.recovery-itinerary-timeline{padding-bottom:6px}
+.recovery-itinerary-item{padding:14px 0!important}
+.recovery-floating-cart{bottom:132px;animation:recoveryCartPulse 2.6s ease-in-out infinite}
+.recovery-floating-cart.cart-pop{animation:recoveryCartPop .46s ease,recoveryCartPulse 2.6s ease-in-out .46s infinite}
+@keyframes recoveryCartPulse{0%,72%,100%{transform:scale(1);box-shadow:0 12px 28px rgba(94,56,38,.24)}82%{transform:scale(1.045);box-shadow:0 14px 34px rgba(201,67,47,.34)}90%{transform:scale(1);box-shadow:0 12px 28px rgba(94,56,38,.24)}}
+@media (prefers-reduced-motion:reduce){.recovery-floating-cart{animation:none!important}}
+.massage-plan-card{margin-bottom:14px!important;padding:24px!important}.massage-plan-card h3{margin:7px 0 12px!important}.massage-plan-details{display:grid;gap:4px;margin-bottom:20px}.massage-plan-details b{font-size:14px;line-height:1.45;color:var(--ink)}.massage-plan-details span{font-size:14px;color:var(--muted)}.massage-plan-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.massage-plan-actions .btn{width:100%;min-height:50px;padding:12px 16px!important;text-align:center;justify-content:center}.massage-cancel-btn{color:#9a5547!important}
+@media(max-width:760px){.recovery-floating-cart{bottom:124px}.massage-plan-actions{gap:10px}.massage-plan-actions .btn{font-size:12px!important;padding:11px 10px!important}}
+@media(max-width:390px){.massage-plan-actions{grid-template-columns:1fr}.massage-plan-actions .btn{min-height:48px}}
