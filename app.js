@@ -145,9 +145,14 @@ const GUIDE=[
 function persist(){db.set('bbb_profile',state.profile);db.set('bbb_plans',state.plans);db.set('bbb_check',state.checklist);db.set('bbb_flight',state.flight);db.set('bbb_cart',state.cart);db.set('bbb_drink_cart',state.drinkCart);db.set('bbb_drink_orders',state.drinkOrders);db.set('bbb_bookings',state.bookings);db.set('bbb_airport_pickup',state.airportPickup)}
 function money(n,c='IDR'){return c==='AUD'?`$${Number(n).toFixed(2)}`:`Rp${Math.round(n).toLocaleString('id-ID')}`}
 function toast(msg){const el=qs('#toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
-function navigate(route){state.route=route;state.modal=null;state.cartOpen=false;state.drinkCartOpen=false;location.hash='#/'+route;window.scrollTo({top:0,behavior:'instant'});render()}
+state.scrollPositions=state.scrollPositions||{};
+function rememberScroll(route=state.route){if(route)state.scrollPositions[route]=window.scrollY||document.documentElement.scrollTop||0}
+function setRouteScroll(route,restore=false){requestAnimationFrame(()=>requestAnimationFrame(()=>{const y=restore?(state.scrollPositions[route]||0):0;window.scrollTo({top:y,behavior:'instant'})}))}
+function navigate(route,opts={}){rememberScroll();state.route=route;state.modal=null;state.cartOpen=false;state.drinkCartOpen=false;location.hash='#/'+route;render();setRouteScroll(route,!!opts.restore)}
+function navigateBack(route){navigate(route,{restore:true})}
 window.go=navigate;
-window.addEventListener('hashchange',()=>{state.route=location.hash.replace('#/','')||'home';render()});
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+window.addEventListener('hashchange',()=>{const next=location.hash.replace('#/','')||'home';if(next===state.route)return;rememberScroll();state.route=next;render();setRouteScroll(next,true)});
 
 function renderHeader(){return `<header class="topbar"><div class="brand-mini"><div class="stamp stamp-logo"><img src="${BBB_SECONDARY_LOGO}" alt="Nicolle's 50th B.B.B Bali 2027 logo"></div><div class="brand-copy"><strong>Nicolle's 50th</strong><span>BALI 2027</span></div></div><button class="btn light" data-action="nav" data-route="profile">${escapeHtml(state.profile?.name||'Guest profile')}</button></header>`}
 function renderNav(){const items=[['home','⌂','Home'],['bbb','🎂','B.B.B'],['travel','✈','Travel'],['bali','☀','Bali'],['profile','☺','Me']];return `<nav class="navbar" aria-label="Main navigation">${items.map(([r,icon,label])=>{const active=state.route===r||(r==='bali'&&state.route.startsWith('guide-'));return `<button class="navitem ${active?'active':''}" data-action="nav" data-route="${r}"><span class="ico">${icon}</span><span>${label}</span></button>`}).join('')}</nav>`}
@@ -214,12 +219,13 @@ function baliView(){return page(`
 
 function guideAction(label,attrs='',kind='primary'){return `<button class="guide-action ${kind}" ${attrs}>${label}</button>`}
 function guideLink(label,url,kind='secondary'){return `<a class="guide-action ${kind}" href="${url}" target="_blank" rel="noopener">${label}</a>`}
-function guideStoreButtons(apple,play){return `<div class="guide-store-row"><a class="store-btn" href="${apple}" target="_blank" rel="noopener"><span class="store-icon"></span><span><small>Download on the</small>App Store</span></a><a class="store-btn" href="${play}" target="_blank" rel="noopener"><span class="store-icon">▶</span><span><small>GET IT ON</small>Google Play</span></a></div>`}
+function storeMark(type){if(type==='apple')return `<span class="store-mark appstore-mark" aria-hidden="true"><span class="appstore-a">A</span></span>`;return `<span class="store-mark playstore-mark" aria-hidden="true"><svg viewBox="0 0 40 40" role="img"><path fill="#00d26a" d="M6 4.7v30.6L22.7 20z"/><path fill="#00a8ff" d="M6.8 4.2 25.4 15l-2.7 5L6 4.7z"/><path fill="#ffd23f" d="m22.7 20 2.7 5L6.8 35.8 6 35.3z"/><path fill="#ff4b55" d="M25.4 15 34 19.2c1.2.6 1.2 1.1 0 1.7L25.4 25l-2.7-5z"/></svg></span>`}
+function guideStoreButtons(apple,play){return `<div class="guide-store-row"><a class="store-btn" href="${apple}" target="_blank" rel="noopener">${storeMark('apple')}<span class="store-copy"><small>Download on the</small>App Store</span></a><a class="store-btn" href="${play}" target="_blank" rel="noopener">${storeMark('play')}<span class="store-copy"><small>GET IT ON</small>Google Play</span></a></div>`}
 function guideCall(label,number,note=''){return `<a class="guide-contact" href="tel:${number}"><span class="guide-contact-icon">☎</span><span><b>${label}</b>${note?`<small>${note}</small>`:''}</span><strong>Call →</strong></a>`}
 function guideWhatsApp(label,number,note=''){return `<a class="guide-contact whatsapp" href="https://wa.me/${number}" target="_blank" rel="noopener"><span class="guide-contact-icon">◉</span><span><b>${label}</b>${note?`<small>${note}</small>`:''}</span><strong>WhatsApp →</strong></a>`}
 function guideNearby(label,query){return `<button class="guide-contact" data-action="near" data-query="${escapeAttr(query)}"><span class="guide-contact-icon">⌖</span><span><b>${label}</b><small>Search around your current location</small></span><strong>Find →</strong></button>`}
 function guideBlock(kicker,title,body,extra=''){return `<section class="guide-block"><div class="guide-kicker">${kicker}</div><h2>${title}</h2>${body}${extra}</section>`}
-function guideIntro(title,sub){return `<section class="guide-pagehead"><button class="guide-back" data-action="nav" data-route="bali">← Bali Guide</button><div class="eyebrow">Bali Bearings · B.B.B Edition</div><h1>${title}</h1><p>${sub}</p></section>`}
+function guideIntro(title,sub){return `<section class="guide-pagehead"><button class="guide-back" data-action="nav-back" data-route="bali">← Bali Guide</button><div class="eyebrow">Bali Bearings · B.B.B Edition</div><h1>${title}</h1><p>${sub}</p></section>`}
 function guideNote(title,text){return `<div class="guide-note"><b>${title}</b><p>${text}</p></div>`}
 function guideBullets(items){return `<ul class="guide-list">${items.map(x=>`<li>${x}</li>`).join('')}</ul>`}
 function transportBrand(name,cls,desc,best,apple,play){return `<article class="transport-app"><div class="transport-brand ${cls}">${name}</div><p>${desc}</p><div class="transport-best"><span>BEST FOR</span><b>${best}</b></div>${guideStoreButtons(apple,play)}</article>`}
@@ -291,7 +297,7 @@ function guidePageContent(slug){
  ${guideNote('Final B.B.B tip','Do the practical bits early, then enjoy your last hours in Bali. The airport run is not the moment to test how accurate Google Maps can be in Seminyak traffic.')}`;
  return `<section class="guide-block"><h2>Guide unavailable</h2><p>Please return to the Bali Guide.</p></section>`;
 }
-function guideView(slug){const g=GUIDE.find(x=>x.slug===slug);if(!g)return baliView();return page(`${guideIntro(g.title,g.desc)}<main class="guide-body">${guidePageContent(slug)}</main><section class="guide-end"><button class="guide-back-bottom" data-action="nav" data-route="bali">← Back to Bali Guide</button></section>`)}
+function guideView(slug){const g=GUIDE.find(x=>x.slug===slug);if(!g)return baliView();return page(`${guideIntro(g.title,g.desc)}<main class="guide-body">${guidePageContent(slug)}</main><section class="guide-end"><button class="guide-back-bottom" data-action="nav-back" data-route="bali">← Back to Bali Guide</button></section>`)}
 
 function profileView(){const pickup=state.airportPickup;return page(`
 <section class="pagehead"><div class="eyebrow">Your space</div><h1>My Profile</h1><p>Your profile, bookings and trip plans.</p></section>
@@ -457,6 +463,7 @@ function escapeAttr(v=''){return escapeHtml(v)}
 
 function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action;
  if(a==='nav')navigate(el.dataset.route);
+ else if(a==='nav-back')navigateBack(el.dataset.route);
  else if(a==='modal')openModal(el.dataset.modal);
  else if(a==='close-modal')closeModal();
  else if(a==='calendar')addCalendar(el.dataset.title,el.dataset.start,el.dataset.duration);
