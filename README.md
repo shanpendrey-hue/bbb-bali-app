@@ -59,3 +59,11 @@ Then in GitHub Desktop:
 ## Test WhatsApp number
 Cocktail orders currently open WhatsApp to: **+61 432 095 292**.
 The guest's profile photo remains visible in the app only; a normal `wa.me` link cannot automatically attach that image.
+
+## v3 changes
+- Rebuilt BBB pages from the brand system instead of displaying brand-board images.
+- Added imagery to cocktail cards and updated Mini Beers copy.
+- Great Aussie Recovery uses the supplied final hero artwork and opens itinerary, pizza, massage and float experiences separately.
+- Massage availability expanded to six 90-minute blocks (10:00 AM–5:30 PM), four places per block.
+- Added Triple J live link, Spotify playlist, Dr Ari, Mobile Medicine, Laundry Bali Express, Travel Card Options (Wise + Revolut), sunset event detail imagery, and photo-upload UI.
+- Shared photo storage, shared booking capacity, automated email receipts/refunds and true push notifications still require the production backend/services described below.
