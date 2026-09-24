@@ -201,3 +201,18 @@
 .store-copy{display:grid;font-size:11px;line-height:1.05;font-weight:700;min-width:0}
 .store-copy small{font-size:7px;letter-spacing:.04em;font-weight:600;opacity:.82;margin-bottom:2px}
 @media(max-width:390px){.store-mark{width:26px;height:26px;flex-basis:26px}.store-btn{min-height:49px}}
+
+/* Bali Guide feedback polish: compact page endings + official store-logo images */
+body.guide-active #app{min-height:auto}
+body.guide-active .shell{padding-bottom:8px}
+body.guide-active .guide-body{padding-bottom:8px}
+body.guide-active .guide-end{padding:14px 0 10px}
+.store-mark{width:25px;height:25px;flex:0 0 25px;display:grid;place-items:center;overflow:hidden;border-radius:6px;background:#fff}
+.store-mark img{width:100%;height:100%;display:block;object-fit:cover}
+.store-btn{gap:10px}
+.store-copy{min-width:0}
+@media(max-width:640px){
+  body.guide-active .shell{padding-bottom:4px}
+  body.guide-active .guide-end{padding:12px 0 8px}
+  .store-mark{width:23px;height:23px;flex-basis:23px;border-radius:5px}
+}
