@@ -40,3 +40,8 @@
   .itinerary-head{display:block}
   .itinerary-head .itinerary-calendar{margin-top:18px;width:100%}
 }
+
+
+/* B.B.B itinerary spacing + cocktail order basket */
+.itinerary-head>div{display:grid;gap:10px}.itinerary-head .section-title{margin:0}.itinerary-head .section-sub{margin-top:0}.cocktail-head{align-items:flex-start}.drink-basket-btn{white-space:nowrap;position:sticky;top:14px;z-index:10}.drink-profile{display:flex;align-items:center;gap:14px;padding:14px 0 18px;border-bottom:1px solid var(--line)}.drink-profile-photo{width:58px;height:58px;border-radius:18px;background:#efe3d4;display:grid;place-items:center;overflow:hidden;font-size:24px;flex:none}.drink-profile-photo img{width:100%;height:100%;object-fit:cover}.drink-profile h3{margin:0;font-size:28px}.drink-cartline{display:flex;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}.drink-cartline small{display:block;color:var(--muted);margin-top:3px}.drink-cart-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.drink-cart-controls>button:not(.remove-drink){width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px}.remove-drink{border:0;background:transparent;color:var(--brown);font-weight:700;font-size:12px;text-decoration:underline;cursor:pointer}.drink-place-actions{margin-top:24px}
+@media(max-width:760px){.itinerary-head>div{gap:9px}.itinerary-head{gap:22px}.cocktail-head{display:grid;grid-template-columns:1fr;gap:16px}.drink-basket-btn{justify-self:start;top:10px}.drink-cartline{align-items:flex-start}.drink-cart-controls{max-width:150px}}
