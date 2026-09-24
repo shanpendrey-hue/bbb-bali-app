@@ -1,1 +1,6 @@
-{"name":"nicolle-bali-app","private":true,"version":"2.0.0","description":"Nicolle's 50th Bali event PWA","dependencies":{"stripe":"^18.5.0"}}
+{
+  "name":"bbb-bali-app",
+  "version":"5.0.0",
+  "private":true,
+  "description":"Nicolle's 50th — B.B.B Bali 2027 static PWA"
+}

@@ -1,30 +1,11 @@
-const CACHE='bbb-bali-v4-1';
-const ASSETS=['/','/index.html','/styles.css','/app.js','/manifest.json','/icon.svg','/assets/sunset-beanbags.png'];
-self.addEventListener('install',event=>{
-  self.skipWaiting();
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
-});
-self.addEventListener('activate',event=>{
-  event.waitUntil(Promise.all([
-    self.clients.claim(),
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
-  ]));
-});
+const CACHE='bbb-v5-20260924';
+const CORE=['/','/index.html','/styles.css?v=5.0.0','/app.js?v=5.0.0','/manifest.json','/icon.svg','/assets/sunset-beanbags.png'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
-  if(event.request.method!=='GET') return;
   const req=event.request;
-  event.respondWith(
-    fetch(req).then(res=>{
-      if(res && res.ok && new URL(req.url).origin===self.location.origin){
-        const copy=res.clone();
-        caches.open(CACHE).then(cache=>cache.put(req,copy));
-      }
-      return res;
-    }).catch(async()=>{
-      const cached=await caches.match(req);
-      if(cached) return cached;
-      if(req.mode==='navigate') return caches.match('/index.html');
-      return Response.error();
-    })
-  );
+  if(req.method!=='GET') return;
+  const url=new URL(req.url);
+  if(url.origin!==location.origin) return;
+  event.respondWith(fetch(req).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(req,copy));return res;}).catch(()=>caches.match(req).then(r=>r||caches.match('/index.html'))));
 });
