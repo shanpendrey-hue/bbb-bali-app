@@ -443,3 +443,13 @@ body.guide-active .guide-end{padding:14px 0 10px}
 .massage-plan-card{margin-bottom:14px!important;padding:24px!important}.massage-plan-card h3{margin:7px 0 12px!important}.massage-plan-details{display:grid;gap:4px;margin-bottom:20px}.massage-plan-details b{font-size:14px;line-height:1.45;color:var(--ink)}.massage-plan-details span{font-size:14px;color:var(--muted)}.massage-plan-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.massage-plan-actions .btn{width:100%;min-height:50px;padding:12px 16px!important;text-align:center;justify-content:center}.massage-cancel-btn{color:#9a5547!important}
 @media(max-width:760px){.recovery-floating-cart{bottom:124px}.massage-plan-actions{gap:10px}.massage-plan-actions .btn{font-size:12px!important;padding:11px 10px!important}}
 @media(max-width:390px){.massage-plan-actions{grid-template-columns:1fr}.massage-plan-actions .btn{min-height:48px}}
+
+/* Recovery refinement v4 */
+.recovery-stars{display:none!important}
+.recovery-cart-price{display:flex;flex-direction:column;align-items:flex-end;gap:12px;text-align:right}
+.recovery-remove{margin-top:2px;padding:8px 13px;border:1px solid rgba(154,85,71,.28);border-radius:999px;background:rgba(255,250,240,.82);text-decoration:none;line-height:1;white-space:nowrap}
+.massage-cancel-modal h2{margin:6px 0 14px;color:var(--aus-teal)}
+.massage-cancel-modal p{margin:0 0 12px;line-height:1.55;color:#6f685e}
+.massage-cancel-actions{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.massage-cancel-actions .aus-btn{width:100%;min-width:0;justify-content:center;text-align:center;padding-left:16px;padding-right:16px}
+@media(max-width:430px){.massage-cancel-actions{grid-template-columns:1fr}.recovery-cart-price{min-width:112px}}
