@@ -1,23 +1,17 @@
-# B.B.B Bali App v5
+# B.B.B Bali App — V5 Master
 
-Fresh static rebuild for Vercel/GitHub.
+This is the clean master build based on the exact V5 `app.js` and `styles.css` from the `Rebuild Bali app v5` branch, with only the three requested changes added:
 
-## Replace your project files
-Keep your existing `.git` folder and `.gitattributes` file. Replace the app files with the contents of this folder.
+1. The Home-page B.B.B birthday card is visually stronger while keeping its wording/layout intact.
+2. Camera Roll includes `Add a photo` plus `View photos`, using the shared Google Drive folder.
+3. Chandra Villas includes `Open in Maps`, `Website`, and `Call`.
 
-Expected files:
-- index.html
-- app.js
-- styles.css
-- manifest.json
-- sw.js
-- icon.svg
-- vercel.json
-- package.json
-- assets/sunset-beanbags.png
+## Important
 
-Then commit to `main` and Push origin in GitHub Desktop. Vercel should redeploy automatically.
+The app can open the device photo picker and then the Google Drive folder, but a browser cannot transfer the already-selected files directly into Google Drive without Google OAuth / Drive API integration. Guests still finish the upload inside Google Drive.
 
-## Notes
-- Stripe/payment, production email receipts, shared live booking capacity and scheduled push notifications still require backend services.
-- Shared photos currently open the supplied Google Drive folder.
+## GitHub / Vercel
+
+Keep your repository's `.git` folder. Replace the app files with this package, commit on your safe branch, push, then preview the Vercel deployment before merging into `main`.
+
+If your existing repository contains an `assets` folder (for example `assets/sunset-beanbags.png`), keep it. This package deliberately does not overwrite assets that were not supplied with the V5 source files.
