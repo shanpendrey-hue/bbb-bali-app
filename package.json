@@ -1,6 +1,6 @@
 {
   "name":"bbb-bali-app",
-  "version":"5.0.0",
+  "version":"6.0.0",
   "private":true,
-  "description":"Nicolle's 50th — B.B.B Bali 2027 static PWA"
+  "dependencies":{"stripe":"^17.7.0"}
 }
