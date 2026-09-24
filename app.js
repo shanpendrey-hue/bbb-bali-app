@@ -97,7 +97,7 @@ function money(n,c='IDR'){return c==='AUD'?`$${Number(n).toFixed(2)}`:`Rp${Math.
 function toast(msg){const el=qs('#toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
 function navigate(route){state.route=route;state.modal=null;state.cartOpen=false;state.drinkCartOpen=false;location.hash='#/'+route;window.scrollTo({top:0,behavior:'instant'});render()}
 window.go=navigate;
-window.addEventListener('hashchange',()=>{state.route=location.hash.replace('#/','')||'home';render()});
+window.addEventListener('hashchange',()=>{stopNicolleHomeShow();state.route=location.hash.replace('#/','')||'home';render()});
 
 function renderHeader(){return `<header class="topbar"><div class="brand-mini"><div class="stamp">B.B.B</div><div class="brand-copy"><strong>Nicolle's 50th</strong><span>BALI 2027</span></div></div><button class="btn light" data-action="nav" data-route="profile">${escapeHtml(state.profile?.name||'Guest profile')}</button></header>`}
 function renderNav(){const items=[['home','⌂','Home'],['bbb','♠','B.B.B'],['travel','✈','Travel'],['bali','☀','Bali'],['profile','☺','Me']];return `<nav class="navbar" aria-label="Main navigation">${items.map(([r,icon,label])=>`<button class="navitem ${state.route===r?'active':''}" data-action="nav" data-route="${r}"><span class="ico">${icon}</span><span>${label}</span></button>`).join('')}</nav>`}
@@ -168,7 +168,7 @@ function renderCart(){qsa('.drawer,.cart-overlay').forEach(x=>x.remove());if(!st
 
 function renderDrinkCart(){qsa('.drink-drawer,.drink-cart-overlay').forEach(x=>x.remove());if(!state.drinkCartOpen)return;const photo=state.profile.photo?`<img src="${state.profile.photo}" alt="${escapeAttr(state.profile.name||'Guest')} profile photo">`:'☺',total=state.drinkCart.reduce((n,x)=>n+x.qty,0);document.body.insertAdjacentHTML('beforeend',`<div class="overlay drink-cart-overlay" data-action="close-drink-cart"></div><aside class="drawer drink-drawer"><div class="section-head"><div><div class="eyebrow">B.B.B cocktails</div><h2 class="section-title">My Order</h2></div><button class="btn light" data-action="close-drink-cart">Close</button></div><div class="drink-profile"><div class="drink-profile-photo">${photo}</div><div><div class="meta">Ordering as</div><h3>${escapeHtml(state.profile.name||'Guest')}</h3></div></div>${state.drinkCart.length?state.drinkCart.map((x,i)=>`<div class="drink-cartline"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.type)}</small></div><div class="drink-cart-controls"><button data-action="drink-cart-qty" data-index="${i}" data-delta="-1">−</button><b>${x.qty}</b><button data-action="drink-cart-qty" data-index="${i}" data-delta="1">+</button><button class="remove-drink" data-action="remove-drink-cart" data-index="${i}">Remove</button></div></div>`).join(''):'<p>Your cocktail order is empty.</p>'}${state.drinkCart.length?`<div class="actions drink-place-actions"><button class="btn olive full" data-action="place-drink-order">Send order to the bar</button></div><p class="drink-order-note">Your order will open directly in WhatsApp to the B.B.B bartenders.</p>${state.drinkClearConfirm?`<div class="clear-order-confirm"><div class="clear-order-icon">↺</div><h3>Clear your order?</h3><p>This will remove all ${total} drink${total===1?'':'s'} from My Order.</p><div class="clear-order-actions"><button class="btn light" data-action="cancel-clear-drink-order">Keep order</button><button class="btn clear-confirm-btn" data-action="clear-drink-order">Yes, clear it</button></div></div>`:`<button class="clear-drink-order clear-attention" data-action="confirm-clear-drink-order"><span class="clear-order-symbol">↺</span><span>CLEAR MY ORDER</span></button>`}`:''}</aside>`) }
 
-function render(){const app=qs('#app');if(!app)return;try{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}renderModal();renderCart();renderDrinkCart()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
+function render(){const app=qs('#app');if(!app)return;try{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}renderModal();renderCart();renderDrinkCart();if(state.route==='home')scheduleNicolleHomeShow()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
 
 function openModal(type){state.modal=type;renderModal()}
 function closeModal(){state.modal=null;renderModal()}
@@ -212,16 +212,47 @@ Guest: ${name}
 Total drinks: ${total}`;state.drinkOrders.unshift({id:'o'+Date.now(),sentAt:new Date().toISOString(),items});state.drinkCart=[];state.drinkCartOpen=false;persist();renderDrinkCart();syncDrinkQuantities();toast('Order sent to the bar 🍸');window.location.href=`https://wa.me/${CFG.whatsappOrder}?text=${encodeURIComponent(msg)}`}
 
 
-let nicolleAudioCtx=null;
-function shouldShowNicolleIntro(){try{return state.route==='home'&&(new URLSearchParams(location.search).get('welcome')==='1'||!db.get('bbb_nicolle_intro_seen',false))}catch{return false}}
-function renderNicolleIntro(){
-  qsa('.nicolle-intro').forEach(x=>x.remove());
-  if(!shouldShowNicolleIntro())return;
-  document.body.insertAdjacentHTML('beforeend',`<div class="nicolle-intro" id="nicolleIntro" role="dialog" aria-label="Welcome to the B.B.B"><div class="nicolle-start-card"><div class="nicolle-start-kicker">NICOLLE'S 50TH · BALI 2027</div><div class="nicolle-start-title">Ready for the B.B.B?</div><button class="btn olive nicolle-start-btn" data-action="start-nicolle-intro">Tap to start the party 🥂</button></div><div class="nicolle-stage" aria-hidden="true"><img class="nicolle-character" id="nicolleCharacter" src="/assets/nicolle-walk-in.png" alt="Cartoon Nicolle"><div class="nicolle-bubble" id="nicolleBubble">Welcome to the B.B.B! 🥂</div><div class="nicolle-popper" id="nicollePopper">🎉</div><div class="nicolle-confetti" id="nicolleConfetti">${Array.from({length:18},(_,i)=>`<i style="--i:${i}"></i>`).join('')}</div></div></div>`)
+let nicolleHomeRun=0;
+function stopNicolleHomeShow(){
+  nicolleHomeRun++;
+  qsa('.nicolle-home-show').forEach(x=>x.remove());
 }
-function introSoundStart(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;nicolleAudioCtx=new AC();nicolleAudioCtx.resume?.();return nicolleAudioCtx}catch{return null}}
-function playNicollePartySound(){const ctx=nicolleAudioCtx;if(!ctx)return;const t=ctx.currentTime;const ping=(freq,at,dur=.08,type='triangle',vol=.055)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t+at);g.gain.setValueAtTime(0,t+at);g.gain.linearRampToValueAtTime(vol,t+at+.012);g.gain.exponentialRampToValueAtTime(.0001,t+at+dur);o.connect(g);g.connect(ctx.destination);o.start(t+at);o.stop(t+at+dur+.02)};ping(150,.00,.07,'square',.04);ping(240,.035,.08,'triangle',.045);ping(680,.22,.10,'sine',.035);ping(790,.34,.10,'sine',.032);ping(710,.47,.11,'sine',.03);ping(840,.59,.12,'sine',.028)}
-function startNicolleIntro(){const wrap=qs('#nicolleIntro'),stage=wrap?.querySelector('.nicolle-stage'),card=wrap?.querySelector('.nicolle-start-card'),char=qs('#nicolleCharacter'),bubble=qs('#nicolleBubble'),popper=qs('#nicollePopper'),confetti=qs('#nicolleConfetti');if(!wrap||!stage||!char)return;db.set('bbb_nicolle_intro_seen',true);introSoundStart();if(card)card.remove();stage.setAttribute('aria-hidden','false');wrap.classList.add('is-running');char.src='/assets/nicolle-walk-in.png';char.className='nicolle-character walk-in';setTimeout(()=>{char.src='/assets/nicolle-wave.png';char.className='nicolle-character centre wave';bubble?.classList.add('show')},1250);setTimeout(()=>{char.src='/assets/nicolle-celebrate.png';char.className='nicolle-character centre celebrate';popper?.classList.add('show');confetti?.classList.add('burst');playNicollePartySound()},2450);setTimeout(()=>{char.src='/assets/nicolle-wave.png';char.className='nicolle-character centre final-wave';popper?.classList.remove('show');bubble?.classList.remove('show')},3650);setTimeout(()=>{char.src='/assets/nicolle-walk-off.png';char.className='nicolle-character walk-off'},4300);setTimeout(()=>wrap.remove(),5550)}
+function partyAudio(){
+  try{
+    const a=new Audio('/assets/bbb-party.wav');
+    a.volume=.75;
+    a.play().catch(()=>{});
+  }catch{}
+  try{
+    const u=new SpeechSynthesisUtterance('Yay!');
+    u.rate=1.18;u.pitch=1.35;u.volume=.65;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }catch{}
+}
+function runNicolleHomeShow(){
+  stopNicolleHomeShow();
+  if(state.route!=='home')return;
+  const run=++nicolleHomeRun;
+  document.body.insertAdjacentHTML('beforeend',`<div class="nicolle-home-show" aria-hidden="true"><div class="nicolle-runway"><img class="nicolle-mini" id="nicolleMini" src="/assets/nicolle-walk-a.png" alt=""><div class="nicolle-streamers" id="nicolleStreamers">${Array.from({length:28},(_,i)=>{const a=(i/28)*Math.PI*2,dx=Math.round(Math.cos(a)*(70+(i%5)*12)),dy=Math.round(-80-(i%7)*11);return `<i style="--i:${i};--dx:${dx}px;--dy:${dy}px"></i>`}).join('')}</div></div></div>`);
+  const wrap=qs('.nicolle-home-show'),char=qs('#nicolleMini'),stream=qs('#nicolleStreamers');
+  if(!wrap||!char)return;
+  const alive=()=>run===nicolleHomeRun&&document.body.contains(wrap)&&state.route==='home';
+  // 0–3s: actual stepping cycle while moving in.
+  let step=0;
+  const walker=setInterval(()=>{if(!alive()){clearInterval(walker);return}char.src=step++%2?'/assets/nicolle-walk-a.png':'/assets/nicolle-walk-b.png'},180);
+  char.classList.add('walk-in');
+  setTimeout(()=>{if(!alive())return;clearInterval(walker);char.src='/assets/nicolle-wave.png';char.className='nicolle-mini at-party wave'},3000);
+  // 3–4.4s wave / welcome gesture.
+  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-welcome.png';char.className='nicolle-mini at-party welcome'},3900);
+  // 4.4–6.3s cracker + sound + streamers.
+  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-party.png';char.className='nicolle-mini at-party party';stream?.classList.add('go');partyAudio()},4400);
+  // 6.3–7s giggle pose.
+  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-giggle.png';char.className='nicolle-mini at-party giggle'},6300);
+  // 7–10s step off-screen.
+  setTimeout(()=>{if(!alive())return;char.src='/assets/nicolle-walk-b.png';char.className='nicolle-mini walk-out';let k=0;const outWalker=setInterval(()=>{if(!alive()){clearInterval(outWalker);return}char.src=k++%2?'/assets/nicolle-walk-a.png':'/assets/nicolle-walk-b.png'},180);setTimeout(()=>clearInterval(outWalker),2950)},7000);
+  setTimeout(()=>{if(run===nicolleHomeRun)wrap.remove()},10000);
+}
+function scheduleNicolleHomeShow(){setTimeout(()=>{if(state.route==='home')runNicolleHomeShow()},120)}
 async function handleBbbPhotoUpload(file){if(!file)return;const shareData={title:'B.B.B Camera Roll',text:'Add this photo to the shared B.B.B camera roll.',files:[file]};try{if(navigator.share&&navigator.canShare?.(shareData)){await navigator.share(shareData);setTimeout(()=>window.open(CFG.drive,'_blank'),350);return}}catch(err){if(err?.name==='AbortError')return}toast('Photo selected — opening the shared camera roll');window.open(CFG.drive,'_blank')}
 
 function confirmMassage(){const id=qs('#mtreat')?.value,slot=qs('#mslot')?.value;if(!slot)return toast('Choose a time');if(state.bookings.filter(b=>b.slot===slot&&b.status!=='cancelled').length>=4)return toast('That block is full');const t=MASSAGES.find(x=>x.id===id),bid='b'+Date.now();state.bookings.push({id:bid,slot,treatment:t.name,status:'booked'});state.plans.push({title:t.name,meta:`26 Jan · ${slot} · ${t.mins} min · ${money(t.price)} cash`,pay:'cash',type:'massage',bookingId:bid});persist();navigate('profile');toast('Massage booked')}
@@ -235,7 +266,6 @@ function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return
  else if(a==='modal')openModal(el.dataset.modal);
  else if(a==='close-modal')closeModal();
  else if(a==='calendar')addCalendar(el.dataset.title,el.dataset.start,el.dataset.duration);
- else if(a==='start-nicolle-intro')startNicolleIntro();
  else if(a==='photo-upload')qs('#bbb-photo-upload')?.click();
  else if(a==='maps')window.open('https://www.google.com/maps/search/?api=1&query='+el.dataset.query,'_blank');
  else if(a==='near'){const q=el.dataset.query;if(!navigator.geolocation)return window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q+' near Chandra Villas Seminyak'),'_blank');navigator.geolocation.getCurrentPosition(p=>window.open(`https://www.google.com/maps/search/${encodeURIComponent(q)}/@${p.coords.latitude},${p.coords.longitude},15z`,'_blank'),()=>window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q+' near Chandra Villas Seminyak'),'_blank'),{timeout:5000})}
@@ -273,5 +303,4 @@ window.addEventListener('error',e=>console.error('BBB app error',e.error||e.mess
 setInterval(()=>{const c=qs('#countdown');if(c)c.innerHTML=countdown()},1000);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{})}
 render();
-setTimeout(renderNicolleIntro,120);
 })();
