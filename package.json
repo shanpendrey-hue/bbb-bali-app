@@ -1,0 +1,9 @@
+{
+  "name":"nicolle-bali-app",
+  "version":"3.0.0",
+  "private":true,
+  "description":"Nicolle's 50th — The Big Bali Bash 2027",
+  "dependencies":{
+    "stripe":"^18.5.0"
+  }
+}

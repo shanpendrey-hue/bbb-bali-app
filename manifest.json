@@ -1,12 +1,11 @@
 {
-  "name": "Nicolle's 50th — The Big Bali Bash",
-  "short_name": "B.B.B Bali",
-  "start_url": "./#home",
-  "display": "standalone",
-  "background_color": "#f7f1e6",
-  "theme_color": "#556B3F",
-  "description": "Nicolle's 50th — The Big Bali Bash, Bali 2027",
-  "icons": [
-    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  "name":"Nicolle's 50th — Bali 2027",
+  "short_name":"BBB Bali",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#f4eee4",
+  "theme_color":"#f4eee4",
+  "icons":[
+    {"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
 }
