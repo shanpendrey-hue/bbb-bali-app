@@ -1080,3 +1080,50 @@ body.bash-chat-open{overflow:hidden!important}.bash-chat-layer{position:fixed!im
 .ready-action-stack .ready-action{margin-top:0}
 .ready-watch-action{display:inline-flex;align-items:center;min-height:34px;font-size:13px;font-weight:700;color:#6b4e3d;text-decoration:none}
 .ready-watch-action:hover{text-decoration:underline}
+
+/* ===== V14 scoped live corrections ===== */
+/* Bash Board: the composer itself is the only create-post trigger. */
+.bash-quick-compose{grid-template-columns:50px minmax(0,1fr)!important;align-items:center!important}
+.bash-quick-input{width:100%!important;min-width:0!important}
+.bash-quick-photo,.bash-quick-plus{display:none!important}
+
+/* Create Post: prevent icon/title collisions from older cascade rules. */
+.bash-create-actions.top-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;margin:16px 18px 10px!important;padding:0!important}
+.bash-create-actions.top-actions button{position:relative!important;min-width:0!important;min-height:112px!important;padding:14px 10px 12px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;text-align:center!important;overflow:hidden!important}
+.bash-create-actions.top-actions button>svg{position:static!important;inset:auto!important;width:30px!important;height:30px!important;flex:0 0 auto!important}
+.bash-create-actions.top-actions button>span{display:grid!important;gap:3px!important;width:100%!important;text-align:center!important}
+.bash-create-actions.top-actions button b{font-size:12px!important;line-height:1.15!important;white-space:normal!important}
+.bash-create-actions.top-actions button small{font-size:9px!important;line-height:1.2!important;white-space:normal!important}
+.bash-create-actions.top-actions button i{position:absolute!important;right:10px!important;bottom:10px!important;font-size:19px!important}
+
+/* Feed: keep the full post in normal document flow and never hide/crop its upper content. */
+.bash-post-stream{display:grid!important;grid-auto-rows:auto!important;align-items:start!important;overflow:visible!important}
+.bash-post-modern{display:block!important;min-height:0!important;height:auto!important;overflow:visible!important}
+.bash-post-modern .bash-post-head,.bash-post-modern .bash-post-text,.bash-post-modern .bash-post-media{visibility:visible!important;opacity:1!important;position:relative!important}
+.bash-post-media,.bash-media-tile{height:auto!important}
+.bash-media-tile img,.bash-media-tile video{min-height:0!important;height:auto!important;aspect-ratio:auto!important}
+
+/* Group Chat: React and Reply are always available on every text/photo message. */
+.bash-chat-quick-actions{display:flex!important;gap:6px!important;margin:6px 4px 2px!important;justify-content:flex-start!important}
+.bash-message.mine .bash-chat-quick-actions{justify-content:flex-end!important}
+.bash-chat-quick-actions button{min-height:34px!important;border:0!important;border-radius:999px!important;background:#f4efe7!important;color:var(--brown)!important;padding:0 12px!important;font:800 11px Montserrat,Arial,sans-serif!important;cursor:pointer!important}
+.bash-message.mine .bash-chat-quick-actions button{background:#f4efe7!important;color:var(--brown)!important}
+
+/* Airport pickup: make the cash total the visual summary and centre Cancel. */
+.pickup-live-total.compact{padding:26px 24px!important;border-radius:24px!important;gap:14px!important;margin:26px 0 28px!important;min-height:132px!important;align-content:center!important}
+.pickup-live-total.compact span{font-size:12px!important;letter-spacing:.16em!important}
+.pickup-live-total.compact strong{font-size:40px!important;line-height:1!important}
+.pickup-live-total.compact small{font-size:15px!important;line-height:1.45!important}
+.modal-card:has([data-action="save-airport-pickup"]) .actions{display:flex!important;flex-direction:column!important;align-items:stretch!important}
+.modal-card:has([data-action="save-airport-pickup"]) [data-action="close-modal"]{align-self:center!important;text-align:center!important;margin-left:auto!important;margin-right:auto!important}
+
+/* Cocktail order: the cart stays tappable; Nicky moves above it whenever items exist. */
+.drink-basket-btn.has-items{z-index:90!important}
+body:has(.drink-basket-btn.has-items) .nicky-launcher{bottom:calc(174px + env(safe-area-inset-bottom))!important;z-index:82!important}
+
+@media(max-width:420px){
+ .bash-create-actions.top-actions{gap:7px!important;margin-left:12px!important;margin-right:12px!important}
+ .bash-create-actions.top-actions button{min-height:106px!important;padding-left:7px!important;padding-right:7px!important}
+ .pickup-live-total.compact strong{font-size:36px!important}
+ body:has(.drink-basket-btn.has-items) .nicky-launcher{bottom:calc(180px + env(safe-area-inset-bottom))!important}
+}
