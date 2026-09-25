@@ -1008,7 +1008,7 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   function removeInstallUI(){document.querySelectorAll('.bbb-install-nudge,.bbb-install-backdrop,.bbb-install-sheet,.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove())}
   function showNudge(force=false){
     if(installed()||document.querySelector('.bbb-install-nudge'))return;
-    if(!force&&localStorage.getItem('bbbInstallDismissed')==='1')return;
+    if(!force&&sessionStorage.getItem('bbbInstallDismissed')==='1')return;
     document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Install B.B.B Bali"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Put B.B.B on your phone</b><small>One tap from your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>ADD B.B.B</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
   }
   function openInstall(){
@@ -1033,10 +1033,22 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   }
   document.addEventListener('click',e=>{
     if(e.target.closest('[data-bbb-install]'))openInstall();
-    if(e.target.closest('[data-bbb-install-dismiss]')){localStorage.setItem('bbbInstallDismissed','1');e.target.closest('.bbb-install-nudge')?.remove()}
+    if(e.target.closest('[data-bbb-install-dismiss]')){sessionStorage.setItem('bbbInstallDismissed','1');e.target.closest('.bbb-install-nudge')?.remove()}
     if(e.target.closest('[data-bbb-install-close]'))document.querySelectorAll('.bbb-install-backdrop,.bbb-install-sheet').forEach(x=>x.remove());
     if(e.target.closest('[data-bbb-notify-close]'))document.querySelectorAll('.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove());
     if(e.target.closest('[data-bbb-notify-enable]'))enableNotifications();
   });
-  window.addEventListener('load',()=>{if(!installed())setTimeout(()=>showNudge(false),900);else maybeNotifyPrompt()});
+  function bootInstallExperience(){
+    if(installed()){maybeNotifyPrompt();return}
+    setTimeout(()=>{
+      showNudge(true);
+      if(!sessionStorage.getItem('bbbInstallIntroShown')){
+        sessionStorage.setItem('bbbInstallIntroShown','1');
+        openInstall();
+      }
+    },1200);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootInstallExperience,{once:true});
+  else bootInstallExperience();
+  window.addEventListener('pageshow',()=>{if(!installed()&&!document.querySelector('.bbb-install-nudge'))setTimeout(()=>showNudge(true),350)});
 })();
