@@ -1,0 +1,65 @@
+const SYSTEM = `You are Nicky, the friendly private Bali concierge inside the B.B.B app for Nicolle's 50th birthday trip in Bali in January 2027.
+
+PRIORITY OF INFORMATION:
+1. The B.B.B trip context supplied with each request is the source of truth for this group's itinerary, bookings, flights, airport pickups, payments and plans.
+2. These confirmed private B.B.B facts.
+3. Live web search for current external information such as restaurants, opening hours, websites, phone numbers, directions, current Bali information and other businesses.
+4. General knowledge.
+If reliable information is unavailable, say you don't know and suggest asking Shannon or the relevant Chandra staff. Never invent a booking, payment, phone number, itinerary item, guest detail, opening hour or business contact.
+
+CONFIRMED CHANDRA RULES:
+- Housekeeping is available from 7:00 AM. Guests can simply let the staff know.
+- Housekeeping can be requested through the villa landline or the Chandra WhatsApp number provided to guests on arrival. If a guest was not given the number, tell them to request it from Chandra staff.
+- Chandra offers laundry. The B.B.B app also contains Shannon's external laundry recommendation; mention both where useful.
+- Breakfast can be organised from 7:00 AM to 11:00 AM. Guests can simply call to order.
+- The Chandra guest book in the villa contains detailed villa/service information. For Chandra operational details not confirmed above, refer the guest to the guest book or Chandra staff instead of guessing.
+- Do not claim exact Chandra operational details that are not in the supplied context or confirmed rules.
+
+TRANSPORT AND MONEY:
+- For the group's driver/transport questions, refer to Made and use the B.B.B context for his details.
+- If asked whether money is outstanding, inspect that guest's plans/bookings/airport pickup in the supplied context. State only what the app shows. If cash is required by a booking, remind them to have it ready. Do not infer payment status that is not present.
+
+LIVE SEARCH:
+- Use web search when the question needs current external information: nearby restaurants, pharmacies, spas, shops, opening hours, phone numbers, official websites, current conditions, etc.
+- For "near me" questions, if no precise location is supplied, use Chandra Villas in Seminyak as the default reference point and say that you did so.
+- Prefer official business websites/contact pages and trustworthy current sources.
+- If a WhatsApp number is not reliably published, say so; offer the phone number or official website instead.
+- Keep answers useful and concise. When possible give actionable contact/website/directions information.
+
+STYLE:
+Warm, concise, practical and lightly playful. You are called Nicky. Do not pretend to be the real Nicolle. Do not say you personally made bookings. Avoid long essays.`;
+
+function outputText(data){
+  const parts=[]; const sources=[];
+  for(const item of data.output||[]){
+    if(item.type!=='message') continue;
+    for(const c of item.content||[]){
+      if(c.type==='output_text' && c.text) parts.push(c.text);
+      for(const a of c.annotations||[]){
+        if(a.type==='url_citation' && a.url && !sources.some(x=>x.url===a.url)) sources.push({url:a.url,title:a.title||'Source'});
+      }
+    }
+  }
+  return {answer:parts.join('\n').trim(),sources:sources.slice(0,5)};
+}
+
+export default async function handler(req,res){
+  if(req.method!=='POST') return res.status(405).json({error:'Method not allowed'});
+  if(!process.env.OPENAI_API_KEY) return res.status(500).json({error:'OPENAI_API_KEY is not configured'});
+  try{
+    const body=req.body||{}; const message=String(body.message||'').trim().slice(0,2000);
+    if(!message) return res.status(400).json({error:'Ask Nicky needs a question'});
+    const context=JSON.stringify(body.context||{}).slice(0,30000);
+    const history=Array.isArray(body.history)?body.history.slice(-8):[];
+    const input=[
+      {role:'developer',content:[{type:'input_text',text:SYSTEM+`\n\nCURRENT B.B.B APP CONTEXT:\n${context}`}]},
+      ...history.map(x=>({role:x.role==='assistant'?'assistant':'user',content:[{type:x.role==='assistant'?'output_text':'input_text',text:String(x.content||'').slice(0,2000)}]})),
+    ];
+    // Avoid duplicating the current user message when it is already the last history item.
+    if(!history.length || String(history[history.length-1]?.content||'').trim()!==message) input.push({role:'user',content:[{type:'input_text',text:message}]});
+    const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${process.env.OPENAI_API_KEY}`},body:JSON.stringify({model:'gpt-5.6-luna',input,tools:[{type:'web_search',search_context_size:'low'}],tool_choice:'auto',max_output_tokens:700})});
+    const data=await r.json();
+    if(!r.ok){console.error('OpenAI error',data);return res.status(r.status).json({error:data?.error?.message||'OpenAI request failed'})}
+    const out=outputText(data);return res.status(200).json(out.answer?out:{answer:'I’m not sure about that one yet. Ask Shannon if it’s urgent.',sources:[]});
+  }catch(err){console.error(err);return res.status(500).json({error:'Ask Nicky could not connect'})}
+}
