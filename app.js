@@ -611,8 +611,8 @@ function renderCart(){qsa('.drawer,.cart-overlay').forEach(x=>x.remove());if(!st
 
 function renderDrinkCart(){qsa('.drink-drawer,.drink-cart-overlay').forEach(x=>x.remove());if(!state.drinkCartOpen)return;const photo=state.profile.photo?`<img src="${state.profile.photo}" alt="${escapeAttr(state.profile.name||'Guest')} profile photo">`:'☺',total=state.drinkCart.reduce((n,x)=>n+x.qty,0);document.body.insertAdjacentHTML('beforeend',`<div class="overlay drink-cart-overlay" data-action="close-drink-cart"></div><aside class="drawer drink-drawer"><div class="section-head"><div><div class="eyebrow">B.B.B cocktails</div><h2 class="section-title">My Order</h2></div><button class="btn light" data-action="close-drink-cart">Close</button></div><div class="drink-profile"><div class="drink-profile-photo">${photo}</div><div><div class="meta">Ordering as</div><h3>${escapeHtml(state.profile.name||'Guest')}</h3></div></div>${state.drinkCart.length?state.drinkCart.map((x,i)=>`<div class="drink-cartline"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.type)}</small></div><div class="drink-cart-controls"><button data-action="drink-cart-qty" data-index="${i}" data-delta="-1">−</button><b>${x.qty}</b><button data-action="drink-cart-qty" data-index="${i}" data-delta="1">+</button><button class="remove-drink" data-action="remove-drink-cart" data-index="${i}">Remove</button></div></div>`).join(''):'<p>Your cocktail order is empty.</p>'}${state.drinkCart.length?`<div class="actions drink-place-actions"><button class="btn olive full" data-action="place-drink-order">Send order to the bar</button></div><p class="drink-order-note">Your order will open directly in WhatsApp to the B.B.B bartenders.</p>${state.drinkClearConfirm?`<div class="clear-order-confirm"><div class="clear-order-icon">↺</div><h3>Clear your order?</h3><p>This will remove all ${total} drink${total===1?'':'s'} from My Order.</p><div class="clear-order-actions"><button class="btn light" data-action="cancel-clear-drink-order">Keep order</button><button class="btn clear-confirm-btn" data-action="clear-drink-order">Yes, clear it</button></div></div>`:`<button class="clear-drink-order clear-attention" data-action="confirm-clear-drink-order"><span class="clear-order-symbol">↺</span><span>CLEAR MY ORDER</span></button>`}`:''}</aside>`) }
 
-const NICKY_IMG='/assets/nicky.jpeg';
-function renderNickyLauncher(){return `<button class="nicky-launcher" data-action="nicky-open" aria-label="Ask Nicky"><span class="nicky-launcher-avatar"><img src="${NICKY_IMG}" alt="Nicky"></span><span>Ask Nicky</span><i>✨</i></button>`}
+const NICKY_IMG='/assets/nicky-profile.png';
+function renderNickyLauncher(){return `<button class="nicky-launcher" data-action="nicky-open" aria-label="Ask Nicky"><span class="nicky-launcher-avatar"><img src="${NICKY_IMG}" alt="Nicky"></span><span class="nicky-launcher-copy"><b>Ask Nicky</b><small>Bali concierge</small></span><i>✨</i></button>`}
 function nickyContext(){
   return {
     guest:{name:state.profile.name||'Guest'},
@@ -626,11 +626,30 @@ function nickyContext(){
     usefulLinks:{laundry:CFG.laundry,drive:CFG.drive}
   }
 }
-function nickyWelcome(){return {role:'assistant',text:`Hey ${escapeHtml((state.profile.name||'there').split(' ')[0])}! 🌴 I'm Nicky, your B.B.B Bali concierge. Ask me about the itinerary, your bookings, Chandra Villas, getting around Bali, or ask me to find something nearby.`}}
+function nickyWelcome(){return {role:'assistant',text:`Hey ${(state.profile.name||'there').split(' ')[0]}! 🌴 I’m Nicky, your B.B.B Bali concierge. What can I help you with?`}}
+function nickyTextHtml(text){
+  let safe=escapeHtml(String(text||''));
+  safe=safe.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  return safe.replace(/\n/g,'<br>')
+}
+function nickyActionHtml(action){
+  if(!action||!action.type)return'';
+  const label=escapeHtml(action.label||'Open');
+  if(action.type==='whatsapp'){const msg=encodeURIComponent(action.message||'');return `<a class="nicky-action primary" href="https://wa.me/${escapeAttr(action.phone||CFG.madeWhatsapp)}?text=${msg}" target="_blank" rel="noopener"><span class="nicky-action-icon">◉</span><span>${label}</span><b>›</b></a>`}
+  if(action.type==='call')return `<a class="nicky-action" href="tel:${escapeAttr(action.phone||'')}"><span class="nicky-action-icon">☎</span><span>${label}</span><b>›</b></a>`;
+  if(action.type==='url')return `<a class="nicky-action" href="${escapeAttr(action.url||'#')}" target="_blank" rel="noopener"><span>${label}</span><b>›</b></a>`;
+  if(action.type==='route')return `<button class="nicky-action" data-action="nicky-route" data-route="${escapeAttr(action.route||'home')}" data-target="${escapeAttr(action.target||'')}"><span>${label}</span><b>›</b></button>`;
+  return''
+}
+function nickyMessageHtml(m){
+  const actions=(m.actions||[]).map(nickyActionHtml).join('');
+  const sources=m.sources?.length?`<div class="nicky-sources">${m.sources.map((x,i)=>`<a href="${escapeAttr(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.title||`Source ${i+1}`)}</a>`).join('')}</div>`:'';
+  return `<div class="nicky-row ${m.role==='user'?'mine':''}">${m.role==='assistant'?`<div class="nicky-mini"><img src="${NICKY_IMG}" alt=""></div>`:''}<div class="nicky-bubble">${nickyTextHtml(m.text)}${actions?`<div class="nicky-actions">${actions}</div>`:''}${sources}</div></div>`
+}
 function renderNicky(){
   qsa('.nicky-layer').forEach(x=>x.remove());document.body.classList.toggle('nicky-open',!!state.nickyOpen);if(!state.nickyOpen)return;
   const messages=state.nickyMessages.length?state.nickyMessages:[nickyWelcome()];
-  document.body.insertAdjacentHTML('beforeend',`<section class="nicky-layer" aria-label="Ask Nicky"><div class="nicky-chat"><header class="nicky-head"><button class="nicky-back" data-action="nicky-close" aria-label="Close">‹</button><div class="nicky-head-avatar"><img src="${NICKY_IMG}" alt="Nicky"></div><div><h3>Ask Nicky <span>✨</span></h3><small>Your B.B.B Bali concierge</small></div></header><div class="nicky-messages" id="nickyMessages">${messages.map(m=>`<div class="nicky-row ${m.role==='user'?'mine':''}">${m.role==='assistant'?`<div class="nicky-mini"><img src="${NICKY_IMG}" alt=""></div>`:''}<div class="nicky-bubble">${escapeHtml(m.text).replace(/\n/g,'<br>')}${m.sources?.length?`<div class="nicky-sources">${m.sources.map((x,i)=>`<a href="${escapeAttr(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.title||`Source ${i+1}`)}</a>`).join('')}</div>`:''}</div></div>`).join('')}${state.nickyBusy?`<div class="nicky-row"><div class="nicky-mini"><img src="${NICKY_IMG}" alt=""></div><div class="nicky-bubble nicky-thinking"><i></i><i></i><i></i></div></div>`:''}</div><div class="nicky-quick">${messages.length<=1?`<button data-action="nicky-quick" data-question="What are we doing today?">Today's plan</button><button data-action="nicky-quick" data-question="What are my airport pickup details?">My airport pickup</button><button data-action="nicky-quick" data-question="Tell me about Chandra Villas and how I request housekeeping or breakfast.">Chandra Villas</button><button data-action="nicky-quick" data-question="Find something nearby">Find nearby</button>`:''}</div><form class="nicky-compose" id="nickyForm"><textarea id="nickyInput" rows="1" placeholder="Ask Nicky anything…" ${state.nickyBusy?'disabled':''}></textarea><button type="submit" ${state.nickyBusy?'disabled':''} aria-label="Send">➤</button></form><div class="nicky-disclaimer">Trip details come from B.B.B. Live information may come from the web.</div></div></section>`);
+  document.body.insertAdjacentHTML('beforeend',`<section class="nicky-layer" aria-label="Ask Nicky"><div class="nicky-chat"><header class="nicky-head"><button class="nicky-back" data-action="nicky-close" aria-label="Close">‹</button><div class="nicky-head-avatar"><img src="${NICKY_IMG}" alt="Nicky"></div><div class="nicky-head-copy"><h3>Ask Nicky <span>✨</span></h3><small>Your B.B.B Bali concierge</small></div></header><div class="nicky-messages" id="nickyMessages">${messages.map(nickyMessageHtml).join('')}${state.nickyBusy?`<div class="nicky-row"><div class="nicky-mini"><img src="${NICKY_IMG}" alt=""></div><div class="nicky-bubble nicky-thinking"><i></i><i></i><i></i></div></div>`:''}</div><form class="nicky-compose" id="nickyForm"><textarea id="nickyInput" rows="1" placeholder="Ask Nicky anything…" ${state.nickyBusy?'disabled':''}></textarea><button type="submit" ${state.nickyBusy?'disabled':''} aria-label="Send">➤</button></form></div></section>`);
   requestAnimationFrame(()=>{const l=qs('#nickyMessages');if(l)l.scrollTop=l.scrollHeight})
 }
 async function nickyAsk(question){
@@ -640,7 +659,7 @@ async function nickyAsk(question){
     const history=state.nickyMessages.slice(-10).map(x=>({role:x.role,content:x.text}));
     const res=await fetch('/api/ask-nicky',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history,context:nickyContext()})});
     const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Ask Nicky is unavailable');
-    state.nickyMessages.push({role:'assistant',text:data.answer||'I’m not sure about that one yet.',sources:data.sources||[]});
+    state.nickyMessages.push({role:'assistant',text:data.answer||'I’m not sure about that one yet.',sources:data.sources||[],actions:data.actions||[]});
   }catch(err){state.nickyMessages.push({role:'assistant',text:'I couldn’t connect just then. Try again in a moment — or ask Shannon if it’s urgent.'})}
   state.nickyBusy=false;db.set('bbb_nicky_messages',state.nickyMessages);renderNicky();
 }
@@ -795,7 +814,7 @@ function bashReactChat(messageId,key){const m=state.bashChat.find(x=>x.id===mess
 function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action;
  if(a==='nicky-open'){state.nickyOpen=true;renderNicky();setTimeout(()=>qs('#nickyInput')?.focus(),80)}
  else if(a==='nicky-close'){state.nickyOpen=false;renderNicky()}
- else if(a==='nicky-quick'){const q=el.dataset.question||'';if(q==='Find something nearby'){const input=qs('#nickyInput');if(input){input.value='Find ';input.focus()}}else nickyAsk(q)}
+ else if(a==='nicky-route'){const route=el.dataset.route||'home',target=el.dataset.target||'';state.nickyOpen=false;renderNicky();navigate(route);if(target)setTimeout(()=>qs('#'+target)?.scrollIntoView({behavior:'smooth',block:'start'}),120)}
  else if(a==='nav'){const route=el.dataset.route;if(state.route==='bali'&&route?.startsWith('guide-'))rememberGuideReturn(el.dataset.guideSlug||route.slice(6),el);if(route==='bash'){state.bashUnreadFeed=0;bashPersist()}navigate(route);}
  else if(a==='bash-bali-mode')bashEnableBaliMode()
  else if(a==='bash-notifications-open'){state.bashNotificationsOpen=true;render()}

@@ -27,7 +27,7 @@ LIVE SEARCH:
 - Keep answers useful and concise. When possible give actionable contact/website/directions information.
 
 STYLE:
-Warm, concise, practical and lightly playful. You are called Nicky. Do not pretend to be the real Nicolle. Do not say you personally made bookings. Avoid long essays.`;
+Warm, concise, practical and lightly playful. You are called Nicky. Do not pretend to be the real Nicolle. Do not say you personally made bookings. ACTION-FIRST: when the guest asks to do something and the B.B.B context already contains the relevant contact, booking area, map, website or app route, answer in 1–3 short sentences and direct them to that action. Do not pad the answer with unrelated cautions, airport-pickup status, payment advice or generic checklists unless the guest asked for them. For a general car/driver request, simply say Made is the B.B.B driver and that they can message him; do not turn it into an airport-pickup answer. Avoid long essays. Markdown bold is allowed, but keep formatting simple.`;
 
 function outputText(data){
   const parts=[]; const sources=[];
@@ -43,13 +43,31 @@ function outputText(data){
   return {answer:parts.join('\n').trim(),sources:sources.slice(0,5)};
 }
 
+function localActions(message,context){
+  const q=String(message||'').toLowerCase(); const actions=[];
+  const driver=context?.driver||{}; const accommodation=context?.accommodation||{};
+  const transport=/\b(car|driver|transport|ride|taxi|transfer|made)\b/.test(q);
+  const airport=/\bairport\b/.test(q);
+  if(transport && !airport && driver.whatsapp){
+    const name=context?.guest?.name||'Guest';
+    actions.push({type:'whatsapp',label:'Message Made on WhatsApp',phone:driver.whatsapp,message:`Hi Made, it’s ${name} from Nicolle’s B.B.B. I’d like to organise a car for my Bali trip. My date/time and pickup/drop-off details are:`});
+    return actions;
+  }
+  if(/\b(chandra|villa|breakfast|housekeeping)\b/.test(q) && accommodation.phone){
+    actions.push({type:'call',label:'Call Chandra Villas',phone:accommodation.phone});
+    if(accommodation.website)actions.push({type:'url',label:'Chandra Villas website',url:accommodation.website});
+  }
+  if(airport){actions.push({type:'route',label:'Open my airport pickup',route:'travel',target:'made-pickup'});}
+  return actions.slice(0,3);
+}
+
 export default async function handler(req,res){
   if(req.method!=='POST') return res.status(405).json({error:'Method not allowed'});
   if(!process.env.OPENAI_API_KEY) return res.status(500).json({error:'OPENAI_API_KEY is not configured'});
   try{
     const body=req.body||{}; const message=String(body.message||'').trim().slice(0,2000);
     if(!message) return res.status(400).json({error:'Ask Nicky needs a question'});
-    const context=JSON.stringify(body.context||{}).slice(0,30000);
+    const contextObject=body.context||{}; const context=JSON.stringify(contextObject).slice(0,30000);
     const history=Array.isArray(body.history)?body.history.slice(-8):[];
     const input=[
       {role:'developer',content:[{type:'input_text',text:SYSTEM+`\n\nCURRENT B.B.B APP CONTEXT:\n${context}`}]},
@@ -60,6 +78,6 @@ export default async function handler(req,res){
     const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${process.env.OPENAI_API_KEY}`},body:JSON.stringify({model:'gpt-5.6-luna',input,tools:[{type:'web_search',search_context_size:'low'}],tool_choice:'auto',max_output_tokens:700})});
     const data=await r.json();
     if(!r.ok){console.error('OpenAI error',data);return res.status(r.status).json({error:data?.error?.message||'OpenAI request failed'})}
-    const out=outputText(data);return res.status(200).json(out.answer?out:{answer:'I’m not sure about that one yet. Ask Shannon if it’s urgent.',sources:[]});
+    const out=outputText(data);const actions=localActions(message,contextObject);return res.status(200).json(out.answer?{...out,actions}:{answer:'I’m not sure about that one yet. Ask Shannon if it’s urgent.',sources:[],actions});
   }catch(err){console.error(err);return res.status(500).json({error:'Ask Nicky could not connect'})}
 }
