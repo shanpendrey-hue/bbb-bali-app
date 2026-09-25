@@ -1301,3 +1301,28 @@ body:has(.bash-feed-v4){background:#f7f1e6!important}
 /* Create post: calmer hierarchy, caption field behaves like a normal composer. */
 .bash-create-actions.top-actions{gap:10px!important}.bash-create-actions.top-actions button{min-height:92px!important;padding:14px 8px!important}.bash-create-actions.top-actions button span b{font-size:13px!important}.bash-create-actions.top-actions button span small{font-size:9px!important}.bash-caption-preview{min-height:118px!important;padding:20px!important;border-radius:22px!important}.bash-caption-preview>span{font-size:24px!important;line-height:1.15!important}.bash-caption-preview:not(.has-text)>span{color:#928983!important}
 @media(max-width:520px){.bash-board-top{padding:22px 14px 14px!important}.bash-board-title h1{font-size:clamp(39px,11.3vw,50px)!important}.bash-board-tools{gap:2px!important}.bash-board-tool{width:40px!important;height:40px!important}.bash-feed-v4{padding-left:14px!important;padding-right:14px!important}.bash-now-modern{margin-left:-14px!important;margin-right:-14px!important;padding-left:14px!important;padding-right:14px!important}.bash-bali-mode-cta{grid-template-columns:36px 1fr auto!important}.bash-bali-mode-cta button{grid-column:auto!important}.bash-post-modern{border-radius:22px!important;padding:14px!important}.bash-post-media{margin-left:0!important;margin-right:0!important;border-radius:16px!important}.bash-post-media:not(.multi) .bash-media-tile{border-radius:16px!important}}
+
+/* V21: keep the two primary sunset actions together on mobile */
+.sunset-card .inner > .actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  align-items:stretch;
+}
+.sunset-card .inner > .actions .btn{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:15px 10px!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+  font-size:clamp(14px,3.8vw,17px)!important;
+}
+@media(max-width:380px){
+  .sunset-card .inner > .actions{gap:8px!important}
+  .sunset-card .inner > .actions .btn{padding:14px 7px!important;font-size:13px!important}
+}
+\n\n/* V22: final combined mobile polish */\n/* Remove artificial bottom whitespace: body owns the nav clearance; shells should not add a second nav-sized pad. */\n@media(max-width:760px){\n  .shell{padding-bottom:24px!important}\n  .shell>.section:last-child,.shell>.card:last-child{margin-bottom:0!important}\n  .bash-feed-v4{padding-bottom:18px!important}\n  .bash-post-stream{padding-bottom:18px!important}\n}\n/* Bash Board title stays branded but cleaner and more editorial. */\n.bash-board-top{background:linear-gradient(145deg,#f8f1e5,#f2eadc)!important;border-radius:26px 26px 0 0!important;box-shadow:0 10px 28px rgba(64,47,37,.07)!important}\n.bash-board-title h1{font-family:'Cormorant Garamond',Georgia,serif!important;color:#3b2a22!important;font-weight:700!important;letter-spacing:-.045em!important;line-height:.84!important}\n.bash-board-title .eyebrow{color:var(--olive)!important}\n/* Feed: no duplicate Comment label when there is nothing to count. */\n.bash-post-social:empty{display:none!important}\n/* Chat messages start directly below the header instead of floating in the vertical middle. */\n.bash-message-list{justify-content:flex-start!important;align-content:flex-start!important}\n/* Message options stay hidden until tap/hold. */\n.bash-chat-quick-actions{display:none!important}\n.bash-chat-message-actions{width:max-content;max-width:100%;background:#fff;border:1px solid #e8e2da;border-radius:18px;padding:7px;box-shadow:0 12px 30px rgba(43,33,27,.13)!important}\n.bash-message.mine .bash-chat-message-actions{margin-left:auto!important}\n/* Home sunset card: both important actions remain side-by-side. */\n.sunset-card .inner>.actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important;width:100%!important}\n.sunset-card .inner>.actions .btn{width:100%!important;min-width:0!important;white-space:nowrap!important;padding:14px 8px!important;font-size:clamp(12px,3.35vw,16px)!important}\n@media(max-width:390px){.sunset-card .inner>.actions{gap:7px!important}.sunset-card .inner>.actions .btn{font-size:12px!important;padding-left:5px!important;padding-right:5px!important}}\n

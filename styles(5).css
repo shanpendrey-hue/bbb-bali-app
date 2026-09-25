@@ -1140,3 +1140,189 @@ body:has(.drink-basket-btn.has-items) .nicky-launcher{bottom:calc(174px + env(sa
 .fastdrip-actions{display:flex;gap:12px;flex-wrap:wrap}.fastdrip-services{padding:30px 0}.fastdrip-section-title h2{font-family:'Cormorant Garamond',serif;color:var(--aus-teal);font-size:42px;line-height:1;margin:5px 0 10px}.fastdrip-section-title p{color:#6b665d;max-width:620px}
 .fastdrip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}.fastdrip-card{padding:0;overflow:hidden;border:1px solid rgba(75,23,111,.14);border-radius:26px;background:rgba(255,255,255,.62);box-shadow:0 12px 30px rgba(72,55,40,.05)}.fastdrip-card-photo{aspect-ratio:16/10;overflow:hidden;background:var(--fastdrip-soft)}.fastdrip-card-photo img{width:100%;height:100%;object-fit:cover;display:block}.fastdrip-card-body{padding:22px 24px 24px}.fastdrip-card .meta{color:var(--fastdrip)}.fastdrip-card h3{font-family:'Cormorant Garamond',serif;color:var(--aus-teal);font-size:31px;margin:5px 0 10px}.fastdrip-card p{color:#6b665d;line-height:1.55;min-height:72px}.fastdrip-card a{display:inline-flex;margin-top:10px;color:var(--fastdrip);font-weight:800;text-decoration:none}.fastdrip-note{margin:10px 0 34px;padding:26px;border-radius:26px;background:#f4eee5;border:1px solid rgba(75,23,111,.12)}.fastdrip-note b{font-size:22px;color:var(--aus-teal)}.fastdrip-note p{line-height:1.6;color:#6b665d;margin:8px 0 18px}
 @media(max-width:640px){.fastdrip-head h1{font-size:clamp(39px,10.6vw,50px);letter-spacing:-.02em}.fastdrip-hero-photo{aspect-ratio:16/7;border-radius:22px}.fastdrip-grid{grid-template-columns:1fr}.fastdrip-card p{min-height:0}.fastdrip-actions .aus-btn{width:100%}.fastdrip-provider{width:100%;justify-content:space-between}.fastdrip-section-title h2{font-size:36px}}
+\n/* V17 - GoFood recovery feature */\n.recovery-feature-gofood .recovery-feature-icon{background:#fff4f2;border-color:rgba(238,39,55,.22);color:#ee2737}.gofood-icon span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#ee2737;color:#fff;font-size:14px;font-weight:950;letter-spacing:-.04em}.recovery-feature-gofood .meta{color:#c92331}.recovery-feature-gofood h3{max-width:640px}.gofood-villa-tip{display:flex;flex-direction:column;gap:5px;margin:16px 0 18px;padding:15px 17px;border-radius:17px;background:#f4eee5;border:1px solid rgba(35,85,78,.12);max-width:660px}.gofood-villa-tip b{color:var(--aus-teal);font-size:14px}.gofood-villa-tip span{font-size:14px;line-height:1.5;color:#665f56}.gofood-actions{display:flex;flex-direction:column;align-items:flex-start;gap:15px}.gofood-button{background:#ee2737!important;border-color:#ee2737!important;color:#fff!important}.gofood-downloads{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gofood-downloads>span{width:100%;font-size:9px;letter-spacing:.14em;font-weight:900;color:#80776d}.store-badge{min-width:142px;height:46px;padding:5px 12px;border-radius:9px;background:#111;color:#fff!important;text-decoration:none!important;display:flex;align-items:center;gap:8px;border:1px solid #333}.store-badge>b{font-size:23px;line-height:1}.store-badge.play>b{font-size:17px}.store-badge em{display:flex;flex-direction:column;font-style:normal;font-weight:700;font-size:16px;line-height:1}.store-badge small{font-size:8px;letter-spacing:.04em;margin-bottom:3px;font-weight:600}.store-badge:hover{transform:translateY(-1px)}\n@media(max-width:760px){.gofood-actions{align-items:stretch}.gofood-button{width:100%}.gofood-downloads{display:grid;grid-template-columns:1fr 1fr}.gofood-downloads>span{grid-column:1/-1}.store-badge{min-width:0;width:100%;justify-content:center;padding-left:8px;padding-right:8px}.store-badge em{font-size:14px}.gofood-villa-tip{margin-top:14px}}\n@media(max-width:390px){.gofood-downloads{grid-template-columns:1fr}.gofood-downloads>span{grid-column:auto}.store-badge{justify-content:flex-start;padding-left:18px}}\n
+
+/* ===== V18 polish pass: Bash Board + FastDrip + GoFood ===== */
+/* Bash Board quick composer: more breathing room without changing behaviour. */
+.bash-quick-compose{padding:22px 16px!important;gap:14px!important;align-items:center!important}
+.bash-quick-compose>.bash-avatar{width:54px!important;height:54px!important}
+.bash-quick-input{min-height:78px!important;padding:14px 20px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:7px!important}
+.bash-quick-input b{font-size:19px!important;line-height:1.08!important}
+.bash-quick-input small{font-size:12px!important;line-height:1.25!important;margin-top:0!important}
+
+/* Empty board: end naturally after the CTA; no artificial empty feed block. */
+.bash-post-stream:has(.bash-empty-v4){display:block!important;background:#f2eadf!important;padding:0!important;min-height:0!important}
+.bash-empty-v4{padding:52px 20px 34px!important;min-height:0!important;margin:0!important}
+.bash-feed-v4:has(.bash-empty-v4){padding-bottom:92px!important}
+
+/* Create Post: compact, social-composer proportions. */
+.bash-create-modern{overflow-y:auto!important}
+.bash-create-user{padding-top:14px!important;padding-bottom:10px!important}
+.bash-create-actions.top-actions{margin-top:10px!important;margin-bottom:12px!important}
+.bash-create-actions.top-actions button{min-height:104px!important}
+.bash-caption-preview{min-height:138px!important;margin-top:14px!important;padding:24px!important;align-content:start!important;gap:0!important}
+.bash-caption-preview>span{font-size:25px!important;line-height:1.18!important;font-weight:600!important}
+.bash-caption-preview.has-text>span{font-size:19px!important;line-height:1.45!important}
+.bash-caption-preview small{margin-top:16px!important}
+
+/* Check-in search: one border only. Outer control owns the shape/border. */
+.bash-location-sheet .bash-place-search.solo{height:62px!important;display:flex!important;align-items:center!important;padding:0 18px!important;border:1px solid rgba(107,78,61,.14)!important;border-radius:20px!important;background:#f7f5f1!important;box-shadow:none!important}
+.bash-location-sheet .bash-place-search.solo>span{position:static!important;display:grid!important;place-items:center!important;width:28px!important;flex:0 0 28px!important;margin-right:8px!important}
+.bash-location-sheet .bash-place-search.solo input{height:58px!important;flex:1!important;min-width:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:0!important}
+
+/* FastDrip: use real bundled imagery and finish the page close to its back action. */
+.fastdrip-card-photo{display:block!important;min-height:210px!important;background:#eee7f1!important}
+.fastdrip-card-photo img{display:block!important;width:100%!important;height:100%!important;min-height:210px!important;object-fit:cover!important;opacity:1!important;visibility:visible!important}
+.fastdrip-note{margin-bottom:8px!important}
+.fastdrip-page .recovery-page-end{padding:14px 0 0!important;gap:8px!important}
+.fastdrip-page .shell{padding-bottom:104px!important}
+
+/* GoFood: tighter hierarchy and less dead vertical space. */
+.recovery-feature-gofood{padding-top:24px!important;padding-bottom:24px!important;align-items:start!important}
+.recovery-feature-gofood .recovery-feature-copy{padding-top:0!important}
+.recovery-feature-gofood .meta{margin-bottom:8px!important}
+.recovery-feature-gofood h3{margin-top:0!important;margin-bottom:8px!important;line-height:.96!important}
+.recovery-feature-gofood p{margin-top:0!important;margin-bottom:0!important;line-height:1.48!important}
+.recovery-feature-gofood p b{display:inline-block!important;margin-bottom:5px!important}
+.gofood-villa-tip{margin:12px 0 12px!important;padding:13px 16px!important;gap:3px!important}
+.gofood-actions{gap:11px!important}
+.gofood-downloads{gap:7px!important}
+.gofood-downloads>span{margin-top:1px!important;margin-bottom:1px!important}
+.store-badge{height:48px!important}
+.store-badge .apple-mark{width:24px!important;height:24px!important;display:grid!important;place-items:center!important;flex:0 0 24px!important}
+.store-badge .apple-mark svg{display:block!important;width:24px!important;height:24px!important}
+.recovery-feature-gofood + .recovery-feature-float{padding-top:24px!important}
+
+@media(max-width:760px){
+ .bash-quick-compose{padding:20px 14px!important}
+ .bash-quick-input{min-height:76px!important;padding:13px 18px!important}
+ .bash-create-actions.top-actions button{min-height:100px!important}
+ .bash-caption-preview{min-height:132px!important;padding:22px!important}
+ .recovery-feature-gofood{grid-template-columns:58px 1fr!important;gap:18px!important}
+ .gofood-icon{margin-top:2px!important}
+ .gofood-villa-tip{margin-top:11px!important}
+ .fastdrip-card-photo,.fastdrip-card-photo img{min-height:220px!important}
+}
+
+/* V19 - unified spacing + Bash Board / chat polish */
+:root{--app-section-gap:24px;--app-card-gap:24px}
+@media(max-width:760px){
+  .shell{padding-bottom:94px!important}
+  .section{margin-top:var(--app-section-gap)!important}
+  .grid,.grid.two,.guide-grid,.help-grid,.ready-grid{gap:var(--app-card-gap)!important}
+  .section-head{margin-bottom:16px!important}
+  .shell>.section:last-child{margin-bottom:0!important}
+  .shell>.section:last-child>*:last-child{margin-bottom:0!important}
+  .card{padding:26px!important}
+  .card .actions{margin-top:18px!important}
+}
+
+/* Bash Board hero title: deliberately branded, strong and balanced. */
+.bash-board-top{padding:18px 16px 20px!important;align-items:center!important;min-height:142px!important}
+.bash-board-title{gap:15px!important;align-items:center!important}
+.bash-board-mark{width:64px!important;height:64px!important;border-radius:20px!important;font-size:31px!important;flex:0 0 64px!important}
+.bash-board-title .eyebrow{font-size:10px!important;letter-spacing:.2em!important;margin-bottom:6px!important}
+.bash-board-title h1{font-family:'Cormorant Garamond',Georgia,serif!important;font-size:46px!important;line-height:.78!important;font-weight:700!important;letter-spacing:-.035em!important;color:var(--brown)!important;margin:0!important}
+.bash-board-title h1 span{display:block!important}
+.bash-board-tools{gap:10px!important;align-self:center!important}
+.bash-board-tool{width:52px!important;height:52px!important}
+
+/* Status composer: neither cramped nor oversized. */
+.bash-quick-compose{padding:18px 16px!important;gap:13px!important}
+.bash-quick-compose>.bash-avatar{width:50px!important;height:50px!important}
+.bash-quick-input{min-height:68px!important;padding:11px 18px!important;gap:4px!important;border-radius:34px!important}
+.bash-quick-input b{font-size:18px!important;line-height:1.1!important}
+.bash-quick-input small{font-size:12px!important;line-height:1.2!important}
+
+/* Empty Bash Board finishes naturally instead of stretching into a blank block. */
+.bash-post-stream:has(.bash-empty-v4){min-height:0!important;height:auto!important;padding:0!important;margin-bottom:0!important}
+.bash-empty-v4{min-height:0!important;height:auto!important;padding:44px 20px 48px!important;margin:0!important}
+.bash-feed-v4:has(.bash-empty-v4){min-height:0!important;padding-bottom:0!important;margin-bottom:0!important}
+
+/* Create post: compact social composer that expands with content. */
+.bash-create-user{padding-top:12px!important;padding-bottom:8px!important}
+.bash-create-actions.top-actions{margin:8px 0 10px!important}
+.bash-caption-preview{min-height:138px!important;height:auto!important;padding:24px 20px!important;align-items:flex-start!important;justify-content:flex-start!important}
+.bash-caption-preview>span{font-size:31px!important;line-height:1.08!important}
+.bash-caption-preview small{margin-top:10px!important}
+
+/* Check-in search is one field, one outline. */
+.bash-location-sheet .bash-place-search.solo{border:1px solid rgba(107,78,61,.16)!important;box-shadow:none!important;background:#f7f5f1!important;overflow:hidden!important}
+.bash-location-sheet .bash-place-search.solo input{border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
+
+/* Group chat: messages begin at the top. Interaction controls only appear when a message is tapped. */
+.bash-message-list{justify-content:flex-start!important;align-content:flex-start!important}
+.bash-chat-empty.modern{margin:auto!important}
+.bash-chat-quick-actions{display:none!important}
+.bash-chat-message-actions{margin-top:6px!important}
+.bash-message-reaction-summary{margin-top:4px!important}
+
+/* Consistent final-page spacing above fixed navigation; floating Nicky does not reserve layout space. */
+.nicky-launcher{position:fixed!important}
+@media(max-width:520px){
+  .bash-board-top{min-height:132px!important;padding:16px 14px 18px!important}
+  .bash-board-mark{width:58px!important;height:58px!important;flex-basis:58px!important;font-size:28px!important}
+  .bash-board-title h1{font-size:41px!important}
+  .bash-board-tool{width:48px!important;height:48px!important}
+  .bash-quick-compose{padding:16px 14px!important}
+  .bash-quick-input{min-height:66px!important;padding:10px 16px!important}
+  .bash-caption-preview{min-height:132px!important}
+}
+
+/* V19 - Bash media Drive status + compact tap menu */
+.bash-post-media-wrap{display:grid;gap:8px}
+.bash-drive-link{justify-self:start;margin:0 2px 4px;color:var(--olive);text-decoration:none;font:800 10px/1.2 Montserrat,Arial,sans-serif;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px}
+.bash-drive-link span{font-size:13px}
+.bash-message-primary-actions{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bash-message-primary-actions button{border:0;border-radius:999px;background:#f4efe7;color:var(--brown);min-height:34px;padding:0 12px;font:800 11px Montserrat,Arial,sans-serif}
+.bash-message-primary-actions span{font:800 10px Montserrat,Arial,sans-serif;color:#8a817a;text-transform:uppercase;letter-spacing:.12em}
+
+/* V20 - Bash Board editorial redesign approved from visual mockup */
+body:has(.bash-feed-v4){background:#f7f1e6!important}
+.bash-board-top{position:relative!important;top:auto!important;min-height:0!important;margin:0!important;padding:26px 18px 18px!important;border:0!important;border-radius:0!important;background:radial-gradient(circle at 88% 0%,rgba(205,184,153,.20),transparent 35%),#f8f2e8!important;box-shadow:none!important;align-items:end!important}
+.bash-board-title{display:block!important;min-width:0!important}
+.bash-board-mark{display:none!important}
+.bash-board-title .eyebrow{font:800 10px/1.2 Montserrat,Arial,sans-serif!important;letter-spacing:.22em!important;color:var(--olive)!important;margin:0 0 8px!important;text-transform:uppercase}
+.bash-board-title h1{font:700 clamp(43px,12vw,58px)/.88 'Cormorant Garamond',Georgia,serif!important;letter-spacing:-.045em!important;color:#35261f!important;margin:0!important;white-space:nowrap!important}
+.bash-board-title h1 span{display:inline!important}.bash-board-title h1 span+span:before{content:' '!important}
+.bash-board-tools{gap:8px!important;padding-bottom:5px!important}.bash-board-tool{width:44px!important;height:44px!important;background:transparent!important;border:0!important;box-shadow:none!important}.bash-board-tool svg{width:27px!important;height:27px!important;stroke-width:1.8!important;color:#4e382d!important}
+.bash-feed-v4{margin:0!important;padding:0 18px 0!important;background:#f8f2e8!important}
+.bash-quick-compose{margin:0!important;padding:12px 0 20px!important;grid-template-columns:48px 1fr!important;gap:10px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.bash-quick-compose>.bash-avatar{width:48px!important;height:48px!important;border:0!important;background:#efe3d2!important}
+.bash-quick-input{min-height:56px!important;height:56px!important;border:1px solid rgba(107,78,61,.16)!important;border-radius:999px!important;background:rgba(255,255,255,.72)!important;padding:0 18px!important;display:flex!important;justify-content:center!important;gap:0!important;box-shadow:none!important}
+.bash-quick-input b{font:500 16px/1.2 Montserrat,Arial,sans-serif!important;color:#827973!important}.bash-quick-input small{display:none!important}
+.bash-now-modern{margin:0 -18px 20px!important;padding:13px 18px!important;border-radius:0!important;border-top:1px solid rgba(107,78,61,.12)!important;border-bottom:1px solid rgba(107,78,61,.12)!important;background:transparent!important;box-shadow:none!important}
+.bash-now-head{margin-bottom:10px!important}.bash-now-head b{font-size:14px!important;letter-spacing:.13em!important}.bash-now-count{font-size:10px!important}
+.bash-bali-mode-cta{grid-template-columns:38px 1fr auto!important;gap:10px!important;padding:0!important;border:0!important;background:transparent!important;border-radius:0!important}.bash-bali-mode-icon{width:38px!important;height:38px!important;font-size:20px!important;background:rgba(85,107,63,.08)!important}.bash-bali-mode-cta b{font-size:13px!important}.bash-bali-mode-cta small{font-size:10px!important;margin-top:2px!important}.bash-bali-mode-cta button{grid-column:auto!important;width:auto!important;padding:10px 14px!important;font-size:10px!important}
+.bash-post-stream{gap:18px!important;margin:0!important;padding:0 0 20px!important;background:transparent!important}.bash-post-modern{border-radius:24px!important;border:1px solid rgba(107,78,61,.08)!important;padding:16px!important;background:#fffdf9!important;box-shadow:0 10px 28px rgba(70,51,40,.06)!important}.bash-post-media{margin:12px 0 0!important;border-radius:18px!important;overflow:hidden!important}.bash-post-media:not(.multi) .bash-media-tile{border-radius:18px!important}.bash-post-text{font-size:15px!important;line-height:1.55!important}.bash-post-name-row strong{font-size:15px!important}.bash-post-head .bash-avatar{width:44px!important;height:44px!important}
+.bash-post-stream:has(.bash-empty-v4){background:transparent!important}.bash-empty-v4{padding:48px 16px 36px!important;background:transparent!important}.bash-empty-logo{width:62px!important;height:62px!important;border-radius:18px!important}.bash-empty-v4 h3{font-size:22px!important}.bash-empty-v4 p{font-size:15px!important}.bash-feed-v4:has(.bash-empty-v4){padding-bottom:0!important}
+/* Chat starts beneath header; message actions are tap-to-open, never permanently cluttering bubbles. */
+.bash-message-list{justify-content:flex-start!important;align-content:flex-start!important;padding-top:18px!important;padding-bottom:110px!important}.bash-message{margin-bottom:12px!important}.bash-chat-quick-actions{display:none!important}.bash-chat-message-actions{margin-top:7px!important}.bash-message-primary-actions{justify-content:flex-start!important}.bash-bubble{cursor:pointer!important}
+/* Create post: calmer hierarchy, caption field behaves like a normal composer. */
+.bash-create-actions.top-actions{gap:10px!important}.bash-create-actions.top-actions button{min-height:92px!important;padding:14px 8px!important}.bash-create-actions.top-actions button span b{font-size:13px!important}.bash-create-actions.top-actions button span small{font-size:9px!important}.bash-caption-preview{min-height:118px!important;padding:20px!important;border-radius:22px!important}.bash-caption-preview>span{font-size:24px!important;line-height:1.15!important}.bash-caption-preview:not(.has-text)>span{color:#928983!important}
+@media(max-width:520px){.bash-board-top{padding:22px 14px 14px!important}.bash-board-title h1{font-size:clamp(39px,11.3vw,50px)!important}.bash-board-tools{gap:2px!important}.bash-board-tool{width:40px!important;height:40px!important}.bash-feed-v4{padding-left:14px!important;padding-right:14px!important}.bash-now-modern{margin-left:-14px!important;margin-right:-14px!important;padding-left:14px!important;padding-right:14px!important}.bash-bali-mode-cta{grid-template-columns:36px 1fr auto!important}.bash-bali-mode-cta button{grid-column:auto!important}.bash-post-modern{border-radius:22px!important;padding:14px!important}.bash-post-media{margin-left:0!important;margin-right:0!important;border-radius:16px!important}.bash-post-media:not(.multi) .bash-media-tile{border-radius:16px!important}}
+
+/* V21: keep the two primary sunset actions together on mobile */
+.sunset-card .inner > .actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  align-items:stretch;
+}
+.sunset-card .inner > .actions .btn{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:15px 10px!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+  font-size:clamp(14px,3.8vw,17px)!important;
+}
+@media(max-width:380px){
+  .sunset-card .inner > .actions{gap:8px!important}
+  .sunset-card .inner > .actions .btn{padding:14px 7px!important;font-size:13px!important}
+}
+\n\n/* V22: final combined mobile polish */\n/* Remove artificial bottom whitespace: body owns the nav clearance; shells should not add a second nav-sized pad. */\n@media(max-width:760px){\n  .shell{padding-bottom:24px!important}\n  .shell>.section:last-child,.shell>.card:last-child{margin-bottom:0!important}\n  .bash-feed-v4{padding-bottom:18px!important}\n  .bash-post-stream{padding-bottom:18px!important}\n}\n/* Bash Board title stays branded but cleaner and more editorial. */\n.bash-board-top{background:linear-gradient(145deg,#f8f1e5,#f2eadc)!important;border-radius:26px 26px 0 0!important;box-shadow:0 10px 28px rgba(64,47,37,.07)!important}\n.bash-board-title h1{font-family:'Cormorant Garamond',Georgia,serif!important;color:#3b2a22!important;font-weight:700!important;letter-spacing:-.045em!important;line-height:.84!important}\n.bash-board-title .eyebrow{color:var(--olive)!important}\n/* Feed: no duplicate Comment label when there is nothing to count. */\n.bash-post-social:empty{display:none!important}\n/* Chat messages start directly below the header instead of floating in the vertical middle. */\n.bash-message-list{justify-content:flex-start!important;align-content:flex-start!important}\n/* Message options stay hidden until tap/hold. */\n.bash-chat-quick-actions{display:none!important}\n.bash-chat-message-actions{width:max-content;max-width:100%;background:#fff;border:1px solid #e8e2da;border-radius:18px;padding:7px;box-shadow:0 12px 30px rgba(43,33,27,.13)!important}\n.bash-message.mine .bash-chat-message-actions{margin-left:auto!important}\n/* Home sunset card: both important actions remain side-by-side. */\n.sunset-card .inner>.actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important;width:100%!important}\n.sunset-card .inner>.actions .btn{width:100%!important;min-width:0!important;white-space:nowrap!important;padding:14px 8px!important;font-size:clamp(12px,3.35vw,16px)!important}\n@media(max-width:390px){.sunset-card .inner>.actions{gap:7px!important}.sunset-card .inner>.actions .btn{font-size:12px!important;padding-left:5px!important;padding-right:5px!important}}\n
