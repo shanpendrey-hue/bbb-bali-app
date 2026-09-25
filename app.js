@@ -995,3 +995,48 @@ setTimeout(handleRecoveryPaymentReturn,0);
 
 function bashSyncVisualViewport(){const vv=window.visualViewport;if(!vv)return;document.documentElement.style.setProperty('--bash-vvh',vv.height+'px');document.documentElement.style.setProperty('--bash-vvo',vv.offsetTop+'px');document.documentElement.style.setProperty('--bash-vvc',(vv.offsetTop+vv.height/2)+'px');if(document.body.classList.contains('bash-chat-open')){const l=qs('#bashMessageList');if(l)requestAnimationFrame(()=>{l.scrollTop=l.scrollHeight})}}
 if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSyncVisualViewport);window.visualViewport.addEventListener('scroll',bashSyncVisualViewport)}
+
+/* V25 — installable B.B.B Home Screen experience */
+(()=>{
+  const LOGO='/assets/bbb-logo.png';
+  const installed=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  const ios=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+  let deferredInstall=null;
+  if(installed())document.documentElement.classList.add('bbb-standalone');
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;showNudge(true)});
+  window.addEventListener('appinstalled',()=>{localStorage.setItem('bbbInstalled','1');removeInstallUI();document.documentElement.classList.add('bbb-standalone')});
+  function removeInstallUI(){document.querySelectorAll('.bbb-install-nudge,.bbb-install-backdrop,.bbb-install-sheet,.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove())}
+  function showNudge(force=false){
+    if(installed()||document.querySelector('.bbb-install-nudge'))return;
+    if(!force&&localStorage.getItem('bbbInstallDismissed')==='1')return;
+    document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Install B.B.B Bali"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Put B.B.B on your phone</b><small>One tap from your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>ADD B.B.B</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
+  }
+  function openInstall(){
+    if(deferredInstall&&!ios()){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null});return}
+    document.querySelectorAll('.bbb-install-backdrop,.bbb-install-sheet').forEach(x=>x.remove());
+    const safari=ios();
+    document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop" data-bbb-install-close></div><section class="bbb-install-sheet" role="dialog" aria-modal="true"><button class="bbb-install-sheet-close" data-bbb-install-close aria-label="Close">×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">Nicolle's 50th · Bali 2027</div><h2>Add B.B.B to your phone</h2></div></div><p>${safari?'It takes about 10 seconds. Once added, B.B.B opens from its own icon like an app.':'Install B.B.B so it opens from its own icon like an app.'}</p><div class="bbb-install-steps">${safari?`<div class="bbb-install-step"><i>1</i><div><b>Tap Share</b><span>Tap the square with the ↑ arrow in Safari.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose “Add to Home Screen”</b><span>Scroll down in the Share menu if you don't see it.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Tap Add</b><span>Keep the name B.B.B Bali, then tap Add.</span></div></div>`:`<div class="bbb-install-step"><i>1</i><div><b>Install B.B.B</b><span>Use your browser's Install app / Add to Home Screen option.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Open from your Home Screen</b><span>Look for the Nicolle's 50th palm-tree icon.</span></div></div>`}</div><button class="bbb-install-primary" data-bbb-install-close>Got it</button><p class="bbb-install-note">Look for this exact B.B.B palm-tree icon on your Home Screen.</p></section>`)
+  }
+  async function enableNotifications(){
+    if(!('Notification'in window)){return}
+    const permission=await Notification.requestPermission();
+    if(permission==='granted'){
+      localStorage.setItem('bbbNotificationsEnabled','1');
+      const reg=await navigator.serviceWorker?.ready.catch(()=>null);
+      if(reg)reg.showNotification('B.B.B Bali 🌴',{body:'Notifications are on. You won’t miss the B.B.B updates.',icon:'/assets/icons/icon-192.png',badge:'/assets/icons/icon-192.png',tag:'bbb-welcome'});
+      document.querySelectorAll('.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove())
+    }
+  }
+  function maybeNotifyPrompt(){
+    if(!installed()||!('Notification'in window)||Notification.permission!=='default'||localStorage.getItem('bbbNotifyPrompted')==='1')return;
+    setTimeout(()=>{if(document.querySelector('.bbb-notify-sheet'))return;localStorage.setItem('bbbNotifyPrompted','1');document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop bbb-notify-backdrop" data-bbb-notify-close></div><section class="bbb-install-sheet bbb-notify-sheet"><button class="bbb-install-sheet-close" data-bbb-notify-close>×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">B.B.B updates</div><h2>Don't miss a thing</h2></div></div><p>Turn on notifications for trip reminders and B.B.B updates.</p><button class="bbb-install-primary" data-bbb-notify-enable>Turn on notifications</button><p class="bbb-install-note">You can choose Allow when your phone asks.</p></section>`)},1400)
+  }
+  document.addEventListener('click',e=>{
+    if(e.target.closest('[data-bbb-install]'))openInstall();
+    if(e.target.closest('[data-bbb-install-dismiss]')){localStorage.setItem('bbbInstallDismissed','1');e.target.closest('.bbb-install-nudge')?.remove()}
+    if(e.target.closest('[data-bbb-install-close]'))document.querySelectorAll('.bbb-install-backdrop,.bbb-install-sheet').forEach(x=>x.remove());
+    if(e.target.closest('[data-bbb-notify-close]'))document.querySelectorAll('.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove());
+    if(e.target.closest('[data-bbb-notify-enable]'))enableNotifications();
+  });
+  window.addEventListener('load',()=>{if(!installed())setTimeout(()=>showNudge(false),900);else maybeNotifyPrompt()});
+})();
