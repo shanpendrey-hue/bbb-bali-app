@@ -1141,3 +1141,65 @@ body:has(.drink-basket-btn.has-items) .nicky-launcher{bottom:calc(174px + env(sa
 .fastdrip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}.fastdrip-card{padding:0;overflow:hidden;border:1px solid rgba(75,23,111,.14);border-radius:26px;background:rgba(255,255,255,.62);box-shadow:0 12px 30px rgba(72,55,40,.05)}.fastdrip-card-photo{aspect-ratio:16/10;overflow:hidden;background:var(--fastdrip-soft)}.fastdrip-card-photo img{width:100%;height:100%;object-fit:cover;display:block}.fastdrip-card-body{padding:22px 24px 24px}.fastdrip-card .meta{color:var(--fastdrip)}.fastdrip-card h3{font-family:'Cormorant Garamond',serif;color:var(--aus-teal);font-size:31px;margin:5px 0 10px}.fastdrip-card p{color:#6b665d;line-height:1.55;min-height:72px}.fastdrip-card a{display:inline-flex;margin-top:10px;color:var(--fastdrip);font-weight:800;text-decoration:none}.fastdrip-note{margin:10px 0 34px;padding:26px;border-radius:26px;background:#f4eee5;border:1px solid rgba(75,23,111,.12)}.fastdrip-note b{font-size:22px;color:var(--aus-teal)}.fastdrip-note p{line-height:1.6;color:#6b665d;margin:8px 0 18px}
 @media(max-width:640px){.fastdrip-head h1{font-size:clamp(39px,10.6vw,50px);letter-spacing:-.02em}.fastdrip-hero-photo{aspect-ratio:16/7;border-radius:22px}.fastdrip-grid{grid-template-columns:1fr}.fastdrip-card p{min-height:0}.fastdrip-actions .aus-btn{width:100%}.fastdrip-provider{width:100%;justify-content:space-between}.fastdrip-section-title h2{font-size:36px}}
 \n/* V17 - GoFood recovery feature */\n.recovery-feature-gofood .recovery-feature-icon{background:#fff4f2;border-color:rgba(238,39,55,.22);color:#ee2737}.gofood-icon span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#ee2737;color:#fff;font-size:14px;font-weight:950;letter-spacing:-.04em}.recovery-feature-gofood .meta{color:#c92331}.recovery-feature-gofood h3{max-width:640px}.gofood-villa-tip{display:flex;flex-direction:column;gap:5px;margin:16px 0 18px;padding:15px 17px;border-radius:17px;background:#f4eee5;border:1px solid rgba(35,85,78,.12);max-width:660px}.gofood-villa-tip b{color:var(--aus-teal);font-size:14px}.gofood-villa-tip span{font-size:14px;line-height:1.5;color:#665f56}.gofood-actions{display:flex;flex-direction:column;align-items:flex-start;gap:15px}.gofood-button{background:#ee2737!important;border-color:#ee2737!important;color:#fff!important}.gofood-downloads{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gofood-downloads>span{width:100%;font-size:9px;letter-spacing:.14em;font-weight:900;color:#80776d}.store-badge{min-width:142px;height:46px;padding:5px 12px;border-radius:9px;background:#111;color:#fff!important;text-decoration:none!important;display:flex;align-items:center;gap:8px;border:1px solid #333}.store-badge>b{font-size:23px;line-height:1}.store-badge.play>b{font-size:17px}.store-badge em{display:flex;flex-direction:column;font-style:normal;font-weight:700;font-size:16px;line-height:1}.store-badge small{font-size:8px;letter-spacing:.04em;margin-bottom:3px;font-weight:600}.store-badge:hover{transform:translateY(-1px)}\n@media(max-width:760px){.gofood-actions{align-items:stretch}.gofood-button{width:100%}.gofood-downloads{display:grid;grid-template-columns:1fr 1fr}.gofood-downloads>span{grid-column:1/-1}.store-badge{min-width:0;width:100%;justify-content:center;padding-left:8px;padding-right:8px}.store-badge em{font-size:14px}.gofood-villa-tip{margin-top:14px}}\n@media(max-width:390px){.gofood-downloads{grid-template-columns:1fr}.gofood-downloads>span{grid-column:auto}.store-badge{justify-content:flex-start;padding-left:18px}}\n
+
+/* ===== V18 polish pass: Bash Board + FastDrip + GoFood ===== */
+/* Bash Board quick composer: more breathing room without changing behaviour. */
+.bash-quick-compose{padding:22px 16px!important;gap:14px!important;align-items:center!important}
+.bash-quick-compose>.bash-avatar{width:54px!important;height:54px!important}
+.bash-quick-input{min-height:78px!important;padding:14px 20px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:7px!important}
+.bash-quick-input b{font-size:19px!important;line-height:1.08!important}
+.bash-quick-input small{font-size:12px!important;line-height:1.25!important;margin-top:0!important}
+
+/* Empty board: end naturally after the CTA; no artificial empty feed block. */
+.bash-post-stream:has(.bash-empty-v4){display:block!important;background:#f2eadf!important;padding:0!important;min-height:0!important}
+.bash-empty-v4{padding:52px 20px 34px!important;min-height:0!important;margin:0!important}
+.bash-feed-v4:has(.bash-empty-v4){padding-bottom:92px!important}
+
+/* Create Post: compact, social-composer proportions. */
+.bash-create-modern{overflow-y:auto!important}
+.bash-create-user{padding-top:14px!important;padding-bottom:10px!important}
+.bash-create-actions.top-actions{margin-top:10px!important;margin-bottom:12px!important}
+.bash-create-actions.top-actions button{min-height:104px!important}
+.bash-caption-preview{min-height:138px!important;margin-top:14px!important;padding:24px!important;align-content:start!important;gap:0!important}
+.bash-caption-preview>span{font-size:25px!important;line-height:1.18!important;font-weight:600!important}
+.bash-caption-preview.has-text>span{font-size:19px!important;line-height:1.45!important}
+.bash-caption-preview small{margin-top:16px!important}
+
+/* Check-in search: one border only. Outer control owns the shape/border. */
+.bash-location-sheet .bash-place-search.solo{height:62px!important;display:flex!important;align-items:center!important;padding:0 18px!important;border:1px solid rgba(107,78,61,.14)!important;border-radius:20px!important;background:#f7f5f1!important;box-shadow:none!important}
+.bash-location-sheet .bash-place-search.solo>span{position:static!important;display:grid!important;place-items:center!important;width:28px!important;flex:0 0 28px!important;margin-right:8px!important}
+.bash-location-sheet .bash-place-search.solo input{height:58px!important;flex:1!important;min-width:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:0!important}
+
+/* FastDrip: use real bundled imagery and finish the page close to its back action. */
+.fastdrip-card-photo{display:block!important;min-height:210px!important;background:#eee7f1!important}
+.fastdrip-card-photo img{display:block!important;width:100%!important;height:100%!important;min-height:210px!important;object-fit:cover!important;opacity:1!important;visibility:visible!important}
+.fastdrip-note{margin-bottom:8px!important}
+.fastdrip-page .recovery-page-end{padding:14px 0 0!important;gap:8px!important}
+.fastdrip-page .shell{padding-bottom:104px!important}
+
+/* GoFood: tighter hierarchy and less dead vertical space. */
+.recovery-feature-gofood{padding-top:24px!important;padding-bottom:24px!important;align-items:start!important}
+.recovery-feature-gofood .recovery-feature-copy{padding-top:0!important}
+.recovery-feature-gofood .meta{margin-bottom:8px!important}
+.recovery-feature-gofood h3{margin-top:0!important;margin-bottom:8px!important;line-height:.96!important}
+.recovery-feature-gofood p{margin-top:0!important;margin-bottom:0!important;line-height:1.48!important}
+.recovery-feature-gofood p b{display:inline-block!important;margin-bottom:5px!important}
+.gofood-villa-tip{margin:12px 0 12px!important;padding:13px 16px!important;gap:3px!important}
+.gofood-actions{gap:11px!important}
+.gofood-downloads{gap:7px!important}
+.gofood-downloads>span{margin-top:1px!important;margin-bottom:1px!important}
+.store-badge{height:48px!important}
+.store-badge .apple-mark{width:24px!important;height:24px!important;display:grid!important;place-items:center!important;flex:0 0 24px!important}
+.store-badge .apple-mark svg{display:block!important;width:24px!important;height:24px!important}
+.recovery-feature-gofood + .recovery-feature-float{padding-top:24px!important}
+
+@media(max-width:760px){
+ .bash-quick-compose{padding:20px 14px!important}
+ .bash-quick-input{min-height:76px!important;padding:13px 18px!important}
+ .bash-create-actions.top-actions button{min-height:100px!important}
+ .bash-caption-preview{min-height:132px!important;padding:22px!important}
+ .recovery-feature-gofood{grid-template-columns:58px 1fr!important;gap:18px!important}
+ .gofood-icon{margin-top:2px!important}
+ .gofood-villa-tip{margin-top:11px!important}
+ .fastdrip-card-photo,.fastdrip-card-photo img{min-height:220px!important}
+}
