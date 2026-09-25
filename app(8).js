@@ -1001,21 +1001,37 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   const LOGO='/assets/bbb-logo.png';
   const installed=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   const ios=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const android=()=>/android/i.test(navigator.userAgent);
+  const mobile=()=>ios()||android();
+  const iosBrowser=()=>{const u=navigator.userAgent;if(/CriOS/i.test(u))return'Chrome';if(/FxiOS/i.test(u))return'Firefox';if(/EdgiOS/i.test(u))return'Edge';return'Safari'};
   let deferredInstall=null;
   if(installed())document.documentElement.classList.add('bbb-standalone');
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;showNudge(true)});
   window.addEventListener('appinstalled',()=>{localStorage.setItem('bbbInstalled','1');removeInstallUI();document.documentElement.classList.add('bbb-standalone')});
   function removeInstallUI(){document.querySelectorAll('.bbb-install-nudge,.bbb-install-backdrop,.bbb-install-sheet,.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove())}
   function showNudge(force=false){
-    if(installed()||document.querySelector('.bbb-install-nudge'))return;
+    if(installed()||!mobile()||document.querySelector('.bbb-install-nudge'))return;
     if(!force&&sessionStorage.getItem('bbbInstallDismissed')==='1')return;
-    document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Install B.B.B Bali"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Put B.B.B on your phone</b><small>One tap from your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>ADD B.B.B</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
+    document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Install B.B.B Bali"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Put B.B.B on your phone</b><small>One tap from your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>GET THE APP</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
   }
-  function openInstall(){
-    if(deferredInstall&&!ios()){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null});return}
+  async function openInstall(){
+    if(installed())return;
+    if(android()&&deferredInstall){
+      deferredInstall.prompt();
+      try{await deferredInstall.userChoice}catch(e){}
+      deferredInstall=null;
+      return;
+    }
     document.querySelectorAll('.bbb-install-backdrop,.bbb-install-sheet').forEach(x=>x.remove());
-    const safari=ios();
-    document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop" data-bbb-install-close></div><section class="bbb-install-sheet" role="dialog" aria-modal="true"><button class="bbb-install-sheet-close" data-bbb-install-close aria-label="Close">×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">Nicolle's 50th · Bali 2027</div><h2>Add B.B.B to your phone</h2></div></div><p>${safari?'It takes about 10 seconds. Once added, B.B.B opens from its own icon like an app.':'Install B.B.B so it opens from its own icon like an app.'}</p><div class="bbb-install-steps">${safari?`<div class="bbb-install-step"><i>1</i><div><b>Tap Share</b><span>Tap the square with the ↑ arrow in Safari.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose “Add to Home Screen”</b><span>Scroll down in the Share menu if you don't see it.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Tap Add</b><span>Keep the name B.B.B Bali, then tap Add.</span></div></div>`:`<div class="bbb-install-step"><i>1</i><div><b>Install B.B.B</b><span>Use your browser's Install app / Add to Home Screen option.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Open from your Home Screen</b><span>Look for the Nicolle's 50th palm-tree icon.</span></div></div>`}</div><button class="bbb-install-primary" data-bbb-install-close>Got it</button><p class="bbb-install-note">Look for this exact B.B.B palm-tree icon on your Home Screen.</p></section>`)
+    const isIOS=ios();
+    const browser=isIOS?iosBrowser():'';
+    const intro=isIOS
+      ?`You're on iPhone using ${browser}. Apple needs you to confirm adding B.B.B to your Home Screen.`
+      :'Your Android browser will either show an Install prompt or let you add B.B.B from its menu.';
+    const steps=isIOS
+      ?`<div class="bbb-install-step"><i>1</i><div><b>Tap Share</b><span>Tap your browser's Share button (the square with the ↑ arrow).</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose “Add to Home Screen”</b><span>Scroll through the Share options if you don't see it straight away.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Tap Add</b><span>Keep the name B.B.B Bali, then tap Add.</span></div></div>`
+      :`<div class="bbb-install-step"><i>1</i><div><b>Open your browser menu</b><span>Tap ⋮ and choose “Install app” or “Add to Home screen”.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Confirm B.B.B Bali</b><span>Tap Install / Add when your phone asks.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Open B.B.B</b><span>Look for the Nicolle's 50th palm-tree icon on your Home Screen.</span></div></div>`;
+    document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop" data-bbb-install-close></div><section class="bbb-install-sheet" role="dialog" aria-modal="true"><button class="bbb-install-sheet-close" data-bbb-install-close aria-label="Close">×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">Nicolle's 50th · Bali 2027</div><h2>Get the B.B.B app</h2></div></div><p>${intro}</p><div class="bbb-device-pill">${isIOS?'iPhone · '+browser:'Android'}</div><div class="bbb-install-steps">${steps}</div><button class="bbb-install-primary" data-bbb-install-close>Got it</button><p class="bbb-install-note">When installed, B.B.B opens from this exact palm-tree icon like an app.</p></section>`)
   }
   async function enableNotifications(){
     if(!('Notification'in window)){return}
