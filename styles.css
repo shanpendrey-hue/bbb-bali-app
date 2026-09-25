@@ -1387,3 +1387,35 @@ body:has(.bash-feed-v4){background:#f7f1e6!important}
   .sunset-card .inner > .actions .btn:first-child{font-size:14px!important;padding-left:5px!important;padding-right:5px!important}
   .sunset-card .inner > .actions .btn:last-child{font-size:13px!important;padding-left:5px!important;padding-right:5px!important}
 }
+
+/* V24: sunset actions - equal buttons with balanced spacing */
+.sunset-card .inner > .actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+  align-items:stretch!important;
+}
+.sunset-card .inner > .actions .btn,
+.sunset-card .inner > .actions .btn:first-child,
+.sunset-card .inner > .actions .btn:last-child{
+  width:100%!important;
+  min-width:0!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:12px 5px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  font-size:clamp(12px,3.05vw,15px)!important;
+  line-height:1.05!important;
+}
+@media(max-width:390px){
+  .sunset-card .inner > .actions{gap:10px!important}
+  .sunset-card .inner > .actions .btn,
+  .sunset-card .inner > .actions .btn:first-child,
+  .sunset-card .inner > .actions .btn:last-child{font-size:12px!important;padding-left:3px!important;padding-right:3px!important}
+}
