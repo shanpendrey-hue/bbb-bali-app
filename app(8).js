@@ -97,7 +97,10 @@ const state={
   bashCommentReply:null,
   bashCommentEdit:null,
   bashCommentMenuId:null,
-  bashChatReplyTo:null
+  bashChatReplyTo:null,
+  nickyOpen:false,
+  nickyBusy:false,
+  nickyMessages:db.get('bbb_nicky_messages',[])
 };
 
 // Migrate the original single-flight format into the new outbound/return structure.
@@ -394,7 +397,7 @@ window.addEventListener('hashchange',()=>{const next=location.hash.replace('#/',
 
 function renderHeader(){return `<header class="topbar"><div class="brand-mini"><div class="stamp stamp-logo"><img src="${BBB_SECONDARY_LOGO}" alt="Nicolle's 50th B.B.B Bali 2027 logo"></div><div class="brand-copy"><strong>Nicolle's 50th</strong><span>BALI 2027</span></div></div><button class="btn light profile-top-btn" data-action="nav" data-route="profile">My Profile</button></header>`}
 function renderNav(){const unread=bashUnreadTotal();const items=[['home','⌂','Home'],['bbb','🎂','B.B.B'],['bash','BB','Bash Board'],['travel','✈','Travel'],['bali','☀','Bali']];return `<nav class="navbar" aria-label="Main navigation">${items.map(([r,icon,label])=>{const active=state.route===r||(r==='bali'&&state.route.startsWith('guide-'));const center=r==='bash';return `<button class="navitem ${active?'active':''} ${center?'bash-navitem':''}" data-action="nav" data-route="${r}"><span class="ico ${center?'bash-nav-ico':''}">${center?`<span class="bash-orb-ring"></span><span class="bash-orb-core">BB</span>${unread?`<i class="bash-nav-badge">${unread>9?'9+':unread}</i>`:''}`:icon}</span><span>${label}</span></button>`}).join('')}</nav>`}
-function page(content,nav=true){return `<div class="shell">${renderHeader()}${content}</div>${nav?renderNav():''}`}
+function page(content,nav=true){return `<div class="shell">${renderHeader()}${content}</div>${nav?renderNav():''}${nav?renderNickyLauncher():''}`}
 function countdown(){let d=Math.max(0,new Date(CFG.birthday)-new Date()),days=Math.floor(d/864e5);d%=864e5;const h=Math.floor(d/36e5);d%=36e5;const m=Math.floor(d/6e4),s=Math.floor((d%6e4)/1000);return [[days,'Days'],[h,'Hours'],[m,'Mins'],[s,'Secs']].map(x=>`<div class="count"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}
 
 function homeView(){return page(`
@@ -426,11 +429,17 @@ function madeCarSvg(){return `<svg class="made-car-svg" viewBox="0 0 280 170" ar
 function pickupTotal(p=state.airportPickup){if(!p)return 0;const ride=Number(p.ridePrice||0),drinks=(p.drinks||[]).reduce((n,x)=>n+Number(x.qty||0)*Number(x.price||0),0);return ride+drinks}
 function pickupSummary(p=state.airportPickup,compact=false){if(!p)return'';const drinks=(p.drinks||[]).filter(x=>x.qty>0),drinkQty=drinks.reduce((n,x)=>n+Number(x.qty||0),0),flight=state.flight?.outbound,drinkText=drinks.length?drinks.map(x=>`${x.qty} × ${escapeHtml(x.name)}`).join(', '):'No drinks';if(compact)return `<div class="pickup-summary-rows"><div><span>Pickup</span><b>${escapeHtml(p.area)}</b></div><div><span>Ride</span><b>$${Number(p.ridePrice).toFixed(0)} AUD</b></div><div><span>Flight</span><b>${flight?`${escapeHtml(flight.airline)} ${escapeHtml(flight.no)}`:'Not added'}</b></div><div><span>Drinks</span><b>${drinkQty?`${drinkQty} item${drinkQty===1?'':'s'}`:'No drinks'}</b></div><div class="pickup-summary-total"><span>Total due</span><strong>$${pickupTotal(p).toFixed(0)} AUD CASH</strong></div></div>`;return `<div class="pickup-summary-rows detailed"><div><span>Pickup</span><b>${escapeHtml(p.area)}</b></div><div><span>Ride</span><b>$${Number(p.ridePrice).toFixed(0)} AUD</b></div><div><span>Flight</span><b>${flight?`${escapeHtml(flight.airline)} ${escapeHtml(flight.no)} · ${formatFlightDate(flight.arrive)}`:'Not added · Arrival will be confirmed separately.'}</b></div><div><span>Drinks</span><b>${drinkText}</b></div><div class="pickup-summary-total"><span>Total due</span><strong>$${pickupTotal(p).toFixed(0)} AUD CASH</strong></div></div>`}
 function airportPickupCard(){const p=state.airportPickup;if(p?.status==='booked')return `<article class="card pickup-card booked pickup-card-clean"><div class="pickup-card-top"><div><div class="meta">Airport pickup</div><h3>Made has you covered</h3></div><span class="pickup-badge booked">✓ BOOKED</span></div><div class="pickup-booked-visual"><div class="pickup-car-wrap compact-van">${madeCarSvg()}</div></div>${pickupSummary(p,true)}<div class="actions pickup-card-actions"><button class="btn olive" data-action="modal" data-modal="pickup-view">View booking</button><button class="btn light" data-action="modal" data-modal="airport-pickup">Edit booking</button></div></article>`;if(p?.status==='cancelled')return `<article class="card pickup-card"><div class="pickup-card-top"><div><div class="meta">Airport pickup</div><h3>Need a driver?</h3></div><span class="pickup-badge cancelled">CANCELLED</span></div><div class="pickup-card-body"><div class="pickup-car-wrap">${madeCarSvg()}</div><div><p>Your previous pickup was cancelled. You can make a new booking any time.</p><div class="actions"><button class="btn" data-action="modal" data-modal="airport-pickup">Book again</button></div></div></div></article>`;return `<article class="card pickup-card"><div class="pickup-card-top"><div><div class="meta">Airport pickup</div><h3>Need a driver?</h3></div></div><div class="pickup-card-body"><div class="pickup-car-wrap">${madeCarSvg()}</div><div><p>Book Made for your Bali arrival and add cold drinks to be waiting when you land.</p><div class="pickup-prices"><span>Kuta / Legian <b>$30 AUD</b></span><span>Seminyak <b>$40 AUD</b></span></div><div class="actions"><button class="btn olive" data-action="modal" data-modal="airport-pickup">Book airport pickup</button></div></div></div></article>`}
+const READY_WATCH={
+ visa:'https://www.youtube.com/watch?v=7neeR2ZH00c&t=260s',
+ levy:'https://www.youtube.com/watch?v=L-0qquSH5yA',
+ arrival:'https://www.youtube.com/watch?v=zUqUaEwJj3A&t=50s'
+};
+function readyOfficialAction(url,key){return `<div class="ready-action-stack"><a class="ready-action" href="${url}" target="_blank" rel="noopener">Do it now →</a><a class="ready-watch-action" href="${READY_WATCH[key]}" target="_blank" rel="noopener">▶ Watch how →</a></div>`}
 function readyAction(key){
  if(state.checklist[key])return'';
- if(key==='visa')return `<a class="ready-action" href="${CFG.visa}" target="_blank" rel="noopener">Do it now →</a>`;
- if(key==='levy')return `<a class="ready-action" href="${CFG.levy}" target="_blank" rel="noopener">Do it now →</a>`;
- if(key==='arrival')return `<a class="ready-action" href="${CFG.allIndonesia}" target="_blank" rel="noopener">Do it now →</a>`;
+ if(key==='visa')return readyOfficialAction(CFG.visa,key);
+ if(key==='levy')return readyOfficialAction(CFG.levy,key);
+ if(key==='arrival')return readyOfficialAction(CFG.allIndonesia,key);
  if(key==='flight')return `<button class="ready-action ready-action-button" data-action="nav" data-route="travel">Add flights →</button>`;
  if(key==='medication')return `<a class="ready-action" href="${CFG.smartraveller}" target="_blank" rel="noopener">Check guidance →</a>`;
  return'';
@@ -608,7 +617,87 @@ function renderCart(){qsa('.drawer,.cart-overlay').forEach(x=>x.remove());if(!st
 
 function renderDrinkCart(){qsa('.drink-drawer,.drink-cart-overlay').forEach(x=>x.remove());if(!state.drinkCartOpen)return;const photo=state.profile.photo?`<img src="${state.profile.photo}" alt="${escapeAttr(state.profile.name||'Guest')} profile photo">`:'☺',total=state.drinkCart.reduce((n,x)=>n+x.qty,0);document.body.insertAdjacentHTML('beforeend',`<div class="overlay drink-cart-overlay" data-action="close-drink-cart"></div><aside class="drawer drink-drawer"><div class="section-head"><div><div class="eyebrow">B.B.B cocktails</div><h2 class="section-title">My Order</h2></div><button class="btn light" data-action="close-drink-cart">Close</button></div><div class="drink-profile"><div class="drink-profile-photo">${photo}</div><div><div class="meta">Ordering as</div><h3>${escapeHtml(state.profile.name||'Guest')}</h3></div></div>${state.drinkCart.length?state.drinkCart.map((x,i)=>`<div class="drink-cartline"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.type)}</small></div><div class="drink-cart-controls"><button data-action="drink-cart-qty" data-index="${i}" data-delta="-1">−</button><b>${x.qty}</b><button data-action="drink-cart-qty" data-index="${i}" data-delta="1">+</button><button class="remove-drink" data-action="remove-drink-cart" data-index="${i}">Remove</button></div></div>`).join(''):'<p>Your cocktail order is empty.</p>'}${state.drinkCart.length?`<div class="actions drink-place-actions"><button class="btn olive full" data-action="place-drink-order">Send order to the bar</button></div><p class="drink-order-note">Your order will open directly in WhatsApp to the B.B.B bartenders.</p>${state.drinkClearConfirm?`<div class="clear-order-confirm"><div class="clear-order-icon">↺</div><h3>Clear your order?</h3><p>This will remove all ${total} drink${total===1?'':'s'} from My Order.</p><div class="clear-order-actions"><button class="btn light" data-action="cancel-clear-drink-order">Keep order</button><button class="btn clear-confirm-btn" data-action="clear-drink-order">Yes, clear it</button></div></div>`:`<button class="clear-drink-order clear-attention" data-action="confirm-clear-drink-order"><span class="clear-order-symbol">↺</span><span>CLEAR MY ORDER</span></button>`}`:''}</aside>`) }
 
-function render(){const app=qs('#app');if(!app)return;document.body.classList.toggle('guide-active',state.route.startsWith('guide-'));try{if(state.route.startsWith('guide-')){app.innerHTML=guideView(state.route.slice(6));}else{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'bash':app.innerHTML=bashBoardView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}}renderModal();renderCart();renderDrinkCart();renderBashChat()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
+const NICKY_IMG='/assets/nicky-profile.png';
+const NICKY_REPLY_IMG='/assets/nicky-profile.png';
+state.nickyAttachment=state.nickyAttachment||null;
+function renderNickyLauncher(){return `<button class="nicky-launcher" data-action="nicky-open" aria-label="Ask Nicky"><span class="nicky-launcher-avatar"><img src="${NICKY_IMG}" alt="Nicky"></span><span class="nicky-launcher-copy"><b>Ask Nicky</b><small>Bali concierge</small></span><i>✨</i></button>`}
+function nickyContext(location=null){
+  const guideDetails=(typeof GUIDE!=='undefined'?GUIDE:[]).map((x,i)=>({
+    title:x.title||x[0]||'',description:x.desc||x[1]||'',slug:x.slug||'',
+    appContent:(typeof guidePageContent==='function'&&x.slug)?String(guidePageContent(x.slug)).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,5000):''
+  }));
+  return {
+    source:'LIVE B.B.B APP STATE',
+    capturedAt:new Date().toISOString(),
+    deviceLocalTime:new Date().toString(),
+    guest:{name:state.profile.name||'Guest',profile:state.profile||{}},
+    currentLocation:location||null,
+    accommodation:{name:CFG.villa,address:CFG.address,phone:CFG.villaPhone,website:CFG.villaWebsite},
+    driver:{name:'Made',whatsapp:CFG.madeWhatsapp},
+    itinerary:ITINERARY.map(x=>({time:x[0],title:x[1],details:x[2]})),
+    airportPickup:state.airportPickup||null,
+    airportPickupOptions:{note:'The app explicitly offers Made airport pickup and allows guests to add cold drinks to be waiting when they land.',prices:{'Kuta / Legian':'$30 AUD','Seminyak':'$40 AUD'},drinks:typeof MADE_DRINKS!=='undefined'?MADE_DRINKS:[]},
+    plans:state.plans||[],bookings:state.bookings||[],flights:state.flight||{},
+    checklist:state.checklist||{},drinkCart:state.drinkCart||[],drinkOrders:state.drinkOrders||[],cart:state.cart||[],
+    baliGuide:guideDetails,
+    usefulLinks:{laundry:CFG.laundry,drive:CFG.drive,villaWebsite:CFG.villaWebsite},
+    appConfig:{villa:CFG.villa,address:CFG.address,villaPhone:CFG.villaPhone,madeWhatsapp:CFG.madeWhatsapp,laundry:CFG.laundry}
+  }
+}
+function nickyNeedsLocation(q){return /\b(near me|nearby|closest|walking distance|walkable|where can i|where should i|where to|eat tonight|dinner tonight|lunch|breakfast near|restaurant|restaurants|bar|bars|cafe|cafes|coffee|pharmacy|chemist|massage|spa|nails|supermarket|shop|shopping|beach club|what'?s around)\b/i.test(String(q||''))}
+function nickyGetLocation(){return new Promise(resolve=>{if(!navigator.geolocation)return resolve(null);navigator.geolocation.getCurrentPosition(p=>resolve({latitude:p.coords.latitude,longitude:p.coords.longitude,accuracyMetres:Math.round(p.coords.accuracy||0),capturedAt:new Date().toISOString()}),()=>resolve(null),{enableHighAccuracy:true,timeout:7000,maximumAge:120000})})}
+
+function nickyWelcome(){return {role:'assistant',text:`Hey ${(state.profile.name||'there').split(' ')[0]}! 🌴 I’m Nicky, your B.B.B Bali concierge. What can I help you with?`}}
+function nickyTextHtml(text){
+  let safe=escapeHtml(String(text||''));
+  // Keep web URLs out of the chat body: sources/actions are rendered as proper cards below.
+  safe=safe.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi,'$1');
+  safe=safe.replace(/\(?https?:\/\/[^\s<)]+\)?/gi,'');
+  safe=safe.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  safe=safe.replace(/^###?\s+(.+)$/gm,'<strong class="nicky-line-title">$1</strong>');
+  safe=safe.replace(/^[-•]\s+(.+)$/gm,'<span class="nicky-list-item">$1</span>');
+  safe=safe.replace(/\n{2,}/g,'<span class="nicky-break"></span>').replace(/\n/g,'<br>');
+  return safe.trim();
+}
+function nickySourceHtml(x){
+  let host='Website';try{host=new URL(x.url).hostname.replace(/^www\./,'')}catch(e){}
+  let title=String(x.title||host).replace(/\s*[|–—-]\s*(Wanderlog|Keen|Tripadvisor|Google|Visit Perth).*$/i,'').trim();
+  if(title.length>58)title=title.slice(0,55)+'…';
+  return `<a class="nicky-source-card" href="${escapeAttr(x.url)}" target="_blank" rel="noopener"><span class="nicky-source-mark">↗</span><span><b>${escapeHtml(title||host)}</b><small>${escapeHtml(host)} · Open website</small></span><strong>›</strong></a>`;
+}
+function nickyActionHtml(action){
+  if(!action||!action.type)return'';
+  const label=escapeHtml(action.label||'Open');
+  if(action.type==='whatsapp'){const msg=encodeURIComponent(action.message||'');return `<a class="nicky-action primary" href="https://wa.me/${escapeAttr(action.phone||CFG.madeWhatsapp)}?text=${msg}" target="_blank" rel="noopener"><span class="nicky-action-icon">◉</span><span>${label}</span><b>›</b></a>`}
+  if(action.type==='call')return `<a class="nicky-action" href="tel:${escapeAttr(action.phone||'')}"><span class="nicky-action-icon">☎</span><span>${label}</span><b>›</b></a>`;
+  if(action.type==='url')return `<a class="nicky-action" href="${escapeAttr(action.url||'#')}" target="_blank" rel="noopener"><span>${label}</span><b>›</b></a>`;
+  if(action.type==='route')return `<button class="nicky-action" data-action="nicky-route" data-route="${escapeAttr(action.route||'home')}" data-target="${escapeAttr(action.target||'')}"><span>${label}</span><b>›</b></button>`;
+  return''
+}
+function nickyMessageHtml(m){
+  const actions=(m.actions||[]).map(nickyActionHtml).join('');
+  const sources=m.sources?.length?`<div class="nicky-sources">${m.sources.slice(0,3).map(nickySourceHtml).join('')}</div>`:'';
+  return `<div class="nicky-row ${m.role==='user'?'mine':''}">${m.role==='assistant'?`<div class="nicky-mini"><img src="${NICKY_REPLY_IMG}" alt=""></div>`:''}<div class="nicky-bubble">${nickyTextHtml(m.text)}${actions?`<div class="nicky-actions">${actions}</div>`:''}${sources}</div></div>`
+}
+function renderNicky(){
+  qsa('.nicky-layer').forEach(x=>x.remove());document.body.classList.toggle('nicky-open',!!state.nickyOpen);if(!state.nickyOpen)return;
+  const messages=state.nickyMessages.length?state.nickyMessages:[nickyWelcome()];
+  document.body.insertAdjacentHTML('beforeend',`<section class="nicky-layer" aria-label="Ask Nicky"><div class="nicky-chat"><header class="nicky-head"><button class="nicky-back" data-action="nicky-close" aria-label="Close">‹</button><div class="nicky-head-avatar"><img src="${NICKY_IMG}" alt="Nicky"></div><div class="nicky-head-copy"><h3>Ask Nicky <span>✨</span></h3><small>Your B.B.B Bali concierge</small></div></header><div class="nicky-messages" id="nickyMessages">${messages.map(nickyMessageHtml).join('')}${state.nickyBusy?`<div class="nicky-row"><div class="nicky-mini"><img src="${NICKY_REPLY_IMG}" alt=""></div><div class="nicky-bubble nicky-thinking"><i></i><i></i><i></i></div></div>`:''}</div><form class="nicky-compose" id="nickyForm"><input id="nickyAttach" type="file" accept="image/*,application/pdf" hidden><button class="nicky-attach" type="button" data-action="nicky-attach" aria-label="Attach photo or file">+</button><div class="nicky-input-wrap">${state.nickyAttachment?`<div class="nicky-attachment-chip"><span>${state.nickyAttachment.type?.startsWith('image/')?'📷':'📄'}</span><b>${escapeHtml(state.nickyAttachment.name||'Attachment')}</b><button type="button" data-action="nicky-attach-remove" aria-label="Remove attachment">×</button></div>`:''}<textarea id="nickyInput" rows="1" placeholder="Ask Nicky anything…" ${state.nickyBusy?'disabled':''}></textarea></div><button class="nicky-send" type="submit" ${state.nickyBusy?'disabled':''} aria-label="Send">➤</button></form></div></section>`);
+  requestAnimationFrame(()=>{const l=qs('#nickyMessages');if(l)l.scrollTop=l.scrollHeight})
+}
+async function nickyAsk(question){
+  const q=(question||'').trim();if(!q||state.nickyBusy)return;
+  state.nickyMessages.push({role:'user',text:q});state.nickyBusy=true;db.set('bbb_nicky_messages',state.nickyMessages);renderNicky();
+  try{
+    const history=state.nickyMessages.slice(-10).map(x=>({role:x.role,content:x.text}));
+    const location=nickyNeedsLocation(q)?await nickyGetLocation():null;
+    const res=await fetch('/api/ask-nicky',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history,context:nickyContext(location),attachment:state.nickyAttachment})});
+    const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Ask Nicky is unavailable');
+    state.nickyMessages.push({role:'assistant',text:data.answer||'I’m not sure about that one yet.',sources:data.sources||[],actions:data.actions||[]});state.nickyAttachment=null;
+  }catch(err){state.nickyMessages.push({role:'assistant',text:'I couldn’t connect just then. Try again in a moment — or ask Shannon if it’s urgent.'})}
+  state.nickyBusy=false;db.set('bbb_nicky_messages',state.nickyMessages);renderNicky();
+}
+function render(){const app=qs('#app');if(!app)return;document.body.classList.toggle('guide-active',state.route.startsWith('guide-'));try{if(state.route.startsWith('guide-')){app.innerHTML=guideView(state.route.slice(6));}else{switch(state.route){case'bbb':app.innerHTML=bbbView();break;case'bash':app.innerHTML=bashBoardView();break;case'travel':app.innerHTML=travelView();break;case'ready':app.innerHTML=readyView();break;case'bali':app.innerHTML=baliView();setTimeout(()=>{loadWeather();loadFx()},10);break;case'profile':app.innerHTML=profileView();break;case'recovery':app.innerHTML=recoveryView();break;case'massage':app.innerHTML=massageView();break;case'floats':app.innerHTML=floatsView();break;default:app.innerHTML=homeView()}}renderModal();renderCart();renderDrinkCart();renderBashChat();renderNicky()}catch(err){console.error(err);app.innerHTML=`<div class="shell"><div class="card" style="margin-top:40px"><h3>App loading issue</h3><p>Please refresh. If this persists, send the browser Console error.</p></div></div>`}}
 
 function openModal(type){state.modal=type;renderModal()}
 function closeModal(){state.modal=null;renderModal()}
@@ -757,7 +846,12 @@ function bashDeleteComment(postId,commentId){const p=state.bashPosts.find(x=>x.i
 function bashReactChat(messageId,key){const m=state.bashChat.find(x=>x.id===messageId);if(!m)return;m.reactions=m.reactions||{};m.myReactions=m.myReactions||[];const has=m.myReactions.includes(key);m.reactions[key]=Math.max(0,Number(m.reactions[key]||0)+(has?-1:1));m.myReactions=has?m.myReactions.filter(x=>x!==key):[...m.myReactions,key];state.bashChatReactionMessage=null;bashPersist();renderBashChat()}
 
 function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action;
- if(a==='nav'){const route=el.dataset.route;if(state.route==='bali'&&route?.startsWith('guide-'))rememberGuideReturn(el.dataset.guideSlug||route.slice(6),el);if(route==='bash'){state.bashUnreadFeed=0;bashPersist()}navigate(route);}
+ if(a==='nicky-open'){state.nickyOpen=true;renderNicky();setTimeout(()=>qs('#nickyInput')?.focus(),80)}
+ else if(a==='nicky-attach'){qs('#nickyAttach')?.click()}
+ else if(a==='nicky-attach-remove'){state.nickyAttachment=null;renderNicky();setTimeout(()=>qs('#nickyInput')?.focus(),60)}
+ else if(a==='nicky-close'){state.nickyOpen=false;renderNicky()}
+ else if(a==='nicky-route'){const route=el.dataset.route||'home',target=el.dataset.target||'';state.nickyOpen=false;renderNicky();navigate(route);if(target)setTimeout(()=>qs('#'+target)?.scrollIntoView({behavior:'smooth',block:'start'}),120)}
+ else if(a==='nav'){const route=el.dataset.route;if(state.route==='bali'&&route?.startsWith('guide-'))rememberGuideReturn(el.dataset.guideSlug||route.slice(6),el);if(route==='bash'){state.bashUnreadFeed=0;bashPersist()}navigate(route);}
  else if(a==='bash-bali-mode')bashEnableBaliMode()
  else if(a==='bash-notifications-open'){state.bashNotificationsOpen=true;render()}
  else if(a==='bash-notifications-close'){state.bashNotificationsOpen=false;render()}
@@ -864,6 +958,8 @@ function handleClick(e){const el=e.target.closest('[data-action]');if(!el)return
  else if(a==='swap-fx'){if(!state.fx)return;const aud=qs('#aud'),idr=qs('#idr');const aVal=Number(aud.value||0),iVal=parseIdr(idr.value);aud.value=(iVal/state.fx).toFixed(2);idr.value=formatIdr(aVal*state.fx)}
  else if(a==='refresh-fx')loadFx()
 }
+document.addEventListener('change',e=>{if(e.target.id==='nickyAttach'){const f=e.target.files?.[0];if(!f)return;if(f.size>5*1024*1024){toast('Please choose a file under 5 MB');return}const reader=new FileReader();reader.onload=()=>{state.nickyAttachment={name:f.name,type:f.type||'application/octet-stream',data:String(reader.result||'')};renderNicky();setTimeout(()=>qs('#nickyInput')?.focus(),60)};reader.readAsDataURL(f)}});
+document.addEventListener('submit',e=>{if(e.target.id==='nickyForm'){e.preventDefault();const i=qs('#nickyInput');nickyAsk(i?.value||'');if(i)i.value=''}});
 document.addEventListener('click',handleClick);
 document.addEventListener('input',e=>{if(e.target.id==='aud')convertFx('aud');if(e.target.id==='idr')convertFx('idr');if(e.target.name==='pickup-area')updatePickupTotal();if(e.target.id==='pizzaqty')updatePizzaTotal();if(e.target.id==='pizzaAddQty')updatePizzaUpgradeTotal();if(e.target.id==='bash-post-text'||e.target.id==='bash-caption-text')state.bashComposer.text=e.target.value;if(e.target.id==='bash-location-search'){clearTimeout(state._bashPlaceTimer);state.bashPlaceQuery=e.target.value;const v=e.target.value;state._bashPlaceTimer=setTimeout(()=>bashSearchPlaces(v),280)}if(e.target.id==='bash-custom-feeling')state.bashComposer.customFeeling=e.target.value});
 
