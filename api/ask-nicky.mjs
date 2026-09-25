@@ -27,7 +27,18 @@ LIVE SEARCH:
 - Keep answers useful and concise. When possible give actionable contact/website/directions information.
 
 STYLE:
-Warm, concise, practical and lightly playful. You are called Nicky. Do not pretend to be the real Nicolle. Do not say you personally made bookings. ACTION-FIRST: when the guest asks to do something and the B.B.B context already contains the relevant contact, booking area, map, website or app route, answer in 1–3 short sentences and direct them to that action. Do not pad the answer with unrelated cautions, airport-pickup status, payment advice or generic checklists unless the guest asked for them. For a general car/driver request, simply say Made is the B.B.B driver and that they can message him; do not turn it into an airport-pickup answer. Avoid long essays. Markdown bold is allowed, but keep formatting simple.`;
+Warm, concise, practical and lightly playful. You are called Nicky. Do not pretend to be the real Nicolle. Do not say you personally made bookings. ACTION-FIRST: when the guest asks to do something and the B.B.B context already contains the relevant contact, booking area, map, website or app route, answer in 1–3 short sentences and direct them to that action. Do not pad the answer with unrelated cautions, airport-pickup status, payment advice or generic checklists unless the guest asked for them. For a general car/driver request, simply say Made is the B.B.B driver and that they can message him; do not turn it into an airport-pickup answer. Avoid long essays. Markdown bold is allowed, but keep formatting simple.
+
+RESPONSE PRESENTATION:
+- Lead with the direct answer.
+- For recommendations, give at most 3 strong options unless the guest asks for more.
+- Use short paragraphs and simple bullets.
+- NEVER put raw URLs or Markdown links in the answer text. URLs are rendered separately by the app as large action/source cards.
+- Do not repeat source names in the prose unless useful.
+- Do not add a 'My pick' or rank a business unless the guest asks you to choose.
+- If an attachment is supplied, inspect it and answer the guest's question about it.
+- For event/itinerary answers, make the time/date/place easy to scan.
+`;
 
 function outputText(data){
   const parts=[]; const sources=[];
@@ -69,12 +80,20 @@ export default async function handler(req,res){
     if(!message) return res.status(400).json({error:'Ask Nicky needs a question'});
     const contextObject=body.context||{}; const context=JSON.stringify(contextObject).slice(0,30000);
     const history=Array.isArray(body.history)?body.history.slice(-8):[];
+    const attachment=body.attachment&&typeof body.attachment==='object'?body.attachment:null;
     const input=[
       {role:'developer',content:[{type:'input_text',text:SYSTEM+`\n\nCURRENT B.B.B APP CONTEXT:\n${context}`}]},
       ...history.map(x=>({role:x.role==='assistant'?'assistant':'user',content:[{type:x.role==='assistant'?'output_text':'input_text',text:String(x.content||'').slice(0,2000)}]})),
     ];
     // Avoid duplicating the current user message when it is already the last history item.
-    if(!history.length || String(history[history.length-1]?.content||'').trim()!==message) input.push({role:'user',content:[{type:'input_text',text:message}]});
+    if(!history.length || String(history[history.length-1]?.content||'').trim()!==message || attachment){
+      const content=[{type:'input_text',text:message}];
+      if(attachment?.data&&String(attachment.data).length<7_000_000){
+        if(String(attachment.type||'').startsWith('image/')) content.push({type:'input_image',image_url:String(attachment.data)});
+        else if(String(attachment.type||'')==='application/pdf') content.push({type:'input_file',filename:String(attachment.name||'attachment.pdf').slice(0,120),file_data:String(attachment.data)});
+      }
+      input.push({role:'user',content});
+    }
     const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${process.env.OPENAI_API_KEY}`},body:JSON.stringify({model:'gpt-5.6-luna',input,tools:[{type:'web_search',search_context_size:'low'}],tool_choice:'auto',max_output_tokens:700})});
     const data=await r.json();
     if(!r.ok){console.error('OpenAI error',data);return res.status(r.status).json({error:data?.error?.message||'OpenAI request failed'})}
