@@ -615,19 +615,32 @@ const NICKY_IMG='/assets/nicky-profile.png';
 const NICKY_REPLY_IMG='/assets/nicky.jpeg';
 state.nickyAttachment=state.nickyAttachment||null;
 function renderNickyLauncher(){return `<button class="nicky-launcher" data-action="nicky-open" aria-label="Ask Nicky"><span class="nicky-launcher-avatar"><img src="${NICKY_IMG}" alt="Nicky"></span><span class="nicky-launcher-copy"><b>Ask Nicky</b><small>Bali concierge</small></span><i>✨</i></button>`}
-function nickyContext(){
+function nickyContext(location=null){
+  const guideDetails=(typeof GUIDE!=='undefined'?GUIDE:[]).map((x,i)=>({
+    title:x.title||x[0]||'',description:x.desc||x[1]||'',slug:x.slug||'',
+    appContent:(typeof guidePageContent==='function'&&x.slug)?String(guidePageContent(x.slug)).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,5000):''
+  }));
   return {
-    guest:{name:state.profile.name||'Guest'},
+    source:'LIVE B.B.B APP STATE',
+    capturedAt:new Date().toISOString(),
+    deviceLocalTime:new Date().toString(),
+    guest:{name:state.profile.name||'Guest',profile:state.profile||{}},
+    currentLocation:location||null,
     accommodation:{name:CFG.villa,address:CFG.address,phone:CFG.villaPhone,website:CFG.villaWebsite},
     driver:{name:'Made',whatsapp:CFG.madeWhatsapp},
     itinerary:ITINERARY.map(x=>({time:x[0],title:x[1],details:x[2]})),
     airportPickup:state.airportPickup||null,
-    plans:state.plans||[],
-    flights:state.flight||{},
-    baliGuide:(typeof GUIDE!=='undefined'?GUIDE:[]).map(x=>({title:x.title,description:x.desc,slug:x.slug})),
-    usefulLinks:{laundry:CFG.laundry,drive:CFG.drive}
+    airportPickupOptions:{note:'The app explicitly offers Made airport pickup and allows guests to add cold drinks to be waiting when they land.',prices:{'Kuta / Legian':'$30 AUD','Seminyak':'$40 AUD'},drinks:typeof MADE_DRINKS!=='undefined'?MADE_DRINKS:[]},
+    plans:state.plans||[],bookings:state.bookings||[],flights:state.flight||{},
+    checklist:state.checklist||{},drinkCart:state.drinkCart||[],drinkOrders:state.drinkOrders||[],cart:state.cart||[],
+    baliGuide:guideDetails,
+    usefulLinks:{laundry:CFG.laundry,drive:CFG.drive,villaWebsite:CFG.villaWebsite},
+    appConfig:{villa:CFG.villa,address:CFG.address,villaPhone:CFG.villaPhone,madeWhatsapp:CFG.madeWhatsapp,laundry:CFG.laundry}
   }
 }
+function nickyNeedsLocation(q){return /\b(near me|nearby|closest|walking distance|walkable|where can i|where should i|where to|eat tonight|dinner tonight|lunch|breakfast near|restaurant|restaurants|bar|bars|cafe|cafes|coffee|pharmacy|chemist|massage|spa|nails|supermarket|shop|shopping|beach club|what'?s around)\b/i.test(String(q||''))}
+function nickyGetLocation(){return new Promise(resolve=>{if(!navigator.geolocation)return resolve(null);navigator.geolocation.getCurrentPosition(p=>resolve({latitude:p.coords.latitude,longitude:p.coords.longitude,accuracyMetres:Math.round(p.coords.accuracy||0),capturedAt:new Date().toISOString()}),()=>resolve(null),{enableHighAccuracy:true,timeout:7000,maximumAge:120000})})}
+
 function nickyWelcome(){return {role:'assistant',text:`Hey ${(state.profile.name||'there').split(' ')[0]}! 🌴 I’m Nicky, your B.B.B Bali concierge. What can I help you with?`}}
 function nickyTextHtml(text){
   let safe=escapeHtml(String(text||''));
@@ -671,7 +684,8 @@ async function nickyAsk(question){
   state.nickyMessages.push({role:'user',text:q});state.nickyBusy=true;db.set('bbb_nicky_messages',state.nickyMessages);renderNicky();
   try{
     const history=state.nickyMessages.slice(-10).map(x=>({role:x.role,content:x.text}));
-    const res=await fetch('/api/ask-nicky',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history,context:nickyContext(),attachment:state.nickyAttachment})});
+    const location=nickyNeedsLocation(q)?await nickyGetLocation():null;
+    const res=await fetch('/api/ask-nicky',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history,context:nickyContext(location),attachment:state.nickyAttachment})});
     const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Ask Nicky is unavailable');
     state.nickyMessages.push({role:'assistant',text:data.answer||'I’m not sure about that one yet.',sources:data.sources||[],actions:data.actions||[]});state.nickyAttachment=null;
   }catch(err){state.nickyMessages.push({role:'assistant',text:'I couldn’t connect just then. Try again in a moment — or ask Shannon if it’s urgent.'})}
