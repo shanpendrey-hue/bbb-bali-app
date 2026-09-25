@@ -5,7 +5,7 @@ let cache='';
 export function baliGuideKnowledge(){
   if(cache) return cache;
   try{
-    cache=fs.readFileSync(path.join(process.cwd(),'api','bali-guide-knowledge.txt'),'utf8').trim();
+    cache=fs.readFileSync(path.join(process.cwd(),'bali-guide-knowledge.txt'),'utf8').trim();
   }catch(err){
     console.error('Bali guide knowledge unavailable',err);
     cache='';
