@@ -22,10 +22,10 @@ const steps=[
  {route:'travel',target:'.pagehead',title:'Travel ✈️',text:'Before Bali, this is an important one. Your flights, airport pickup and villa information all live in the Travel area.'},
  {route:'ready',target:'.pagehead',title:'Bali Ready',text:'Use Bali Ready for your visa, tourist levy, arrival declaration, insurance, passport and saved flight details. Work through it before you fly.'},
  {route:'travel',target:'.pickup-card, [class*="pickup-card"]',title:'Airport pickup',text:'Need a lift from the airport? Your Made airport pickup can be organised and managed here, along with your arrival details.'},
- {route:'travel',target:'.villa-actions',closest:'.card',place:'top',title:'Chandra Villas',text:'Your Bali base is easy to find — open it in Maps, jump to the Chandra website or call from here.'},
+ {route:'travel',target:'.villa-actions',closest:'.card',place:'top',reveal:'card-below',title:'Chandra Villas',text:'Your Bali base is easy to find — open it in Maps, jump to the Chandra website or call from here.'},
  {route:'bali',target:'.section-head',findText:'The Bali Guide',closest:'.section',place:'top',title:'The Bali Guide 🌴',text:'Food, drinks, practical Bali info and Shannon’s recommendations are all here. Open a guide whenever you need it.'},
  {route:'profile',target:'.pagehead',title:'Your Profile 👤',text:'This bit is all about YOU. Your profile is where you’ll find everything you’ve organised for the trip.'},
- {route:'profile',target:'.section',findHeading:'My Plans',place:'top',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
+ {route:'profile',target:'.section-head',findText:'My Plans',closest:'.section',place:'top',reveal:'section-below',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
  {route:'profile',target:'#nicky-tour-profile-card',place:'bottom',title:'Need the tour again?',text:'Haven’t had a chance to explore properly — or want another look? Come back to Profile and tap Take the tour with Nicky. I’ll start this walkthrough again anytime.'},
  {route:'home',target:'.nicky-launcher',place:'top',spot:'tight',title:'If you’re not sure… Ask Nicky! ✨',text:'I’m your number one B.B.B Bali guru. Ask me about the trip, itinerary, villa, Bali, where to go or what you’ve booked. I’m always hanging out here in the corner — tap me and chat whenever you need me.',finish:true}
 ];
@@ -133,8 +133,11 @@ async function revealTarget(target,step){
  let r=target.getBoundingClientRect();
  let desiredTop;
  if(step?.action==='drink-order'){
-   // Keep the actual order drawer visible below Nicky instead of hiding it behind the bubble.
-   desiredTop=Math.max(cardH+34,Math.min(innerHeight*.48,r.top));
+   // Keep the order header/profile and empty/order state clearly visible beneath Nicky.
+   desiredTop=Math.min(innerHeight-r.height-bottomSafe,cardH+26);
+ } else if(step?.reveal==='card-below' || step?.reveal==='section-below'){
+   // These larger cards should begin directly below the tour bubble, not underneath it.
+   desiredTop=Math.min(innerHeight-r.height-bottomSafe,cardH+24);
  } else if(step?.target==='.bash-chat-compose'){
    desiredTop=Math.max(topSafe,innerHeight-cardH-r.height-gap-bottomSafe);
  } else if(step?.place==='top'){
@@ -172,10 +175,15 @@ async function show(){
 }
 
 function start(){
- if(active)return; active=true; index=0; runId++; ensureUI(); document.body.classList.add('nicky-tour-active'); show();
+ if(active)return; active=true; index=0; runId++; ensureUI();
+ if(card){card.style.display='block';card.style.pointerEvents=''} if(shade)shade.style.display=''; if(mark)mark.style.display='';
+ document.body.classList.add('nicky-tour-active'); show();
 }
 function end(completed=false){
- active=false; runId++; busy=false; clearTarget(); shade?.classList.remove('show'); card?.classList.remove('show'); document.body.classList.remove('nicky-tour-active');
+ active=false; runId++; busy=false; clearTarget(); shade?.classList.remove('show'); card?.classList.remove('show'); mark?.classList.remove('show'); document.body.classList.remove('nicky-tour-active','nicky-tour-moving');
+ if(card){card.style.display='none';card.style.pointerEvents='none'}
+ if(shade)shade.style.display='none';
+ if(mark)mark.style.display='none';
  try{localStorage.setItem(KEY,completed?'completed':'skipped')}catch{}
  if(document.body.classList.contains('bash-chat-open')) $('[data-action="bash-chat-close"]')?.click();
  $('[data-action="close-drink-cart"]')?.click();
@@ -193,7 +201,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest('[data-nicky-tour-start]')){e.preventDefault(); $('.nicky-tour-welcome')?.remove(); start(); return;}
  if(e.target.closest('[data-nicky-tour-dismiss]')){dismissOffer();return;}
  if(e.target.closest('[data-nicky-tour-skip]')){if(busy)return;end(false);return;}
- if(e.target.closest('[data-nicky-tour-next]')){if(busy)return;if(index>=steps.length-1){end(true);location.hash='#/home';return;} card?.classList.remove('settled'); index++;show();return;}
+ if(e.target.closest('[data-nicky-tour-next]')){e.preventDefault();e.stopPropagation();if(index>=steps.length-1){end(true);setTimeout(()=>{location.hash='#/home'},30);return;}if(busy)return; card?.classList.remove('settled'); index++;show();return;}
  if(e.target.closest('[data-nicky-tour-back]')){if(busy)return;if(index>0){card?.classList.remove('settled');index--;show();}return;}
 });
 const obs=new MutationObserver(()=>{addProfileCard();if(active){clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const t=findTarget(steps[index]);if(t)position(t)},80)}});
