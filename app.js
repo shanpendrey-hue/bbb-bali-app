@@ -104,11 +104,49 @@ async function bbbPostInsert(post){post._syncing=true;try{const data=await bbbAp
 async function bbbPostUpdate(post){if(!post._cloudId)return bbbPostInsert(post);try{const data=await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(bbbPostRow(post))});const row=Array.isArray(data)?data[0]:data;if(row)bbbPostsApplyRealtime({eventType:'UPDATE',new:row});post._syncError='';return true}catch(error){post._syncError=error.message||String(error);console.error('B.B.B shared post update failed',error);toast('Could not update shared post: '+post._syncError);bbbPostsScheduleRefresh();return false}}
 async function bbbPostDelete(post){if(!post?._cloudId)return true;try{await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'DELETE',headers:{'Prefer':'return=minimal'}});bbbPostsApplyRealtime({eventType:'DELETE',old:{id:post._cloudId}});return true}catch(error){console.error('B.B.B shared post delete failed',error);toast('Could not remove shared post: '+(error.message||error));bbbPostsScheduleRefresh();return false}}
 async function bbbPostsUploadLocal(){const local=state.bashPosts.filter(p=>!p._cloudId&&!p._syncing);for(const post of local)await bbbPostInsert(post)}
-async function bbbPostsLoad(force=false){if(bbbPostsLoading){bbbPostsLoadQueued=bbbPostsLoadQueued||force;return}bbbPostsLoading=true;try{const data=await bbbApi('?select=*&order=created_at.desc&limit=300',{method:'GET'});const list=Array.isArray(data)?data:[];bbbPostsDiag.lastFetch=bbbDiagTime();bbbPostsDiag.posts=list.length;bbbPostsDiag.error='None';const sync=JSON.stringify(list.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));bbbPostsInitialLoaded=true;if(force||sync!==bbbPostsLastSync){bbbPostsLastSync=sync;state.bashPosts=list.map(bbbPostFromRow).filter(Boolean);bbbPostsSort();bashPersist();if(state.route==='bash')render()}}catch(error){bbbPostsDiag.error=error?.message||String(error);console.error('B.B.B shared feed load failed',error)}finally{bbbPostsLoading=false;const queued=bbbPostsLoadQueued;bbbPostsLoadQueued=false;if(queued)setTimeout(()=>bbbPostsLoad(true),0)}}
-async function bbbPostsEnter(){bbbPostsInitialLoaded=false;if(state.route==='bash')render();await bbbPostsLoad(true);if(!bbbPostsChannel)bbbPostsStartRealtime()}
+async function bbbPostsLoad(force=false){
+  if(bbbPostsLoading){bbbPostsLoadQueued=bbbPostsLoadQueued||force;return}
+  bbbPostsLoading=true;
+  try{
+    // v86: read through the Supabase client. Do not use the legacy REST GET with
+    // custom no-cache request headers; those can fail at the browser/CORS layer.
+    const c=bbbChatClient();
+    if(!c)throw new Error('Supabase client is unavailable');
+    const {data,error}=await c.from('bbb_bash_posts').select('*').order('created_at',{ascending:false}).limit(300);
+    if(error)throw error;
+    const list=Array.isArray(data)?data:[];
+    bbbPostsDiag.lastFetch=bbbDiagTime();
+    bbbPostsDiag.posts=list.length;
+    bbbPostsDiag.error='None';
+    const sync=JSON.stringify(list.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));
+    bbbPostsInitialLoaded=true;
+    if(force||sync!==bbbPostsLastSync){
+      bbbPostsLastSync=sync;
+      state.bashPosts=list.map(bbbPostFromRow).filter(Boolean);
+      bbbPostsSort();
+      bashPersist();
+    }
+  }catch(error){
+    bbbPostsDiag.error=error?.message||String(error);
+    console.error('B.B.B shared feed load failed',error);
+    // Never replace a visible feed with an empty/error state after a failed read.
+  }finally{
+    bbbPostsLoading=false;
+    if(state.route==='bash')render();
+    const queued=bbbPostsLoadQueued;
+    bbbPostsLoadQueued=false;
+    if(queued)setTimeout(()=>bbbPostsLoad(true),0);
+  }
+}
+async function bbbPostsEnter(){
+  bbbPostsInitialLoaded=false;
+  if(state.route==='bash')render();
+  await bbbPostsLoad(true);
+  if(!bbbPostsChannel)bbbPostsStartRealtime();
+}
 function bbbPostsStopRealtime(){bbbPostsRealtimeGeneration++;clearTimeout(bbbPostsReconnectTimer);const c=bbbChatClient(),ch=bbbPostsChannel;bbbPostsChannel=null;if(ch){try{c?.removeChannel(ch)}catch{}}bbbPostsDiag.status='IDLE'}
 function bbbPostsStartRealtime(){const c=bbbChatClient();if(!c){bbbPostsDiag.status='CLIENT MISSING';bbbPostsDiag.error='Supabase JS client did not load';return}if(bbbPostsChannel)return;clearTimeout(bbbPostsReconnectTimer);const generation=++bbbPostsRealtimeGeneration;bbbPostsDiag.status='CONNECTING';bbbPostsDiag.error='None';const ch=c.channel('bbb-bash-posts-live-'+generation).on('postgres_changes',{event:'*',schema:'public',table:'bbb_bash_posts'},payload=>{if(generation!==bbbPostsRealtimeGeneration)return;bbbPostsDiag.lastEvent=bbbDiagTime();bbbPostsDiag.eventType=payload.eventType||'CHANGE';bbbPostsDiag.error='None';bbbPostsApplyRealtime(payload);bbbPostsScheduleRefresh(250)});bbbPostsChannel=ch;ch.subscribe(status=>{if(generation!==bbbPostsRealtimeGeneration)return;bbbPostsDiag.status=status;console.log('B.B.B Bash Board realtime status:',status);if(status==='SUBSCRIBED'){bbbPostsDiag.error='None';bbbPostsLoad(true)}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){bbbPostsDiag.error='Realtime channel '+status;bbbPostsChannel=null;clearTimeout(bbbPostsReconnectTimer);bbbPostsReconnectTimer=setTimeout(()=>{if(!document.hidden){bbbPostsStartRealtime();bbbPostsLoad(true)}},1200)}})}
-function bbbPostsStartSync(){clearInterval(bbbPostsPollTimer);bbbPostsLoad(true);bbbPostsStartRealtime();bbbPostsPollTimer=setInterval(()=>{if(!document.hidden){if(!bbbPostsChannel)bbbPostsStartRealtime();bbbPostsLoad(state.route==='bash')}},3000)}
+function bbbPostsStartSync(){clearInterval(bbbPostsPollTimer);bbbPostsPollTimer=null;if(state.route==='bash')bbbPostsEnter()}
 const state={
   route:(location.hash.replace('#/','')||'home'),
   profile:db.get('bbb_profile',{name:'',photo:'',created:false}),
@@ -1239,10 +1277,7 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
 document.addEventListener('visibilitychange',()=>{if(!state.bashChatOpen)return;if(document.hidden){bbbChatSendTyping(false)}else{if(!bbbChatChannel||!bbbChatChangesChannel)bbbChatStartRealtime();bbbChatLoad(true)}});
 window.addEventListener('load',()=>{if(state.profile?.created&&!state.profile.signedUp){state.profile.signedUp=new Date().toISOString();db.set('bbb_profile',state.profile)}bbbQueueGuestManagementSync();bbbChatStartRealtime();bbbChatLoad(true)});
 
-// v61 shared Bash Board sync
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.route==='bash'){bbbPostsStopRealtime();bbbPostsStartRealtime();bbbPostsLoad(true)}});
-window.addEventListener('pageshow',()=>{if(state.route==='bash'){bbbPostsLoad(true);if(!bbbPostsChannel)bbbPostsStartRealtime()}});
-window.addEventListener('focus',()=>{if(state.route==='bash')bbbPostsLoad(true)});
-window.addEventListener('focus',()=>{if(state.route==='bash'){if(!bbbPostsChannel)bbbPostsStartRealtime();bbbPostsLoad(true)}});
-// v85: legacy local Bash Board migration is complete. Do not clear the live feed on every page load.
-setTimeout(()=>{bbbPostsStartSync();if(state.route==='bash')bbbPostsEnter()},300);
+// v86 shared Bash Board lifecycle: one initial load, then Realtime.
+// When the app returns from the background, refresh once to catch anything missed.
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.route==='bash')bbbPostsLoad(true)});
+setTimeout(()=>{if(state.route==='bash')bbbPostsEnter()},300);
