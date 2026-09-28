@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="t d">
+<title id="t">Bali beach at sunset with colourful beanbags</title><desc id="d">Warm tropical sunset over the ocean with palm silhouettes and relaxed beach beanbags.</desc>
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d99572"/><stop offset=".55" stop-color="#efc899"/><stop offset="1" stop-color="#f4dfb7"/></linearGradient><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8eb5ad"/><stop offset="1" stop-color="#507b76"/></linearGradient></defs>
+<rect width="1200" height="720" fill="url(#sky)"/><circle cx="790" cy="220" r="86" fill="#f6d486" opacity=".95"/><path d="M0 360 C220 330 360 380 560 355 S900 325 1200 365 V540 H0Z" fill="url(#sea)"/><path d="M0 510 C250 470 500 535 760 500 S1030 490 1200 520 V720 H0Z" fill="#e8cf9f"/>
+<g fill="#3f5f4d"><path d="M130 515c30-170 44-280 76-405h18c-17 135-29 270-32 407z"/><path d="M205 120c-82-44-129-19-169 15 73-9 119 1 164 21-69 3-106 34-139 67 60-27 101-29 145-18-43 37-55 77-61 119 35-52 61-75 91-89 17 49 49 74 88 93-35-45-48-79-51-117 50 20 91 15 132-1-56-6-91-21-123-48 47-16 76-44 101-77-51 24-90 31-132 24 20-42 19-76 10-113-10 45-26 80-56 124z"/></g>
+<g><path d="M270 625c-3-75 38-119 105-119s108 44 105 119z" fill="#b75d50"/><path d="M505 635c-4-88 42-139 116-139s121 51 117 139z" fill="#637c52"/><path d="M760 625c-3-70 34-111 97-111s100 41 97 111z" fill="#d49a3a"/></g>
+<g fill="none" stroke="#fff4da" stroke-width="7" opacity=".65"><path d="M20 402c190-34 360 32 548 0s371-29 612 4"/><path d="M80 438c170-26 328 22 492-2s345-19 555 7"/></g>
+</svg>
