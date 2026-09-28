@@ -639,6 +639,10 @@ function renderDrinkCart(){
     : `<div class="bar-closed-inline" role="status"><div class="bar-closed-inline-title">BAR CLOSED</div><div class="bar-closed-inline-copy">The bar will be open on the day!</div></div>`;
   document.body.insertAdjacentHTML('beforeend',`<div class="overlay drink-cart-overlay" data-action="close-drink-cart"></div><aside class="drawer drink-drawer"><div class="section-head"><div><div class="eyebrow">B.B.B cocktails</div><h2 class="section-title">My Order</h2></div><button class="btn light" data-action="close-drink-cart">Close</button></div><div class="drink-profile"><div class="drink-profile-photo">${photo}</div><div><div class="meta">Ordering as</div><h3>${escapeHtml(state.profile.name||'Guest')}</h3></div></div>${orderLines}${orderAction}${clearControl}</aside>`);
 }
+const NICKY_IMG='/assets/nicky-profile.png';
+const NICKY_REPLY_IMG='/assets/nicky-profile.png';
+state.nickyAttachment=state.nickyAttachment||null;
+
 function renderNickyLauncher(){return `<button class="nicky-launcher" data-action="nicky-open" aria-label="Ask Nicky"><span class="nicky-launcher-avatar"><img src="${NICKY_IMG}" alt="Nicky"></span><span class="nicky-launcher-copy"><b>Ask Nicky</b><small>Bali concierge</small></span><i>✨</i></button>`}
 function nickyContext(location=null){
   const guideDetails=(typeof GUIDE!=='undefined'?GUIDE:[]).map((x,i)=>({
