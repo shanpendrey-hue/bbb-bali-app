@@ -1813,3 +1813,7 @@ body.bash-media-viewer-open .bash-media-lightbox-stage{touch-action:pan-y!import
 .nicky-attachment-preview.is-image img{width:104px;height:104px;object-fit:cover;border-radius:15px;display:block}
 .nicky-attachment-preview.is-image>button{right:-9px;top:-9px}
 .nicky-message-image img{background:#eee6da}
+
+/* v79: keep Bash Board confirmation toast wide and on one line */
+.toast{min-width:310px;max-width:calc(100vw - 32px);text-align:center;white-space:nowrap;box-sizing:border-box}
+@media(max-width:360px){.toast{min-width:0;width:calc(100vw - 28px);font-size:11px!important;padding-left:10px!important;padding-right:10px!important}}
