@@ -1186,6 +1186,22 @@ setInterval(()=>{const c=qs('#countdown');if(c)c.innerHTML=countdown()},1000);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{})}
 render();
 setTimeout(handleRecoveryPaymentReturn,0);
+// v87: lifecycle listeners must stay inside the app closure so `state` and the
+// Bash Board/chat helpers are in scope on a cold page load.
+document.addEventListener('visibilitychange',()=>{
+  if(state.bashChatOpen){
+    if(document.hidden) bbbChatSendTyping(false);
+    else { if(!bbbChatChannel||!bbbChatChangesChannel) bbbChatStartRealtime(); bbbChatLoad(true); }
+  }
+  if(!document.hidden&&state.route==='bash') bbbPostsLoad(true);
+});
+window.addEventListener('load',()=>{
+  if(state.profile?.created&&!state.profile.signedUp){state.profile.signedUp=new Date().toISOString();db.set('bbb_profile',state.profile)}
+  bbbQueueGuestManagementSync();
+  bbbChatStartRealtime();
+  bbbChatLoad(true);
+  if(state.route==='bash') bbbPostsEnter();
+});
 })();
 
 function bashPinChatToBottom(){const l=qs('#bashMessageList');if(!l)return;const pin=()=>{l.scrollTop=Math.max(0,l.scrollHeight-l.clientHeight);const end=qs('#bashChatEnd');if(end)end.scrollIntoView({block:'end',inline:'nearest'})};requestAnimationFrame(()=>requestAnimationFrame(pin));l.querySelectorAll('img,video').forEach(el=>{if(el.tagName==='IMG'&&el.complete)return;el.addEventListener('load',pin,{once:true});el.addEventListener('loadedmetadata',pin,{once:true})});setTimeout(pin,80);setTimeout(pin,250);setTimeout(pin,700)}
@@ -1274,10 +1290,6 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   window.addEventListener('pageshow',()=>{if(!installed()&&!document.querySelector('.bbb-install-nudge'))setTimeout(()=>showNudge(true),350)});
 })();
 
-document.addEventListener('visibilitychange',()=>{if(!state.bashChatOpen)return;if(document.hidden){bbbChatSendTyping(false)}else{if(!bbbChatChannel||!bbbChatChangesChannel)bbbChatStartRealtime();bbbChatLoad(true)}});
-window.addEventListener('load',()=>{if(state.profile?.created&&!state.profile.signedUp){state.profile.signedUp=new Date().toISOString();db.set('bbb_profile',state.profile)}bbbQueueGuestManagementSync();bbbChatStartRealtime();bbbChatLoad(true)});
 
-// v86 shared Bash Board lifecycle: one initial load, then Realtime.
-// When the app returns from the background, refresh once to catch anything missed.
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.route==='bash')bbbPostsLoad(true)});
-setTimeout(()=>{if(state.route==='bash')bbbPostsEnter()},300);
+// v87: startup/visibility lifecycle is registered inside the main app closure above.
+
