@@ -1573,3 +1573,31 @@ body.bash-chat-open .bash-bubble small,body.bash-chat-open .bash-media-message-m
 .bash-video-upload-state.failed{background:rgba(63,38,30,.76)!important;pointer-events:auto!important}
 .bash-video-upload-state.failed>b{font-size:32px!important}.bash-video-upload-state.failed button{position:relative!important;z-index:8!important;min-width:120px!important;min-height:44px!important;margin-top:6px!important;padding:0 18px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#4f3329!important;font:800 14px Montserrat,Arial,sans-serif!important;touch-action:manipulation!important}
 @media(max-width:420px){.bash-create-modern{padding-left:14px!important;padding-right:14px!important}.bash-create-actions.top-actions{gap:6px!important}.bash-create-actions.top-actions button{min-height:86px!important}.bash-caption-input{min-height:92px!important;height:92px!important;padding:16px!important;font-size:18px!important}.bash-media-preview,.bash-add-more-media,.bash-media-preview>img,.bash-media-preview>video{min-height:160px!important}}
+
+/* V39 — compact, polished Create Post composer */
+.bash-create-modern{padding:0 18px calc(20px + env(safe-area-inset-bottom))!important}
+.bash-create-user{padding:16px 2px 10px!important}
+.bash-caption-input{order:initial!important;margin:6px 0 12px!important;min-height:112px!important;height:112px!important;padding:19px 20px!important;border-radius:24px!important;font-size:19px!important;box-shadow:0 8px 24px rgba(50,40,30,.04)!important}
+.bash-create-add-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;min-height:70px!important;margin:0 0 12px!important;padding:10px 12px 10px 16px!important;border:1px solid rgba(107,78,61,.12)!important;border-radius:22px!important;background:rgba(255,255,255,.78)!important;box-shadow:0 7px 20px rgba(50,40,30,.035)!important}
+.bash-create-add-row>span{font:800 13px/1.2 Montserrat,Arial,sans-serif!important;color:#4a4039!important;white-space:nowrap!important}
+.bash-create-add-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important}
+.bash-create-add-actions button{width:56px!important;min-width:56px!important;height:50px!important;padding:4px 2px!important;border:0!important;border-radius:16px!important;background:transparent!important;color:var(--olive)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;box-shadow:none!important}
+.bash-create-add-actions button:active{background:#f0f3e9!important;transform:scale(.97)!important}
+.bash-create-add-actions svg{position:static!important;width:23px!important;height:23px!important;color:var(--olive)!important}
+.bash-create-add-actions small{font:700 8px/1 Montserrat,Arial,sans-serif!important;color:#7f756e!important;white-space:nowrap!important}
+.bash-selected-chips{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin:0 0 12px!important}
+.bash-selected-chips>span{width:auto!important;min-height:40px!important;padding:0 8px 0 12px!important;border-radius:999px!important;font-size:11px!important}
+.bash-selected-chips button{width:28px!important;height:28px!important;margin-left:7px!important}
+.bash-media-loading{margin:0 0 12px!important}
+.bash-media-preview-grid{margin:0 0 12px!important;gap:8px!important}
+.bash-media-preview,.bash-add-more-media{min-height:172px!important}
+@media(max-width:420px){
+ .bash-create-modern{padding-left:14px!important;padding-right:14px!important}
+ .bash-create-user{padding-top:14px!important}
+ .bash-caption-input{min-height:106px!important;height:106px!important;margin-top:4px!important}
+ .bash-create-add-row{min-height:66px!important;padding-left:13px!important;padding-right:7px!important}
+ .bash-create-add-row>span{font-size:12px!important}
+ .bash-create-add-actions{gap:1px!important}
+ .bash-create-add-actions button{width:51px!important;min-width:51px!important;height:48px!important}
+ .bash-create-add-actions small{font-size:7.5px!important}
+}
