@@ -1752,3 +1752,15 @@ body.bash-chat-open .bash-chat-empty.modern{
 .bar-closed-drawer .bar-closed-icon{font-size:42px;margin-bottom:12px}
 .bar-closed-drawer .bar-closed-panel h3{margin:0 0 8px;font-size:28px;color:#3b2a22}
 .bar-closed-drawer .bar-closed-panel p{margin:0;color:#7b746d;font-size:17px;line-height:1.5}
+
+
+/* V43 — practice cocktail ordering + chat-contained photo viewer */
+.bar-closed-drawer .bar-closed-panel .meta{margin-bottom:8px;color:var(--olive);font-weight:800;letter-spacing:.18em}
+.bar-closed-drawer .bar-closed-panel p+p{margin-top:8px}
+.bar-practice-count{margin:22px 0 14px;padding:14px 16px;border-radius:18px;background:#fffdf8;border:1px solid rgba(87,112,62,.16);color:#6f675f;font-size:15px}
+.bar-back-cocktails{margin-top:8px}
+body.bash-media-viewer-open .overlay{z-index:1190!important}
+body.bash-media-viewer-open .modal{z-index:1200!important;padding:0!important;place-items:stretch!important}
+body.bash-media-viewer-open .modal-card.recovery-modal-card{width:100%!important;height:100%!important;max-height:none!important;border-radius:0!important;padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom))!important;overflow:auto!important;background:#fffdf8!important}
+body.bash-media-viewer-open .bash-media-lightbox,body.bash-media-viewer-open .bash-gallery-modal{max-width:680px;margin:0 auto}
+body.bash-media-viewer-open .bash-media-lightbox-stage{touch-action:pan-y!important}
