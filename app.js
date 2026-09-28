@@ -115,7 +115,8 @@ const state={
   flight:db.get('bbb_flight',{outbound:null,return:null}),
   cart:db.get('bbb_cart',[]),
   drinkCart:db.get('bbb_drink_cart',[]),
-  drinkOrders:db.get('bbb_drink_orders',[]),
+  // v80: cocktail orders are isolated to this guest/device. Legacy shared test orders are intentionally ignored.
+  drinkOrders:db.get('bbb_drink_orders_'+BBB_CHAT_GUEST_ID,[]),
   bookings:db.get('bbb_bookings',[]),
   airportPickup:db.get('bbb_airport_pickup',null),
   modal:null,
@@ -477,7 +478,7 @@ async function bbbGuestManagementSync(){
 }
 function bbbQueueGuestManagementSync(){clearTimeout(bbbGuestManagementTimer);bbbGuestManagementTimer=setTimeout(bbbGuestManagementSync,900)}
 
-function persist(){db.set('bbb_profile',state.profile);db.set('bbb_plans',state.plans);db.set('bbb_check',state.checklist);db.set('bbb_flight',state.flight);db.set('bbb_cart',state.cart);db.set('bbb_drink_cart',state.drinkCart);db.set('bbb_drink_orders',state.drinkOrders);db.set('bbb_bookings',state.bookings);db.set('bbb_airport_pickup',state.airportPickup);db.set('bbb_guest_sync_events',state.guestSyncEvents||[]);bashPersist();bbbQueueGuestManagementSync()}
+function persist(){db.set('bbb_profile',state.profile);db.set('bbb_plans',state.plans);db.set('bbb_check',state.checklist);db.set('bbb_flight',state.flight);db.set('bbb_cart',state.cart);db.set('bbb_drink_cart',state.drinkCart);db.set('bbb_drink_orders_'+BBB_CHAT_GUEST_ID,state.drinkOrders);db.set('bbb_bookings',state.bookings);db.set('bbb_airport_pickup',state.airportPickup);db.set('bbb_guest_sync_events',state.guestSyncEvents||[]);bashPersist();bbbQueueGuestManagementSync()}
 function money(n,c='IDR'){return c==='AUD'?`$${Number(n).toFixed(2)}`:`Rp${Math.round(n).toLocaleString('id-ID')}`}
 function toast(msg){const el=qs('#toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
 state.scrollPositions=state.scrollPositions||{};
