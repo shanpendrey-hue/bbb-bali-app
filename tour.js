@@ -2,7 +2,7 @@
 'use strict';
 const KEY='bbb_nicky_tour_seen_v1';
 const NICKY='/assets/nicky-profile.png';
-let active=false,index=0,mark=null,card=null,shade=null,resizeTimer=null,currentTarget=null;
+let active=false,index=0,mark=null,card=null,shade=null,resizeTimer=null,currentTarget=null,busy=false,runId=0;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13,7 +13,7 @@ const steps=[
  {route:'bbb',target:'.bbb-hero',title:'The B.B.B 🎂',text:'This is where the Big Bali Bash lives — the birthday plans, what’s happening and all the fun stuff for Nicolle’s 50th.'},
  {route:'bbb',target:'.itinerary-head',title:'The itinerary',text:'I’ll automatically scroll you to the next thing. Your B.B.B itinerary has the times and plans for the day — no group-chat archaeology required.'},
  {route:'bbb',target:'.cocktail-grid .cocktail:first-child',title:'Cocktails 🍸',text:'Browse the B.B.B cocktail menu, choose your drinks and build your order. You can have a practice before the big day too.'},
- {route:'bbb',action:'drink-order',target:'.drink-drawer',title:'My Order',text:'Your drinks collect here. When the B.B.B Bar is open on the day, Send order to the bar sends your order directly to our B.B.B bartenders. Until then, you can practise — I just won’t let you send it.'},
+ {route:'bbb',action:'drink-order',target:'.drink-drawer .section-head',title:'My Order',text:'Your drinks collect here. When the B.B.B Bar is open on the day, Send order to the bar sends your order directly to our B.B.B bartenders. Until then, you can practise — I just won’t let you send it.'},
  {route:'bbb',target:'.bbb-photo-card',title:'The B.B.B Media Roll 📸',text:'Please share your photos! B.B.B photos are collected in our private B.B.B Google Drive so Nicolle can keep the memories together and everyone can view the collection later.'},
  {route:'bash',target:'.bash-board-top',title:'The Bash Board',text:'Think of this as our little B.B.B Facebook feed. See what everyone’s up to, post updates and keep the trip chatter together.'},
  {route:'bash',target:'.bash-quick-compose',title:'Create a post',text:'Tap “What’s happening?” to post to the crew. You can add photos, check in somewhere or add how you’re feeling.'},
@@ -25,8 +25,8 @@ const steps=[
  {route:'travel',target:'.villa-actions',title:'Chandra Villas',text:'Your Bali base is easy to find — open it in Maps, jump to the Chandra website or call from here.'},
  {route:'bali',target:'.section-head',findText:'The Bali Guide',title:'The Bali Guide 🌴',text:'Food, drinks, practical Bali info and Shannon’s recommendations are all here. Open a guide whenever you need it.'},
  {route:'profile',target:'.pagehead',title:'Your Profile 👤',text:'This bit is all about YOU. Your profile is where you’ll find everything you’ve organised for the trip.'},
- {route:'profile',target:'.section:nth-of-type(5), .section',findText:'My Plans',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
- {route:'profile',target:'#nicky-tour-profile-card',title:'Need the tour again?',text:'Haven’t had a chance to explore properly — or want another look? Come back to Profile and tap Take the tour with Nicky. I’ll start this walkthrough again anytime.'},
+ {route:'profile',target:'.section',findHeading:'My Plans',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
+ {route:'profile',target:'#nicky-tour-profile-card [data-nicky-tour-start]',title:'Need the tour again?',text:'Haven’t had a chance to explore properly — or want another look? Come back to Profile and tap Take the tour with Nicky. I’ll start this walkthrough again anytime.'},
  {route:'home',target:'.nicky-launcher',title:'If you’re not sure… Ask Nicky! ✨',text:'I’m your number one B.B.B Bali guru. Ask me about the trip, itinerary, villa, Bali, where to go or what you’ve booked. I’m always hanging out here in the corner — tap me and chat whenever you need me.',finish:true}
 ];
 
@@ -49,12 +49,20 @@ function ensureUI(){
 function clearTarget(){mark?.classList.remove('show'); currentTarget=null; document.querySelectorAll('.nicky-tour-target').forEach(x=>x.classList.remove('nicky-tour-target'));}
 function findTarget(step){
  let els=[...document.querySelectorAll(step.target||'')];
+ if(step.findHeading) els=els.filter(el=>[...el.querySelectorAll('h1,h2,h3,.section-title')].some(h=>h.textContent.trim()===step.findHeading));
  if(step.findText) els=els.filter(el=>el.textContent.includes(step.findText));
  return els[0]||null;
 }
+async function waitForTarget(step,timeout=1200){
+ const started=Date.now(); let t=null;
+ while(Date.now()-started<timeout){t=findTarget(step);if(t)return t;await sleep(40)}
+ return findTarget(step);
+}
+async function waitForScroll(){await sleep(360);await new Promise(resolve=>{let timer=setTimeout(resolve,160);const done=()=>{clearTimeout(timer);resolve()};if('onscrollend' in window)window.addEventListener('scrollend',done,{once:true});else{let last=window.scrollY,stable=0;const tick=()=>{const now=window.scrollY;if(Math.abs(now-last)<1)stable++;else stable=0;last=now;if(stable>=3)return done();timer=setTimeout(tick,45)};tick()}})}
+function setBusy(on){busy=on;card?.classList.toggle('is-moving',on);document.body.classList.toggle('nicky-tour-moving',on)}
 async function setRoute(route){
  const wanted='#/'+route;
- if(location.hash!==wanted){location.hash=wanted; await sleep(260);} else await sleep(80);
+ if(location.hash!==wanted){location.hash=wanted; await sleep(220);} else await sleep(50);
  addProfileCard();
 }
 async function prep(step){
@@ -68,7 +76,7 @@ async function prep(step){
  if(step.action==='drink-order'){
    await sleep(140);
    const basket=$('.drink-basket-btn');
-   if(basket){basket.click(); await sleep(260);}
+   if(basket){basket.click(); await sleep(240);}
  }
  addProfileCard();
 }
@@ -106,39 +114,48 @@ function position(target){
  const radius=parseFloat(getComputedStyle(target).borderRadius)||16; mark.style.borderRadius=Math.min(26,Math.max(12,radius+4))+'px';
  mark.classList.add('show'); placeCard(target);
 }
-async function revealTarget(target){
+async function revealTarget(target,step){
  if(!target)return;
- const cardH=Math.max(210,card?.offsetHeight||245), gap=22, topSafe=24, bottomSafe=24;
+ const cardH=Math.max(190,card?.offsetHeight||235),gap=18,topSafe=18,bottomSafe=18;
  let r=target.getBoundingClientRect();
- const available=Math.max(170,innerHeight-cardH-gap-topSafe-bottomSafe);
- // Prefer showing the whole feature. If it is large, anchor its most useful upper portion in the clear area.
  let desiredTop;
- if(r.height<=available){
-   desiredTop=Math.max(topSafe,Math.min((innerHeight-r.height)/2,innerHeight-cardH-gap-r.height-bottomSafe));
-   if(desiredTop<topSafe) desiredTop=topSafe;
- } else desiredTop=topSafe;
+ // Purpose-built positions for the awkward mobile UI steps.
+ if(step?.action==='drink-order') desiredTop=Math.max(topSafe,Math.min(92,innerHeight*.12));
+ else if(step?.target==='.bash-chat-compose') desiredTop=Math.max(topSafe,innerHeight-cardH-r.height-gap-bottomSafe);
+ else {
+   const roomAbove=Math.max(0,r.top-topSafe),roomBelow=Math.max(0,innerHeight-r.bottom-bottomSafe);
+   if(roomBelow>=cardH+gap) desiredTop=Math.max(topSafe,Math.min(r.top,innerHeight-cardH-r.height-gap-bottomSafe));
+   else desiredTop=Math.max(topSafe,Math.min(innerHeight-r.height-bottomSafe,r.top));
+ }
  const delta=r.top-desiredTop;
- if(Math.abs(delta)>10){window.scrollBy({top:delta,behavior:'smooth'});await sleep(520);}
+ if(Math.abs(delta)>8){window.scrollBy({top:delta,behavior:'smooth'});await waitForScroll();}
 }
+
 function draw(step){
  const pct=Math.round(((index+1)/steps.length)*100);
  card.innerHTML=`<div class="nicky-tour-card-top"><div class="nicky-tour-avatar"><img src="${NICKY}" alt="Nicky"></div><div class="nicky-tour-heading"><small>NICKY’S APP TOUR · ${index+1} OF ${steps.length}</small><h3>${esc(step.title)}</h3></div><button class="nicky-tour-skip" data-nicky-tour-skip>Skip tour</button></div><p>${esc(step.text)}</p><div class="nicky-tour-progress"><i style="width:${pct}%"></i></div><div class="nicky-tour-actions">${index?'<button class="nicky-tour-back" data-nicky-tour-back>← Back</button>':'<span></span>'}<button class="nicky-tour-next" data-nicky-tour-next>${step.finish?'LET’S B.B.B. 🍸':'Next →'}</button></div>`;
  card.classList.add('show'); shade.classList.add('show'); requestAnimationFrame(()=>placeCard(currentTarget));
 }
 async function show(){
- if(!active)return; const step=steps[index]; clearTarget(); mark.classList.remove('show');
- await prep(step); if(!active)return;
- let target=findTarget(step);
- draw(step); await sleep(45);
- if(target){await revealTarget(target); target=findTarget(step); position(target);}
- else position(null);
- await sleep(60); if(target) position(findTarget(step)||target);
+ if(!active||busy)return;
+ const id=++runId,step=steps[index];
+ setBusy(true); clearTarget(); mark?.classList.remove('show'); card?.classList.remove('settled');
+ try{
+   await prep(step); if(!active||id!==runId)return;
+   let target=await waitForTarget(step);
+   draw(step); await sleep(40);
+   if(target){await revealTarget(target,step); if(!active||id!==runId)return; target=findTarget(step)||target; position(target);}
+   else position(null);
+   await sleep(90); if(target)position(findTarget(step)||target);
+   card?.classList.add('settled');
+ } finally { if(id===runId)setBusy(false); }
 }
+
 function start(){
- if(active)return; active=true; index=0; ensureUI(); document.body.classList.add('nicky-tour-active'); show();
+ if(active)return; active=true; index=0; runId++; ensureUI(); document.body.classList.add('nicky-tour-active'); show();
 }
 function end(completed=false){
- active=false; clearTarget(); shade?.classList.remove('show'); card?.classList.remove('show'); document.body.classList.remove('nicky-tour-active');
+ active=false; runId++; busy=false; clearTarget(); shade?.classList.remove('show'); card?.classList.remove('show'); document.body.classList.remove('nicky-tour-active');
  try{localStorage.setItem(KEY,completed?'completed':'skipped')}catch{}
  if(document.body.classList.contains('bash-chat-open')) $('[data-action="bash-chat-close"]')?.click();
  $('[data-action="close-drink-cart"]')?.click();
@@ -155,9 +172,9 @@ function dismissOffer(){const el=$('.nicky-tour-welcome');if(el){el.classList.re
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-nicky-tour-start]')){e.preventDefault(); $('.nicky-tour-welcome')?.remove(); start(); return;}
  if(e.target.closest('[data-nicky-tour-dismiss]')){dismissOffer();return;}
- if(e.target.closest('[data-nicky-tour-skip]')){end(false);return;}
- if(e.target.closest('[data-nicky-tour-next]')){if(index>=steps.length-1){end(true);location.hash='#/home';return;} index++;show();return;}
- if(e.target.closest('[data-nicky-tour-back]')){if(index>0){index--;show();}return;}
+ if(e.target.closest('[data-nicky-tour-skip]')){if(busy)return;end(false);return;}
+ if(e.target.closest('[data-nicky-tour-next]')){if(busy)return;if(index>=steps.length-1){end(true);location.hash='#/home';return;} card?.classList.remove('settled'); index++;show();return;}
+ if(e.target.closest('[data-nicky-tour-back]')){if(busy)return;if(index>0){card?.classList.remove('settled');index--;show();}return;}
 });
 const obs=new MutationObserver(()=>{addProfileCard();if(active){clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const t=findTarget(steps[index]);if(t)position(t)},80)}});
 obs.observe(document.documentElement,{childList:true,subtree:true});
