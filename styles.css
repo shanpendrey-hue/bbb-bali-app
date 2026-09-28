@@ -1746,3 +1746,9 @@ body.bash-chat-open .bash-chat-composer-wrap{
 body.bash-chat-open .bash-chat-empty.modern{
   margin:auto!important;
 }
+
+/* V42 — day-of bar lock */
+.bar-closed-drawer .bar-closed-panel{margin:30px 0;padding:42px 24px;border:1px solid rgba(87,112,62,.18);border-radius:28px;background:#f8f2e7;text-align:center}
+.bar-closed-drawer .bar-closed-icon{font-size:42px;margin-bottom:12px}
+.bar-closed-drawer .bar-closed-panel h3{margin:0 0 8px;font-size:28px;color:#3b2a22}
+.bar-closed-drawer .bar-closed-panel p{margin:0;color:#7b746d;font-size:17px;line-height:1.5}
