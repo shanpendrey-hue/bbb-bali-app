@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-const SHEET_ID='1lq-6whi6cHXOUIwIyDlOJmg4AJx1vILp9fS3FOwMcTo';
+const SHEET_ID=String(process.env.GOOGLE_GUEST_SHEET_ID||'1lq-6whi6cHXOUIwIyDlOJmg4AJx1vILp9fS3FOwMcTo').trim();
 const TABS={
   Guests:['Guest ID','Guest Name','Signed Up','Last Updated','Outbound Airline','Outbound Flight','Outbound From','Outbound To','Outbound Departure','Outbound Arrival','Return Airline','Return Flight','Return From','Return To','Return Departure','Return Arrival','Made Driver','Massage Bookings','Pizza Party Qty','Pizza Payment'],
   'Made Driver':['Booking ID','Guest ID','Guest Name','Status','Booked / Updated','Destination','Transfer AUD','Bintang','Bintang Crystal','Smirnoff Ice Lemon','Smirnoff Ice Raspberry','Coke','Coke Zero','Sprite','Water','Drinks AUD','Overall AUD','Flight'],

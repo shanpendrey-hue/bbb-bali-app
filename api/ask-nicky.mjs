@@ -111,7 +111,7 @@ export default async function handler(req,res){
     if(!history.length || String(history[history.length-1]?.content||'').trim()!==message || attachment){
       const content=[{type:'input_text',text:message}];
       if(attachment?.data&&String(attachment.data).length<7_000_000){
-        if(String(attachment.type||'').startsWith('image/')) content.push({type:'input_image',image_url:String(attachment.data)});
+        if(String(attachment.type||'').startsWith('image/')||String(attachment.data||'').startsWith('data:image/')||/\.(jpe?g|png|webp|gif|heic|heif|avif)$/i.test(String(attachment.name||''))) content.push({type:'input_image',image_url:String(attachment.data)});
         else if(String(attachment.type||'')==='application/pdf') content.push({type:'input_file',filename:String(attachment.name||'attachment.pdf').slice(0,120),file_data:String(attachment.data)});
       }
       input.push({role:'user',content});

@@ -1,6 +1,6 @@
 {
   "name": "bbb-bali-app",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "private": true,
   "dependencies": {
     "stripe": "^17.7.0"
