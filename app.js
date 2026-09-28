@@ -450,7 +450,44 @@ function bashBoardView(){
 
 let bbbGuestManagementTimer=null,bbbGuestManagementBusy=false,bbbGuestManagementQueued=false;
 function bbbGuestManagementPayload(){return {guestId:BBB_CHAT_GUEST_ID,name:state.profile?.name||'',signedUp:state.profile?.signedUp||'',updatedAt:new Date().toISOString(),flights:state.flight||{},plans:state.plans||[],bookings:(state.bookings||[]).map(b=>{const m=(typeof MASSAGES!=='undefined'?MASSAGES:[]).find(x=>x.name===b.treatment);return {...b,price:m?.price||0,mins:m?.mins||0}}),airportPickup:state.airportPickup||null,events:state.guestSyncEvents||[]}}
-async function bbbGuestManagementSync(){if(!state.profile?.created||!String(state.profile.name||'').trim())return false;if(bbbGuestManagementBusy){bbbGuestManagementQueued=true;return false}bbbGuestManagementBusy=true;try{let r=await fetch('/api/guest-management',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(bbbGuestManagementPayload())});if(!r.ok){await new Promise(x=>setTimeout(x,1200));r=await fetch('/api/guest-management',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(bbbGuestManagementPayload())})}if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.detail||d.error||('sync '+r.status))}if((state.guestSyncEvents||[]).length){state.guestSyncEvents=[];db.set('bbb_guest_sync_events',[])}db.set('bbb_guest_sheet_last_sync',new Date().toISOString());return true}catch(e){console.warn('Guest management sheet sync will retry',e);setTimeout(()=>{if(!bbbGuestManagementBusy)bbbGuestManagementSync()},15000);return false}finally{bbbGuestManagementBusy=false;if(bbbGuestManagementQueued){bbbGuestManagementQueued=false;setTimeout(bbbGuestManagementSync,500)}}}
+async function bbbGuestManagementSync(){
+  if(!state.profile?.created||!String(state.profile.name||'').trim())return false;
+  if(bbbGuestManagementBusy){bbbGuestManagementQueued=true;return false}
+  const c=bbbChatClient();if(!c)return false;
+  bbbGuestManagementBusy=true;
+  try{
+    const d=bbbGuestManagementPayload(),now=d.updatedAt||new Date().toISOString();
+    const profileRow={guest_id:d.guestId,name:d.name,signed_up:d.signedUp||now,updated_at:now,flight_details:d.flights||{},profile_data:{profile:state.profile||{},flights:d.flights||{}}};
+    let result=await c.from('bbb_guest_management').upsert(profileRow,{onConflict:'guest_id'});if(result.error)throw result.error;
+
+    if(d.airportPickup){
+      const p=d.airportPickup,drinks=p.drinks||[],drinkTotal=drinks.reduce((n,x)=>n+Number(x.qty||0)*Number(x.price||0),0),bookingId=p.bookingId||`made-${d.guestId}`;
+      const row={booking_id:bookingId,guest_id:d.guestId,guest_name:d.name,status:p.status||'booked',destination:p.area||'',transfer_price_aud:Number(p.ridePrice||0),drinks,drinks_total_aud:drinkTotal,total_aud:Number(p.ridePrice||0)+drinkTotal,flight_details:d.flights?.outbound||{},updated_at:p.updatedAt||p.cancelledAt||now};
+      result=await c.from('bbb_made_driver').upsert(row,{onConflict:'booking_id'});if(result.error)throw result.error;
+    }
+
+    for(const b of d.bookings||[]){
+      const row={booking_id:b.id,guest_id:d.guestId,guest_name:d.name,status:b.status||'booked',massage:b.treatment||'',quantity:Number(b.quantity||1),booking_date:b.date||'',booking_time:b.slot||'',duration_mins:Number(b.mins||0),price_idr:Number(b.price||0),total_idr:Number(b.price||0)*Number(b.quantity||1),updated_at:b.updatedAt||now};
+      result=await c.from('bbb_massage_bookings').upsert(row,{onConflict:'booking_id'});if(result.error)throw result.error;
+    }
+
+    for(const p of (d.plans||[]).filter(x=>x.type==='pizza')){
+      const bookingId=p.bookingId||`pizza-${d.guestId}`,qty=Math.max(1,Number(p.people||1)),total=Number(p.totalDue||p.totalPaid||p.price||249000*qty),paidAmount=Number(p.paidAmount||p.totalPaid||0),paymentStatus=(p.paymentMarked||p.pay==='paid'||paidAmount>=total)?'Paid':'Unpaid';
+      const row={booking_id:bookingId,guest_id:d.guestId,guest_name:d.name,status:p.status||'booked',option_name:p.title||'Bali Pizza Party',quantity:qty,price_each_idr:Math.round(total/qty),total_idr:total,payment_status:paymentStatus,amount_paid_idr:paidAmount,updated_at:p.updatedAt||p.bookedAt||now};
+      result=await c.from('bbb_pizza_party').upsert(row,{onConflict:'booking_id'});if(result.error)throw result.error;
+    }
+
+    for(const e of d.events||[]){
+      if(e?.type!=='pizza'||!e.bookingId)continue;
+      const row={booking_id:e.bookingId,guest_id:d.guestId,guest_name:d.name,status:'cancelled',option_name:'Bali Pizza Party',quantity:Number(e.quantity||1),price_each_idr:Number(e.unitPrice||249000),total_idr:Number(e.total||0),payment_status:e.paymentStatus||'Unpaid',amount_paid_idr:Number(e.paidAmount||0),updated_at:e.at||now};
+      result=await c.from('bbb_pizza_party').upsert(row,{onConflict:'booking_id'});if(result.error)throw result.error;
+    }
+
+    if((state.guestSyncEvents||[]).length){state.guestSyncEvents=[];db.set('bbb_guest_sync_events',[])}
+    db.set('bbb_guest_management_last_sync',new Date().toISOString());return true;
+  }catch(e){console.warn('Guest management Supabase sync will retry',e?.message||e);setTimeout(()=>{if(!bbbGuestManagementBusy)bbbGuestManagementSync()},15000);return false}
+  finally{bbbGuestManagementBusy=false;if(bbbGuestManagementQueued){bbbGuestManagementQueued=false;setTimeout(bbbGuestManagementSync,500)}}
+}
 function bbbQueueGuestManagementSync(){clearTimeout(bbbGuestManagementTimer);bbbGuestManagementTimer=setTimeout(bbbGuestManagementSync,900)}
 
 function persist(){db.set('bbb_profile',state.profile);db.set('bbb_plans',state.plans);db.set('bbb_check',state.checklist);db.set('bbb_flight',state.flight);db.set('bbb_cart',state.cart);db.set('bbb_drink_cart',state.drinkCart);db.set('bbb_drink_orders',state.drinkOrders);db.set('bbb_bookings',state.bookings);db.set('bbb_airport_pickup',state.airportPickup);db.set('bbb_guest_sync_events',state.guestSyncEvents||[]);bashPersist();bbbQueueGuestManagementSync()}
