@@ -2,7 +2,7 @@
 'use strict';
 const KEY='bbb_nicky_tour_seen_v1';
 const NICKY='/assets/nicky-profile.png';
-let active=false,index=0,mark=null,card=null,shade=null,resizeTimer=null;
+let active=false,index=0,mark=null,card=null,shade=null,resizeTimer=null,currentTarget=null;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -46,7 +46,7 @@ function ensureUI(){
  card=document.createElement('section'); card.className='nicky-tour-card'; card.setAttribute('role','dialog'); card.setAttribute('aria-live','polite');
  document.body.append(shade,mark,card);
 }
-function clearTarget(){mark?.classList.remove('show'); document.querySelectorAll('.nicky-tour-target').forEach(x=>x.classList.remove('nicky-tour-target'));}
+function clearTarget(){mark?.classList.remove('show'); currentTarget=null; document.querySelectorAll('.nicky-tour-target').forEach(x=>x.classList.remove('nicky-tour-target'));}
 function findTarget(step){
  let els=[...document.querySelectorAll(step.target||'')];
  if(step.findText) els=els.filter(el=>el.textContent.includes(step.findText));
@@ -65,23 +65,59 @@ async function prep(step){
  }
  addProfileCard();
 }
+function viewportRoom(r){
+ const safeTop=12,safeBottom=12;
+ return {above:Math.max(0,r.top-safeTop),below:Math.max(0,innerHeight-r.bottom-safeBottom)};
+}
+function placeCard(target){
+ if(!card)return;
+ card.classList.remove('place-top','place-bottom','place-center');
+ if(!target){card.classList.add('place-bottom');return;}
+ const r=target.getBoundingClientRect();
+ const room=viewportRoom(r);
+ // Put Nicky on the opposite side of the thing she is explaining.
+ // Prefer a side with enough room for the card; otherwise use the larger side.
+ const estimated=Math.min(300,Math.max(205,card.offsetHeight||235));
+ let placement;
+ if(room.below>=estimated+28) placement='bottom';
+ else if(room.above>=estimated+28) placement='top';
+ else placement=room.above>room.below?'top':'bottom';
+ card.classList.add('place-'+placement);
+ // If the target is very tall, keep the card on the side furthest from its centre.
+ if(r.height>innerHeight*.48){
+   card.classList.remove('place-top','place-bottom');
+   card.classList.add(r.top+r.height/2>innerHeight/2?'place-top':'place-bottom');
+ }
+}
 function position(target){
- clearTarget(); if(!target)return;
- target.classList.add('nicky-tour-target');
- const r=target.getBoundingClientRect(),pad=7;
- mark.style.left=Math.max(6,r.left-pad)+'px'; mark.style.top=Math.max(6,r.top-pad)+'px'; mark.style.width=Math.min(innerWidth-12,r.width+pad*2)+'px'; mark.style.height=Math.min(innerHeight-12,r.height+pad*2)+'px'; mark.classList.add('show');
+ clearTarget(); if(!target){placeCard(null);return;}
+ currentTarget=target; target.classList.add('nicky-tour-target');
+ const r=target.getBoundingClientRect(),pad=Math.min(10,Math.max(6,r.width*.02));
+ const left=Math.max(8,r.left-pad),top=Math.max(8,r.top-pad);
+ const right=Math.min(innerWidth-8,r.right+pad),bottom=Math.min(innerHeight-8,r.bottom+pad);
+ mark.style.left=left+'px'; mark.style.top=top+'px'; mark.style.width=Math.max(20,right-left)+'px'; mark.style.height=Math.max(20,bottom-top)+'px';
+ const radius=parseFloat(getComputedStyle(target).borderRadius)||16; mark.style.borderRadius=Math.min(26,Math.max(12,radius+4))+'px';
+ mark.classList.add('show'); placeCard(target);
+}
+async function revealTarget(target){
+ if(!target)return;
+ const r=target.getBoundingClientRect();
+ // Reserve space for Nicky so the feature is not hidden behind the bubble.
+ const desiredTop=Math.max(92,Math.min(innerHeight*.34,(innerHeight-r.height)/2));
+ const delta=r.top-desiredTop;
+ if(Math.abs(delta)>18){window.scrollBy({top:delta,behavior:'smooth'});await sleep(470);}
 }
 function draw(step){
  const pct=Math.round(((index+1)/steps.length)*100);
  card.innerHTML=`<div class="nicky-tour-card-top"><div class="nicky-tour-avatar"><img src="${NICKY}" alt="Nicky"></div><div class="nicky-tour-heading"><small>NICKY’S APP TOUR · ${index+1} OF ${steps.length}</small><h3>${esc(step.title)}</h3></div><button class="nicky-tour-skip" data-nicky-tour-skip>Skip tour</button></div><p>${esc(step.text)}</p><div class="nicky-tour-progress"><i style="width:${pct}%"></i></div><div class="nicky-tour-actions">${index?'<button class="nicky-tour-back" data-nicky-tour-back>← Back</button>':'<span></span>'}<button class="nicky-tour-next" data-nicky-tour-next>${step.finish?'LET’S B.B.B. 🍸':'Next →'}</button></div>`;
- card.classList.add('show'); shade.classList.add('show');
+ card.classList.add('show'); shade.classList.add('show'); requestAnimationFrame(()=>placeCard(currentTarget));
 }
 async function show(){
  if(!active)return; const step=steps[index]; clearTarget(); mark.classList.remove('show');
  await prep(step); if(!active)return;
  let target=findTarget(step);
- if(target){target.scrollIntoView({behavior:'smooth',block:'center'}); await sleep(430); target=findTarget(step); position(target);}
- draw(step);
+ if(target){await revealTarget(target); target=findTarget(step); position(target);}
+ draw(step); await sleep(40); if(target) position(findTarget(step)||target);
 }
 function start(){
  if(active)return; active=true; index=0; ensureUI(); document.body.classList.add('nicky-tour-active'); show();
