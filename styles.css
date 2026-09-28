@@ -1787,3 +1787,7 @@ body.bash-media-viewer-open .bash-media-lightbox-stage{touch-action:pan-y!import
   font-weight:750;
   line-height:1.35;
 }
+
+/* V55 — true live Group Chat presence + typing */
+.bash-chat-typing{min-height:20px;padding:3px 14px 5px;font-size:12px;font-weight:700;letter-spacing:.01em;color:var(--olive,#6f7451);background:transparent}
+.bash-chat-typing[hidden]{display:none!important}
