@@ -1493,130 +1493,63 @@ body.bash-chat-open .bash-message.mine .bash-message-stack{align-items:flex-end!
 body.bash-chat-open .bash-bubble{height:auto!important;min-height:0!important}
 @media(max-width:390px){body.bash-chat-open .bash-chat-compose{grid-template-columns:40px 40px 40px minmax(0,1fr) 46px!important;gap:3px!important;padding-left:7px!important;padding-right:7px!important}body.bash-chat-open .bash-chat-plus,body.bash-chat-open .bash-chat-camera-direct,body.bash-chat-open .bash-chat-photo-direct{width:40px!important;height:40px!important;min-width:40px!important}body.bash-chat-open .bash-chat-send{width:46px!important;height:46px!important;min-width:46px!important}body.bash-chat-open .bash-chat-compose input{height:46px!important;padding-left:12px!important;padding-right:12px!important;font-size:14px!important}}
 
-/* V35 — remove empty chat void: short conversations sit against the composer */
+
+/* V36 — definitive Group Chat layout: one scroll viewport + one content thread */
+body.bash-chat-open .bash-chat-screen{
+  height:100%!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr) auto!important;
+}
 body.bash-chat-open .bash-message-list{
+  min-height:0!important;
+  height:auto!important;
+  overflow-y:auto!important;
   display:flex!important;
   flex-direction:column!important;
-  justify-content:flex-end!important;
-  align-content:stretch!important;
-  gap:8px!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
   padding:14px 16px 12px!important;
+  background:#fff!important;
 }
-body.bash-chat-open .bash-message-list > .bash-message:first-child{
+body.bash-chat-open .bash-message-thread{
+  width:100%!important;
   margin-top:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  flex:0 0 auto!important;
 }
-body.bash-chat-open .bash-message{
+body.bash-chat-open .bash-message-thread > .bash-message{
   flex:0 0 auto!important;
   height:auto!important;
   min-height:0!important;
+  margin:0!important;
+  align-self:flex-start!important;
 }
+body.bash-chat-open .bash-message-thread > .bash-message.mine{align-self:flex-end!important}
 body.bash-chat-open .bash-message-stack,
 body.bash-chat-open .bash-media-message,
-body.bash-chat-open .bash-chat-media{
-  flex:0 0 auto!important;
-  height:auto!important;
-  min-height:0!important;
-}
+body.bash-chat-open .bash-chat-media{height:auto!important;min-height:0!important;flex:0 0 auto!important}
+body.bash-chat-open .bash-chat-empty.modern{margin:auto!important}
 
-
-/* V36 — scrollable chat + sent times + Messenger-style day dividers */
-body.bash-chat-open .bash-message-list{
-  justify-content:flex-start!important;
-  align-content:flex-start!important;
-  overflow-y:auto!important;
-  -webkit-overflow-scrolling:touch!important;
-  overscroll-behavior-y:contain!important;
-  min-height:0!important;
-  padding:14px 16px 18px!important;
-}
-body.bash-chat-open .bash-message-list > .bash-message:first-child{margin-top:0!important}
-.bash-chat-day-divider{
+/* V36 — Chandra Villas: three truly equal actions */
+.villa-actions{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
   width:100%!important;
-  flex:0 0 auto!important;
+}
+.villa-actions .btn{
+  width:100%!important;
+  min-width:0!important;
+  height:52px!important;
+  padding:0 6px!important;
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
-  margin:12px 0 8px!important;
-  pointer-events:none!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  font-size:12px!important;
+  line-height:1!important;
 }
-.bash-chat-day-divider:first-child{margin-top:2px!important}
-.bash-chat-day-divider span{
-  display:inline-flex!important;
-  align-items:center!important;
-  min-height:28px!important;
-  padding:6px 11px!important;
-  border-radius:999px!important;
-  background:#f4f0e8!important;
-  color:#80766f!important;
-  font:700 10px/1 Montserrat,Arial,sans-serif!important;
-  letter-spacing:.055em!important;
-  box-shadow:0 1px 0 rgba(72,55,44,.05)!important;
-}
-body.bash-chat-open .bash-bubble small,body.bash-chat-open .bash-media-message-meta small{font-variant-numeric:tabular-nums!important}
-
-/* V38 — compact live Create Post composer + inline chips + reliable video states */
-.bash-create-modern{padding-left:20px!important;padding-right:20px!important}
-.bash-create-actions.top-actions{margin:10px 0 12px!important;gap:8px!important}
-.bash-create-actions.top-actions button{min-height:92px!important;padding:12px 7px!important}
-.bash-caption-input{display:block!important;width:100%!important;box-sizing:border-box!important;min-height:96px!important;height:96px;max-height:220px!important;overflow-y:auto!important;resize:none!important;margin:8px 0 0!important;padding:18px 18px!important;border:1px solid rgba(107,78,61,.14)!important;border-radius:22px!important;background:#fff!important;outline:0!important;box-shadow:0 7px 18px rgba(50,40,30,.035)!important;color:var(--bash-ink)!important;font:500 19px/1.45 Montserrat,Arial,sans-serif!important}
-.bash-caption-input::placeholder{color:#9a928b!important;opacity:1!important}
-.bash-caption-input:focus{border-color:rgba(85,107,63,.42)!important;box-shadow:0 0 0 3px rgba(85,107,63,.07)!important}
-.bash-selected-chips{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin:10px 0 2px!important;padding:0!important}
-.bash-selected-chips>span{width:auto!important;min-height:36px!important;border-radius:999px!important;padding:0 8px 0 12px!important;font-size:11px!important;line-height:1.2!important;box-shadow:none!important}
-.bash-selected-chips button{width:26px!important;height:26px!important;margin-left:7px!important;display:grid!important;place-items:center!important;padding:0!important}
-.bash-media-preview-grid{margin:12px 0 8px!important;gap:8px!important}
-.bash-media-preview,.bash-add-more-media{position:relative!important;min-height:170px!important;border-radius:20px!important;overflow:hidden!important}
-.bash-media-preview>img,.bash-media-preview>video{width:100%!important;height:100%!important;min-height:170px!important;object-fit:cover!important;display:block!important}
-.bash-media-remove{position:absolute!important;z-index:5!important;top:10px!important;right:10px!important;width:32px!important;height:32px!important;border:0!important;border-radius:50%!important;background:rgba(40,31,26,.72)!important;color:#fff!important;font-size:20px!important}
-.bash-video-upload-state{position:absolute!important;z-index:4!important;inset:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;background:rgba(55,38,31,.56)!important;color:#fff!important;text-align:center!important;pointer-events:none!important}
-.bash-video-upload-state b{font:800 24px Montserrat,Arial,sans-serif!important}.bash-video-upload-state small{font:700 11px Montserrat,Arial,sans-serif!important}
-.bash-video-upload-state.failed{background:rgba(63,38,30,.76)!important;pointer-events:auto!important}
-.bash-video-upload-state.failed>b{font-size:32px!important}.bash-video-upload-state.failed button{position:relative!important;z-index:8!important;min-width:120px!important;min-height:44px!important;margin-top:6px!important;padding:0 18px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#4f3329!important;font:800 14px Montserrat,Arial,sans-serif!important;touch-action:manipulation!important}
-@media(max-width:420px){.bash-create-modern{padding-left:14px!important;padding-right:14px!important}.bash-create-actions.top-actions{gap:6px!important}.bash-create-actions.top-actions button{min-height:86px!important}.bash-caption-input{min-height:92px!important;height:92px!important;padding:16px!important;font-size:18px!important}.bash-media-preview,.bash-add-more-media,.bash-media-preview>img,.bash-media-preview>video{min-height:160px!important}}
-
-/* V39 — compact, polished Create Post composer */
-.bash-create-modern{padding:0 18px calc(20px + env(safe-area-inset-bottom))!important}
-.bash-create-user{padding:16px 2px 10px!important}
-.bash-caption-input{order:initial!important;margin:6px 0 12px!important;min-height:112px!important;height:112px!important;padding:19px 20px!important;border-radius:24px!important;font-size:19px!important;box-shadow:0 8px 24px rgba(50,40,30,.04)!important}
-.bash-create-add-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;min-height:70px!important;margin:0 0 12px!important;padding:10px 12px 10px 16px!important;border:1px solid rgba(107,78,61,.12)!important;border-radius:22px!important;background:rgba(255,255,255,.78)!important;box-shadow:0 7px 20px rgba(50,40,30,.035)!important}
-.bash-create-add-row>span{font:800 13px/1.2 Montserrat,Arial,sans-serif!important;color:#4a4039!important;white-space:nowrap!important}
-.bash-create-add-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important}
-.bash-create-add-actions button{width:56px!important;min-width:56px!important;height:50px!important;padding:4px 2px!important;border:0!important;border-radius:16px!important;background:transparent!important;color:var(--olive)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;box-shadow:none!important}
-.bash-create-add-actions button:active{background:#f0f3e9!important;transform:scale(.97)!important}
-.bash-create-add-actions svg{position:static!important;width:23px!important;height:23px!important;color:var(--olive)!important}
-.bash-create-add-actions small{font:700 8px/1 Montserrat,Arial,sans-serif!important;color:#7f756e!important;white-space:nowrap!important}
-.bash-selected-chips{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin:0 0 12px!important}
-.bash-selected-chips>span{width:auto!important;min-height:40px!important;padding:0 8px 0 12px!important;border-radius:999px!important;font-size:11px!important}
-.bash-selected-chips button{width:28px!important;height:28px!important;margin-left:7px!important}
-.bash-media-loading{margin:0 0 12px!important}
-.bash-media-preview-grid{margin:0 0 12px!important;gap:8px!important}
-.bash-media-preview,.bash-add-more-media{min-height:172px!important}
-@media(max-width:420px){
- .bash-create-modern{padding-left:14px!important;padding-right:14px!important}
- .bash-create-user{padding-top:14px!important}
- .bash-caption-input{min-height:106px!important;height:106px!important;margin-top:4px!important}
- .bash-create-add-row{min-height:66px!important;padding-left:13px!important;padding-right:7px!important}
- .bash-create-add-row>span{font-size:12px!important}
- .bash-create-add-actions{gap:1px!important}
- .bash-create-add-actions button{width:51px!important;min-width:51px!important;height:48px!important}
- .bash-create-add-actions small{font-size:7.5px!important}
-}
-
-/* V41 — crisp FastDrip visuals + no Recovery cart */
-.recovery-top{justify-content:flex-start!important}
-.fastdrip-clean-hero{position:relative;min-height:250px;margin:18px 0 22px;border-radius:28px;overflow:hidden;background:linear-gradient(145deg,#421b54 0%,#65216f 48%,#1b6b69 100%);box-shadow:0 14px 34px rgba(48,31,38,.13)}
-.fastdrip-clean-hero:before{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(255,255,255,.2);border-radius:50%;right:-62px;top:-62px}
-.fastdrip-clean-hero:after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;background:linear-gradient(90deg,#e7b93f 0 33%,#e25a42 33% 66%,#46a8a5 66%)}
-.fastdrip-clean-orbit{position:absolute;width:150px;height:150px;border:2px solid rgba(255,255,255,.2);border-radius:50%;right:28px;top:48px}
-.fastdrip-clean-orbit:before,.fastdrip-clean-orbit:after{content:"";position:absolute;background:rgba(255,255,255,.22);border-radius:999px}
-.fastdrip-clean-orbit:before{width:2px;height:180px;left:74px;top:-15px;transform:rotate(35deg)}
-.fastdrip-clean-orbit:after{height:2px;width:180px;left:-15px;top:74px;transform:rotate(-18deg)}
-.fastdrip-clean-cross{position:absolute;right:67px;top:79px;width:72px;height:72px;border-radius:24px;background:#f7f0df;color:#5b2767;display:grid;place-items:center;font:800 54px/1 Montserrat,Arial,sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.12)}
-.fastdrip-clean-copy{position:absolute;left:25px;bottom:29px;color:#fff;z-index:2}.fastdrip-clean-copy span{display:block;margin-bottom:8px;font:800 10px/1 Montserrat,Arial,sans-serif;letter-spacing:.22em}.fastdrip-clean-copy strong{font:900 29px/.9 Montserrat,Arial,sans-serif;letter-spacing:-.045em}
-.fastdrip-card-visual{position:relative;height:190px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#f0e5d0,#d9e2d2)}
-.fastdrip-card-visual.tone-2{background:linear-gradient(145deg,#e9ded0,#d8c6df)}.fastdrip-card-visual.tone-3{background:linear-gradient(145deg,#dce8df,#d9e0c4)}
-.fastdrip-card-visual:before,.fastdrip-card-visual:after{content:"";position:absolute;border:1px solid rgba(61,79,53,.18);border-radius:50%}.fastdrip-card-visual:before{width:220px;height:220px;right:-70px;top:-105px}.fastdrip-card-visual:after{width:140px;height:140px;left:-55px;bottom:-70px}
-.fastdrip-card-visual>span{position:relative;z-index:2;width:88px;height:88px;border-radius:28px;background:rgba(255,255,255,.82);color:#5b2767;display:grid;place-items:center;font:900 35px/1 Montserrat,Arial,sans-serif;box-shadow:0 10px 28px rgba(70,55,45,.10)}
-.fastdrip-card-visual>i{position:absolute;width:2px;height:150px;background:rgba(83,108,69,.22);transform:rotate(48deg)}
-.fastdrip-card-visual>b{position:absolute;left:20px;bottom:16px;color:#536b45;font:800 9px/1 Montserrat,Arial,sans-serif;letter-spacing:.2em}
-@media(max-width:420px){.fastdrip-clean-hero{min-height:230px}.fastdrip-card-visual{height:170px}.fastdrip-clean-copy strong{font-size:26px}}
