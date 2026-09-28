@@ -1642,3 +1642,107 @@ body.bash-chat-open .bash-chat-composer-wrap{
   background:#fff!important;
   border-top:1px solid #ece8e2!important;
 }
+
+
+/* V39 — clean Group Chat viewport rebuild. No spacer/grid rows; thread owns natural height. */
+body.bash-chat-open{overflow:hidden!important}
+body.bash-chat-open .bash-chat-layer{
+  position:fixed!important;
+  left:0!important;right:0!important;
+  top:var(--bash-vvo,0px)!important;
+  bottom:auto!important;
+  width:100%!important;
+  height:var(--bash-vvh,100dvh)!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+body.bash-chat-open .bash-chat-screen{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+body.bash-chat-open .bash-chat-top{
+  flex:0 0 auto!important;
+}
+body.bash-chat-open .bash-message-list{
+  position:relative!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  display:block!important;
+  padding:12px 16px 10px!important;
+  margin:0!important;
+  background:#fff!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+body.bash-chat-open .bash-chat-bottom-spacer{display:none!important}
+body.bash-chat-open .bash-message-thread{
+  width:100%!important;
+  min-height:100%!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-end!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  overflow:visible!important;
+}
+body.bash-chat-open .bash-chat-end{
+  display:block!important;
+  flex:0 0 1px!important;
+  width:100%!important;
+  height:1px!important;
+  min-height:1px!important;
+}
+body.bash-chat-open .bash-message-thread>.bash-message{
+  position:relative!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  max-width:88%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  align-self:flex-start!important;
+  overflow:visible!important;
+}
+body.bash-chat-open .bash-message-thread>.bash-message.mine{align-self:flex-end!important}
+body.bash-chat-open .bash-message-stack,
+body.bash-chat-open .bash-media-message,
+body.bash-chat-open .bash-chat-media,
+body.bash-chat-open .bash-bubble{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+body.bash-chat-open .bash-bubble{
+  width:auto!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+body.bash-chat-open .bash-chat-media{overflow:hidden!important}
+body.bash-chat-open .bash-chat-composer-wrap{
+  position:relative!important;
+  flex:0 0 auto!important;
+  z-index:20!important;
+  width:100%!important;
+  margin:0!important;
+  background:#fff!important;
+  border-top:1px solid #ece8e2!important;
+}
+body.bash-chat-open .bash-chat-empty.modern{
+  margin:auto!important;
+}
