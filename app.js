@@ -5,7 +5,8 @@ const qs=(s,r=document)=>r.querySelector(s);
 const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
 const db={
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
+  remove(k){try{localStorage.removeItem(k)}catch{}}
 };
 
 const CFG={
@@ -125,7 +126,8 @@ const state={
   drinkClearConfirm:false,
   activePlanIndex:null,
   fx:null,
-  bashPosts:db.get('bbb_bash_posts',[]),
+  // v81: Supabase is authoritative for the Bash Board. Never hydrate deleted/stale posts from localStorage.
+  bashPosts:[],
   bashChat:db.get('bbb_bash_chat',[]),
   bashUnreadFeed:db.get('bbb_bash_unread_feed',0),
   bashUnreadChat:db.get('bbb_bash_unread_chat',0),
@@ -911,7 +913,16 @@ Estimated total: $${pickupTotal(p).toFixed(0)} AUD cash
 Can you please organise this with Made for me?`}
 function saveAirportPickup(){const p=pickupDraftFromForm();if(!p)return;const editing=state.airportPickup&&['booked','requested'].includes(state.airportPickup.status);state.airportPickup={...p,bookingId:state.airportPickup?.bookingId||('made-'+Date.now()),status:'requested',updatedAt:new Date().toISOString()};persist();state.modal='pickup-confirmed';renderModal();render();}
 function sendAirportRequest(){if(!state.airportPickup)return;const action=state.airportPickup.requestSentAt?'edit':'new';state.airportPickup={...state.airportPickup,status:'requested',requestSentAt:new Date().toISOString(),updatedAt:new Date().toISOString()};persist();const msg=pickupWhatsappMessage(action,state.airportPickup);closeModal();render();window.location.href=`https://wa.me/${CFG.whatsappOrder}?text=${encodeURIComponent(msg)}`}
-function cancelAirportPickup(){if(!state.airportPickup)return;state.airportPickup={...state.airportPickup,status:'cancelled',cancelledAt:new Date().toISOString(),updatedAt:new Date().toISOString()};persist();closeModal();render();toast('Airport pickup request cancelled')}
+function pickupCancellationWhatsappMessage(p){const name=state.profile.name||'Guest',flight=state.flight?.outbound?`${state.flight.outbound.airline} ${state.flight.outbound.no} · arrives ${formatFlightDate(state.flight.outbound.arrive)}`:'Not added – arrival to be confirmed',drinks=(p.drinks||[]).filter(x=>x.qty>0).map(x=>`${x.qty} × ${x.name}`).join(', ')||'No drinks';return `Hi Shannon! Just letting you know I’ve cancelled my Made airport pickup request.
+
+Guest: ${name}
+Pickup: ${p.area}
+Ride: $${Number(p.ridePrice||0).toFixed(0)} AUD
+Flight: ${flight}
+Drinks: ${drinks}
+Original estimated total: $${pickupTotal(p).toFixed(0)} AUD cash
+Status: CANCELLED`}
+function cancelAirportPickup(){if(!state.airportPickup)return;const cancelled={...state.airportPickup,status:'cancelled',cancelledAt:new Date().toISOString(),updatedAt:new Date().toISOString()};state.airportPickup=cancelled;persist();const msg=pickupCancellationWhatsappMessage(cancelled);closeModal();render();toast('Airport pickup request cancelled');window.location.href=`https://wa.me/${CFG.whatsappOrder}?text=${encodeURIComponent(msg)}`}
 
 function saveProfile(){const name=qs('#pname')?.value.trim();if(!name)return toast('Add your name');state.profile={...state.profile,name,created:true,signedUp:state.profile.signedUp||new Date().toISOString()};persist();bbbQueueGuestProfileSync();render();toast('Profile saved')}
 function handleProfilePhoto(file){if(!file)return;if(!file.type.startsWith('image/'))return toast('Choose a photo');if(file.size>8*1024*1024)return toast('Choose a photo under 8 MB');const reader=new FileReader();reader.onload=()=>{state.profile={...state.profile,photo:reader.result};persist();const avatar=qs('.profile-card .avatar');if(avatar)avatar.innerHTML=`<img src="${reader.result}" alt="Profile photo">`;const pick=qs('[data-action="profile-photo-pick"]');if(pick)pick.textContent='Change photo';toast('Photo added ✓')};reader.readAsDataURL(file)}
@@ -1232,4 +1243,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.rou
 window.addEventListener('pageshow',()=>{if(state.route==='bash'){bbbPostsLoad(true);if(!bbbPostsChannel)bbbPostsStartRealtime()}});
 window.addEventListener('focus',()=>{if(state.route==='bash')bbbPostsLoad(true)});
 window.addEventListener('focus',()=>{if(state.route==='bash'){if(!bbbPostsChannel)bbbPostsStartRealtime();bbbPostsLoad(true)}});
+// v81 migration: remove the legacy local Bash Board cache. Supabase is the only feed source.
+db.remove('bbb_bash_posts');
+state.bashPosts=[];
 setTimeout(()=>bbbPostsStartSync(),300);
