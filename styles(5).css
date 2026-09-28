@@ -1553,3 +1553,9 @@ body.bash-chat-open .bash-chat-empty.modern{margin:auto!important}
   font-size:12px!important;
   line-height:1!important;
 }
+
+/* V37 - Group Chat bottom-anchored thread */
+body.bash-chat-open .bash-message-list{display:block!important;min-height:0!important;height:100%!important;overflow-y:auto!important;padding:14px 16px 12px!important;background:#fff!important}
+body.bash-chat-open .bash-message-thread{width:100%!important;min-height:100%!important;margin:0!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;align-items:stretch!important;gap:8px!important}
+body.bash-chat-open .bash-message-thread>.bash-message{flex:0 0 auto!important;height:auto!important;min-height:0!important;margin:0!important;align-self:flex-start!important}
+body.bash-chat-open .bash-message-thread>.bash-message.mine{align-self:flex-end!important}
