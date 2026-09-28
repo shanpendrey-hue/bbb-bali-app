@@ -188,6 +188,7 @@ function end(completed=false){
  try{localStorage.setItem(KEY,completed?'completed':'skipped')}catch{}
  if(document.body.classList.contains('bash-chat-open')) $('[data-action="bash-chat-close"]')?.click();
  $('[data-action="close-drink-cart"]')?.click();
+ setTimeout(()=>window.BBBProfileOnboarding?.show?.(),220);
 }
 function offer(){
  if(active||$('.nicky-tour-welcome'))return;
@@ -196,7 +197,7 @@ function offer(){
  el.innerHTML=`<div class="nicky-tour-welcome-card"><button class="nicky-tour-welcome-x" data-nicky-tour-dismiss aria-label="Close">×</button><div class="nicky-tour-welcome-avatar"><img src="${NICKY}" alt="Nicky"></div><div class="meta">HEY! I’M NICKY 👋</div><h2>Your B.B.B Bali guru.</h2><p>Want me to show you around? I’ll give you a quick interactive tour so you know where everything is and how the good stuff works.</p><button class="btn olive full" data-nicky-tour-start>Take the tour →</button><button class="nicky-tour-later" data-nicky-tour-dismiss>Skip for now</button></div>`;
  document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('show'));
 }
-function dismissOffer(){const el=$('.nicky-tour-welcome');if(el){el.classList.remove('show');setTimeout(()=>el.remove(),180)}try{localStorage.setItem(KEY,'skipped')}catch{}}
+function dismissOffer(){const el=$('.nicky-tour-welcome');if(el){el.classList.remove('show');setTimeout(()=>el.remove(),180)}try{localStorage.setItem(KEY,'skipped')}catch{}setTimeout(()=>window.BBBProfileOnboarding?.show?.(),220)}
 
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-nicky-tour-start]')){e.preventDefault(); $('.nicky-tour-welcome')?.remove(); start(); return;}
@@ -208,5 +209,5 @@ document.addEventListener('click',e=>{
 const obs=new MutationObserver(()=>{addProfileCard();if(active){clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const t=findTarget(steps[index]);if(t)position(t)},80)}});
 obs.observe(document.documentElement,{childList:true,subtree:true});
 window.addEventListener('resize',()=>{if(active){clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const t=findTarget(steps[index]);if(t)position(t)},80)}});
-window.addEventListener('load',()=>{addProfileCard();setTimeout(offer,1100)});
+window.addEventListener('load',()=>{addProfileCard();setTimeout(()=>{let seen='';try{seen=localStorage.getItem(KEY)||''}catch{}if(seen&&!window.BBBProfileOnboarding?.ready?.())window.BBBProfileOnboarding?.show?.();else offer()},1100)});
 })();
