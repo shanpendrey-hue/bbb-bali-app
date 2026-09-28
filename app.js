@@ -82,57 +82,29 @@ function bbbChatStopRealtime(clearPresence=true){clearTimeout(bbbChatTypingTimer
 async function bbbChatInsert(message){const c=bbbChatClient();if(!c)return false;const tempId='sending-'+Date.now()+'-'+Math.random().toString(36).slice(2),optimistic={id:tempId,guestId:BBB_CHAT_GUEST_ID,author:message.author||'Guest',photo:'',text:message.text||'',createdAt:Date.now(),editedAt:null,reactions:message.reactions||{},myReactions:[],replyTo:message.replyTo||null,_sending:true};state.bashChat.push(optimistic);bbbChatPersist();bbbChatRenderLive(true);const row={guest_id:BBB_CHAT_GUEST_ID,guest_name:message.author||'Guest',message:message.text||'',reply_to_id:message.replyTo||null,photo_urls:[],reactions:message.reactions||{}};const {data,error}=await c.from('bbb_chat_messages').insert(row).select('*').single();if(error){state.bashChat=state.bashChat.filter(x=>x.id!==tempId);bbbChatPersist();bbbChatRenderLive(false);console.error('B.B.B live chat send failed',error);toast('Message could not send — check connection');return false}state.bashChat=state.bashChat.filter(x=>x.id!==tempId);bbbChatUpsertRow(data,{pin:true});bbbChatSendTyping(false);return true}
 async function bbbChatUpdate(message,changes){const c=bbbChatClient();if(!c)return false;const {data,error}=await c.from('bbb_chat_messages').update(changes).eq('id',message.id).eq('guest_id',message.guestId||BBB_CHAT_GUEST_ID).select('*').single();if(error){console.error('B.B.B live chat update failed',error);toast('Could not update message');return false}if(data)bbbChatUpsertRow(data,{pin:false});return true}
 async function bbbChatDelete(message){const c=bbbChatClient();if(!c)return false;const {error}=await c.from('bbb_chat_messages').delete().eq('id',message.id).eq('guest_id',message.guestId||BBB_CHAT_GUEST_ID);if(error){console.error('B.B.B live chat delete failed',error);toast('Could not delete message');return false}bbbChatRemoveRow(message.id);return true}
-// B.B.B Bash Board shared feed — uses the existing Supabase connection/table.
-// Posts are tagged separately from old chat rows so every phone reads the same board.
-const BBB_POST_MARKER='__BBB_POST_V61__';
+// B.B.B Bash Board shared feed — direct REST connection to Supabase Data API.
+// This deliberately does not depend on the external Supabase JS client.
 let bbbPostsLoading=false,bbbPostsLastSync='',bbbPostsPollTimer=null;
-function bbbPostMeta(post){
-  return JSON.stringify({id:post.id,author:post.author,photo:post.photo||'',location:post.location||'',locationUrl:post.locationUrl||'',feeling:post.feeling||'',createdAt:post.createdAt||Date.now(),editedAt:post.editedAt||null,myReactions:post.myReactions||[]});
-}
-function bbbPostFromRow(r){
-  let meta={};try{meta=JSON.parse(r.status||'{}')}catch(e){}
-  const media=Array.isArray(r.images)?r.images:[];
-  return {id:meta.id||r.id,author:meta.author||r.user_name||'Guest',photo:meta.photo||'',text:r.message||'',location:meta.location||'',locationUrl:meta.locationUrl||'',feeling:meta.feeling||'',media,createdAt:meta.createdAt||new Date(r.created_at).getTime(),editedAt:meta.editedAt||null,reactions:r.reactions||{},myReactions:meta.myReactions||[],comments:Array.isArray(r.comments)?r.comments:[],_cloudId:r.id};
-}
-function bbbPostRow(post){
-  return {user_id:BBB_CHAT_GUEST_ID,user_name:post.author||state.profile.name||'Guest',user_initial:(post.author||state.profile.name||'G').trim().charAt(0).toUpperCase(),status:bbbPostMeta(post),message:post.text||'',images:bashMediaItems(post),reactions:post.reactions||{},comments:post.comments||[]};
-}
-async function bbbPostInsert(post){
-  const c=bbbChatClient();if(!c)return false;post._syncing=true;
-  const {data,error}=await c.from('bbb_bash_posts').insert(bbbPostRow(post)).select('*').single();
-  post._syncing=false;
-  if(error){console.error('B.B.B shared post insert failed',error);toast('Post saved on this phone, but could not sync yet');return false}
-  post._cloudId=data.id;bashPersist();return true;
-}
-async function bbbPostUpdate(post){
-  const c=bbbChatClient();if(!c)return false;if(!post._cloudId)return bbbPostInsert(post);
-  const {error}=await c.from('bbb_bash_posts').update(bbbPostRow(post)).eq('id',post._cloudId);
-  if(error){console.error('B.B.B shared post update failed',error);return false}return true;
-}
-async function bbbPostDelete(post){
-  const c=bbbChatClient();if(!c||!post?._cloudId)return true;
-  const {error}=await c.from('bbb_bash_posts').delete().eq('id',post._cloudId);
-  if(error){console.error('B.B.B shared post delete failed',error);toast('Could not remove post for everyone');return false}return true;
-}
-async function bbbPostsUploadLocal(){
-  const local=state.bashPosts.filter(p=>!p._cloudId&&!p._syncing);
-  for(const post of local)await bbbPostInsert(post);
-}
-async function bbbPostsLoad(force=false){
-  if(bbbPostsLoading)return;const c=bbbChatClient();if(!c)return;bbbPostsLoading=true;
+const BBB_POSTS_ENDPOINT=BBB_SUPABASE_URL+'/rest/v1/bbb_bash_posts';
+function bbbApiHeaders(extra={}){return Object.assign({'apikey':BBB_SUPABASE_KEY,'Authorization':'Bearer '+BBB_SUPABASE_KEY,'Content-Type':'application/json'},extra)}
+async function bbbApi(path='',options={}){
+  const url=BBB_POSTS_ENDPOINT+path;
   try{
-    await bbbPostsUploadLocal();
-    const {data,error}=await c.from('bbb_bash_posts').select('*').order('created_at',{ascending:false}).limit(300);
-    if(error){console.error('B.B.B shared feed load failed',error);return}
-    const rows=data||[],sync=JSON.stringify(rows.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));
-    if(!force&&sync===bbbPostsLastSync)return;bbbPostsLastSync=sync;
-    state.bashPosts=rows.map(bbbPostFromRow);bashPersist();if(state.route==='bash')render();
-  }finally{bbbPostsLoading=false}
+    const res=await fetch(url,Object.assign({},options,{headers:bbbApiHeaders(options.headers||{})}));
+    const raw=await res.text();let body=null;try{body=raw?JSON.parse(raw):null}catch{body=raw}
+    if(!res.ok){const detail=(body&&typeof body==='object'&&(body.message||body.details||body.hint))||raw||('HTTP '+res.status);throw new Error('Supabase '+res.status+': '+detail)}
+    return body;
+  }catch(err){console.error('B.B.B Supabase REST request failed',err,url);throw err}
 }
-function bbbPostsStartPolling(){
-  clearInterval(bbbPostsPollTimer);bbbPostsLoad(true);
-  bbbPostsPollTimer=setInterval(()=>{if(state.route==='bash'&&!document.hidden)bbbPostsLoad(false)},4000);
-}
+function bbbPostMeta(post){return JSON.stringify({id:post.id,author:post.author,photo:post.photo||'',location:post.location||'',locationUrl:post.locationUrl||'',feeling:post.feeling||'',createdAt:post.createdAt||Date.now(),editedAt:post.editedAt||null,myReactions:post.myReactions||[]})}
+function bbbPostFromRow(r){let meta={};try{meta=JSON.parse(r.status||'{}')}catch{}const media=Array.isArray(r.images)?r.images:[];return {id:meta.id||r.id,author:meta.author||r.user_name||'Guest',photo:meta.photo||'',text:r.message||'',location:meta.location||'',locationUrl:meta.locationUrl||'',feeling:meta.feeling||'',media,createdAt:meta.createdAt||new Date(r.created_at).getTime(),editedAt:meta.editedAt||null,reactions:r.reactions||{},myReactions:meta.myReactions||[],comments:Array.isArray(r.comments)?r.comments:[],_cloudId:r.id}}
+function bbbPostRow(post){return {user_id:BBB_CHAT_GUEST_ID,user_name:post.author||state.profile.name||'Guest',user_initial:(post.author||state.profile.name||'G').trim().charAt(0).toUpperCase(),status:bbbPostMeta(post),message:post.text||'',images:bashMediaItems(post),reactions:post.reactions||{},comments:post.comments||[]}}
+async function bbbPostInsert(post){post._syncing=true;try{const data=await bbbApi('',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(bbbPostRow(post))});const row=Array.isArray(data)?data[0]:data;if(!row?.id)throw new Error('Supabase returned no post ID');post._cloudId=row.id;post._syncError='';bashPersist();return true}catch(error){post._syncError=error.message||String(error);console.error('B.B.B shared post insert failed',error);toast('Could not post for everyone: '+post._syncError);return false}finally{post._syncing=false}}
+async function bbbPostUpdate(post){if(!post._cloudId)return bbbPostInsert(post);try{await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(bbbPostRow(post))});post._syncError='';return true}catch(error){post._syncError=error.message||String(error);console.error('B.B.B shared post update failed',error);toast('Could not update shared post: '+post._syncError);return false}}
+async function bbbPostDelete(post){if(!post?._cloudId)return true;try{await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'DELETE',headers:{'Prefer':'return=minimal'}});return true}catch(error){console.error('B.B.B shared post delete failed',error);toast('Could not remove shared post: '+(error.message||error));return false}}
+async function bbbPostsUploadLocal(){const local=state.bashPosts.filter(p=>!p._cloudId&&!p._syncing);for(const post of local)await bbbPostInsert(post)}
+async function bbbPostsLoad(force=false){if(bbbPostsLoading)return;bbbPostsLoading=true;try{const rows=await bbbApi('?select=*&order=created_at.desc&limit=300',{method:'GET'});const list=Array.isArray(rows)?rows:[];const sync=JSON.stringify(list.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));if(force||sync!==bbbPostsLastSync){bbbPostsLastSync=sync;state.bashPosts=list.map(bbbPostFromRow);bashPersist();if(state.route==='bash')render()}await bbbPostsUploadLocal()}catch(error){console.error('B.B.B shared feed load failed',error);if(force)toast('Bash Board connection error: '+(error.message||error))}finally{bbbPostsLoading=false}}
+function bbbPostsStartPolling(){clearInterval(bbbPostsPollTimer);bbbPostsLoad(true);bbbPostsPollTimer=setInterval(()=>{if(state.route==='bash'&&!document.hidden)bbbPostsLoad(false)},4000)}
 const state={
   route:(location.hash.replace('#/','')||'home'),
   profile:db.get('bbb_profile',{name:'',photo:'',created:false}),
