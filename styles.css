@@ -1764,3 +1764,26 @@ body.bash-media-viewer-open .modal{z-index:1200!important;padding:0!important;pl
 body.bash-media-viewer-open .modal-card.recovery-modal-card{width:100%!important;height:100%!important;max-height:none!important;border-radius:0!important;padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom))!important;overflow:auto!important;background:#fffdf8!important}
 body.bash-media-viewer-open .bash-media-lightbox,body.bash-media-viewer-open .bash-gallery-modal{max-width:680px;margin:0 auto}
 body.bash-media-viewer-open .bash-media-lightbox-stage{touch-action:pan-y!important}
+
+/* V44 — practice order remains visible while the bar is closed */
+.bar-closed-inline{
+  margin:28px 0 22px;
+  padding:22px 20px;
+  border:1px solid rgba(87,112,62,.22);
+  border-radius:22px;
+  background:#f8f2e7;
+  text-align:center;
+}
+.bar-closed-inline-title{
+  color:var(--olive);
+  font-weight:900;
+  letter-spacing:.16em;
+  font-size:15px;
+}
+.bar-closed-inline-copy{
+  margin-top:7px;
+  color:#3b2a22;
+  font-size:18px;
+  font-weight:750;
+  line-height:1.35;
+}
