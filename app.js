@@ -82,42 +82,15 @@ function bbbChatStopRealtime(clearPresence=true){clearTimeout(bbbChatTypingTimer
 async function bbbChatInsert(message){const c=bbbChatClient();if(!c)return false;const tempId='sending-'+Date.now()+'-'+Math.random().toString(36).slice(2),optimistic={id:tempId,guestId:BBB_CHAT_GUEST_ID,author:message.author||'Guest',photo:'',text:message.text||'',createdAt:Date.now(),editedAt:null,reactions:message.reactions||{},myReactions:[],replyTo:message.replyTo||null,_sending:true};state.bashChat.push(optimistic);bbbChatPersist();bbbChatRenderLive(true);const row={guest_id:BBB_CHAT_GUEST_ID,guest_name:message.author||'Guest',message:message.text||'',reply_to_id:message.replyTo||null,photo_urls:[],reactions:message.reactions||{}};const {data,error}=await c.from('bbb_chat_messages').insert(row).select('*').single();if(error){state.bashChat=state.bashChat.filter(x=>x.id!==tempId);bbbChatPersist();bbbChatRenderLive(false);console.error('B.B.B live chat send failed',error);toast('Message could not send — check connection');return false}state.bashChat=state.bashChat.filter(x=>x.id!==tempId);bbbChatUpsertRow(data,{pin:true});bbbChatSendTyping(false);return true}
 async function bbbChatUpdate(message,changes){const c=bbbChatClient();if(!c)return false;const {data,error}=await c.from('bbb_chat_messages').update(changes).eq('id',message.id).eq('guest_id',message.guestId||BBB_CHAT_GUEST_ID).select('*').single();if(error){console.error('B.B.B live chat update failed',error);toast('Could not update message');return false}if(data)bbbChatUpsertRow(data,{pin:false});return true}
 async function bbbChatDelete(message){const c=bbbChatClient();if(!c)return false;const {error}=await c.from('bbb_chat_messages').delete().eq('id',message.id).eq('guest_id',message.guestId||BBB_CHAT_GUEST_ID);if(error){console.error('B.B.B live chat delete failed',error);toast('Could not delete message');return false}bbbChatRemoveRow(message.id);return true}
-// B.B.B Bash Board shared feed — direct REST connection to Supabase Data API.
-// This deliberately does not depend on the external Supabase JS client.
-let bbbPostsLoading=false,bbbPostsLastSync='',bbbPostsPollTimer=null,bbbPostsChannel=null;
-const bbbDiag={realtime:'NOT STARTED',lastFetch:'Never',lastEvent:'Never',eventType:'—',posts:0,error:'None'};
-function bbbDiagTime(){return new Date().toLocaleTimeString()}
-function bbbDiagRender(){const el=document.getElementById('bbb-realtime-diagnostic');if(!el)return;el.innerHTML=`<b>LIVE SYNC DIAGNOSTIC</b><span>Realtime: <strong>${escapeHtml(bbbDiag.realtime)}</strong></span><span>Last Supabase fetch: ${escapeHtml(bbbDiag.lastFetch)}</span><span>Last realtime event: ${escapeHtml(bbbDiag.lastEvent)}</span><span>Event type: ${escapeHtml(bbbDiag.eventType)}</span><span>Posts received: ${Number(bbbDiag.posts||0)}</span><span>Error: ${escapeHtml(bbbDiag.error)}</span>`}
-function bbbPostsStopRealtime(){const c=bbbChatClient();if(bbbPostsChannel&&c){try{c.removeChannel(bbbPostsChannel)}catch{}}bbbPostsChannel=null}
-function bbbPostsStartRealtime(){
-  const c=bbbChatClient();
-  if(!c){bbbDiag.realtime='CLIENT ERROR';bbbDiag.error='Supabase client did not load';bbbDiagRender();return}
-  bbbPostsStopRealtime();bbbDiag.realtime='CONNECTING';bbbDiag.error='None';bbbDiagRender();
-  const ch=c.channel('bbb-bash-posts-live-'+Date.now(),{config:{broadcast:{self:false}}});
-  ch.on('postgres_changes',{event:'*',schema:'public',table:'bbb_bash_posts'},payload=>{
-    bbbDiag.lastEvent=bbbDiagTime();bbbDiag.eventType=payload.eventType||'CHANGE';bbbDiag.error='None';bbbDiagRender();
-    bbbPostsLoad(true);
-  });
-  ch.subscribe(status=>{
-    bbbDiag.realtime=status;
-    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED')bbbDiag.error='Realtime channel '+status;
-    else if(status==='SUBSCRIBED')bbbDiag.error='None';
-    bbbDiagRender();
-  });
-  bbbPostsChannel=ch;
-}
-
+// B.B.B Bash Board shared feed — Supabase REST for CRUD + Realtime for instant cross-device updates.
+let bbbPostsLoading=false,bbbPostsLastSync='',bbbPostsPollTimer=null,bbbPostsChannel=null,bbbPostsRealtimeGeneration=0;
+const bbbPostsDiag={status:'IDLE',lastFetch:'Never',lastEvent:'Never',eventType:'—',posts:0,error:'None'};
 const BBB_POSTS_ENDPOINT=BBB_SUPABASE_URL+'/rest/v1/bbb_bash_posts';
+function bbbDiagTime(){return new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',second:'2-digit'})}
+function bbbDiagRender(){if(state?.route==='bash'){const el=document.querySelector('#bbbRealtimeDiag');if(el)el.innerHTML=bbbDiagHtml(true)}}
+function bbbDiagHtml(inner=false){const body=`<b>Realtime: ${escapeHtml(bbbPostsDiag.status)}</b><span>Last Supabase fetch: ${escapeHtml(bbbPostsDiag.lastFetch)}</span><span>Last realtime event: ${escapeHtml(bbbPostsDiag.lastEvent)}</span><span>Event type: ${escapeHtml(bbbPostsDiag.eventType)}</span><span>Posts received: ${Number(bbbPostsDiag.posts||0)}</span><span>Error: ${escapeHtml(bbbPostsDiag.error||'None')}</span>`;return inner?body:`<div id="bbbRealtimeDiag" class="bbb-realtime-diag">${body}</div>`}
 function bbbApiHeaders(extra={}){return Object.assign({'apikey':BBB_SUPABASE_KEY,'Authorization':'Bearer '+BBB_SUPABASE_KEY,'Content-Type':'application/json'},extra)}
-async function bbbApi(path='',options={}){
-  const url=BBB_POSTS_ENDPOINT+path;
-  try{
-    const res=await fetch(url,Object.assign({},options,{headers:bbbApiHeaders(options.headers||{})}));
-    const raw=await res.text();let body=null;try{body=raw?JSON.parse(raw):null}catch{body=raw}
-    if(!res.ok){const detail=(body&&typeof body==='object'&&(body.message||body.details||body.hint))||raw||('HTTP '+res.status);throw new Error('Supabase '+res.status+': '+detail)}
-    return body;
-  }catch(err){console.error('B.B.B Supabase REST request failed',err,url);throw err}
-}
+async function bbbApi(path='',options={}){const url=BBB_POSTS_ENDPOINT+path;try{const res=await fetch(url,Object.assign({},options,{headers:bbbApiHeaders(options.headers||{})}));const raw=await res.text();let body=null;try{body=raw?JSON.parse(raw):null}catch{body=raw}if(!res.ok){const detail=(body&&typeof body==='object'&&(body.message||body.details||body.hint))||raw||('HTTP '+res.status);throw new Error('Supabase '+res.status+': '+detail)}return body}catch(err){console.error('B.B.B Supabase REST request failed',err,url);throw err}}
 function bbbPostMeta(post){return JSON.stringify({id:post.id,author:post.author,photo:post.photo||'',location:post.location||'',locationUrl:post.locationUrl||'',feeling:post.feeling||'',createdAt:post.createdAt||Date.now(),editedAt:post.editedAt||null,myReactions:post.myReactions||[]})}
 function bbbPostFromRow(r){let meta={};try{meta=JSON.parse(r.status||'{}')}catch{}const media=Array.isArray(r.images)?r.images:[];return {id:meta.id||r.id,author:meta.author||r.user_name||'Guest',photo:meta.photo||'',text:r.message||'',location:meta.location||'',locationUrl:meta.locationUrl||'',feeling:meta.feeling||'',media,createdAt:meta.createdAt||new Date(r.created_at).getTime(),editedAt:meta.editedAt||null,reactions:r.reactions||{},myReactions:meta.myReactions||[],comments:Array.isArray(r.comments)?r.comments:[],_cloudId:r.id}}
 function bbbPostRow(post){return {user_id:BBB_CHAT_GUEST_ID,user_name:post.author||state.profile.name||'Guest',user_initial:(post.author||state.profile.name||'G').trim().charAt(0).toUpperCase(),status:bbbPostMeta(post),message:post.text||'',images:bashMediaItems(post),reactions:post.reactions||{},comments:post.comments||[]}}
@@ -125,8 +98,10 @@ async function bbbPostInsert(post){post._syncing=true;try{const data=await bbbAp
 async function bbbPostUpdate(post){if(!post._cloudId)return bbbPostInsert(post);try{await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(bbbPostRow(post))});post._syncError='';return true}catch(error){post._syncError=error.message||String(error);console.error('B.B.B shared post update failed',error);toast('Could not update shared post: '+post._syncError);return false}}
 async function bbbPostDelete(post){if(!post?._cloudId)return true;try{await bbbApi('?id=eq.'+encodeURIComponent(post._cloudId),{method:'DELETE',headers:{'Prefer':'return=minimal'}});return true}catch(error){console.error('B.B.B shared post delete failed',error);toast('Could not remove shared post: '+(error.message||error));return false}}
 async function bbbPostsUploadLocal(){const local=state.bashPosts.filter(p=>!p._cloudId&&!p._syncing);for(const post of local)await bbbPostInsert(post)}
-async function bbbPostsLoad(force=false){if(bbbPostsLoading)return;bbbPostsLoading=true;try{const rows=await bbbApi('?select=*&order=created_at.desc&limit=300',{method:'GET'});const list=Array.isArray(rows)?rows:[];bbbDiag.lastFetch=bbbDiagTime();bbbDiag.posts=list.length;bbbDiag.error='None';const sync=JSON.stringify(list.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));if(force||sync!==bbbPostsLastSync){bbbPostsLastSync=sync;state.bashPosts=list.map(bbbPostFromRow);bashPersist();if(state.route==='bash')render()}bbbDiagRender();await bbbPostsUploadLocal()}catch(error){bbbDiag.error=error.message||String(error);bbbDiagRender();console.error('B.B.B shared feed load failed',error);if(force)toast('Bash Board connection error: '+(error.message||error))}finally{bbbPostsLoading=false}}
-function bbbPostsStartPolling(){clearInterval(bbbPostsPollTimer);bbbPostsLoad(true);bbbPostsStartRealtime();bbbPostsPollTimer=setInterval(()=>{if(state.route==='bash'&&!document.hidden)bbbPostsLoad(false)},15000)}
+async function bbbPostsLoad(force=false){if(bbbPostsLoading)return;bbbPostsLoading=true;try{const rows=await bbbApi('?select=*&order=created_at.desc&limit=300',{method:'GET'});const list=Array.isArray(rows)?rows:[];bbbPostsDiag.lastFetch=bbbDiagTime();bbbPostsDiag.posts=list.length;bbbPostsDiag.error='None';const sync=JSON.stringify(list.map(r=>[r.id,r.message,r.status,r.reactions,r.comments,r.images]));if(force||sync!==bbbPostsLastSync){bbbPostsLastSync=sync;state.bashPosts=list.map(bbbPostFromRow);bashPersist();if(state.route==='bash')render()}await bbbPostsUploadLocal()}catch(error){bbbPostsDiag.error=error.message||String(error);console.error('B.B.B shared feed load failed',error);if(force)toast('Bash Board connection error: '+(error.message||error))}finally{bbbPostsLoading=false;bbbDiagRender()}}
+function bbbPostsStopRealtime(){bbbPostsRealtimeGeneration++;const c=bbbChatClient(),ch=bbbPostsChannel;bbbPostsChannel=null;if(ch){try{c?.removeChannel(ch)}catch{}}bbbPostsDiag.status='IDLE';bbbDiagRender()}
+function bbbPostsStartRealtime(){const c=bbbChatClient();if(!c){bbbPostsDiag.status='CLIENT MISSING';bbbPostsDiag.error='Supabase JS client did not load';bbbDiagRender();return}if(bbbPostsChannel)return;const generation=++bbbPostsRealtimeGeneration;bbbPostsDiag.status='CONNECTING';bbbPostsDiag.error='None';bbbDiagRender();const ch=c.channel('bbb-bash-posts-live-'+generation).on('postgres_changes',{event:'*',schema:'public',table:'bbb_bash_posts'},payload=>{if(generation!==bbbPostsRealtimeGeneration)return;bbbPostsDiag.lastEvent=bbbDiagTime();bbbPostsDiag.eventType=payload.eventType||'CHANGE';bbbPostsDiag.error='None';bbbDiagRender();bbbPostsLoad(true)});bbbPostsChannel=ch;ch.subscribe(status=>{if(generation!==bbbPostsRealtimeGeneration)return;bbbPostsDiag.status=status;console.log('B.B.B Bash Board realtime status:',status);if(status==='SUBSCRIBED'){bbbPostsDiag.error='None';bbbPostsLoad(true)}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){bbbPostsDiag.error='Realtime channel '+status}bbbDiagRender()})}
+function bbbPostsStartSync(){clearInterval(bbbPostsPollTimer);bbbPostsLoad(true);bbbPostsStartRealtime();bbbPostsPollTimer=setInterval(()=>{if(state.route==='bash'&&!document.hidden)bbbPostsLoad(false)},30000)}
 const state={
   route:(location.hash.replace('#/','')||'home'),
   profile:db.get('bbb_profile',{name:'',photo:'',created:false}),
@@ -427,7 +402,7 @@ function bashComposer(){
 }
 function bashFeedView(){
   const posts=[...state.bashPosts].sort((a,b)=>Number(b.createdAt)-Number(a.createdAt));
-  return `<div class="bash-feed-v4"><div id="bbb-realtime-diagnostic" style="background:#151515;color:#fff;border-radius:14px;padding:12px 14px;margin:0 0 14px;font:12px/1.45 system-ui;display:grid;gap:2px"><b>LIVE SYNC DIAGNOSTIC</b><span>Realtime: ${escapeHtml(bbbDiag.realtime)}</span><span>Last Supabase fetch: ${escapeHtml(bbbDiag.lastFetch)}</span><span>Last realtime event: ${escapeHtml(bbbDiag.lastEvent)}</span><span>Event type: ${escapeHtml(bbbDiag.eventType)}</span><span>Posts received: ${Number(bbbDiag.posts||0)}</span><span>Error: ${escapeHtml(bbbDiag.error)}</span></div>${bashComposer()}${bashCrewStrip()}<div class="bash-post-stream">${posts.length?posts.map(bashPostCard).join(''):`<div class="bash-empty-v4"><div class="bash-empty-logo">BB</div><h3>Nothing on the board yet</h3><p>Start the trip chatter.</p><button class="btn olive" data-action="bash-compose-open">Create the first post</button></div>`}</div></div>`
+  return `${bbbDiagHtml()}<div class="bash-feed-v4">${bashComposer()}${bashCrewStrip()}<div class="bash-post-stream">${posts.length?posts.map(bashPostCard).join(''):`<div class="bash-empty-v4"><div class="bash-empty-logo">BB</div><h3>Nothing on the board yet</h3><p>Start the trip chatter.</p><button class="btn olive" data-action="bash-compose-open">Create the first post</button></div>`}</div></div>`
 }
 function bashChatAttachmentHtml(a){if(!a)return'';if(a.type==='gallery'){const items=a.items||[],show=items.slice(0,3);return `<button class="bash-chat-gallery-stack" data-action="bash-view-chat-media" data-message="${a.messageId||''}" aria-label="Open ${items.length} photos"><span class="bash-chat-gallery-count">${items.length} photos</span><span class="bash-chat-gallery-fan">${show.map((m,i)=>`<img src="${m.data}" alt="Chat photo ${i+1}">`).join('')}</span></button>`}if(a.type==='image')return `<button class="bash-chat-media" data-action="bash-view-chat-media" data-message="${a.messageId||''}"><img src="${a.data}" alt="Chat photo"></button>`;if(a.type==='video')return `<button class="bash-chat-media video" data-action="bash-view-chat-media" data-message="${a.messageId||''}"><video src="${a.data}" muted playsinline></video><i>▶</i></button>`;return `<a class="bash-chat-file" href="${a.data}" download="${escapeAttr(a.name||'attachment')}">📎 ${escapeHtml(a.name||'Attachment')}</a>`}
 function bashMessageReactionSummary(m){const r=m.reactions||{},used=[['love','♥'],['laugh','😂'],['cheers','🍸'],['fire','🔥']].filter(([k])=>Number(r[k]||0));if(!used.length)return'';return `<div class="bash-message-reaction-summary">${used.map(([k,ic])=>`<button data-action="bash-chat-react" data-message="${m.id}" data-reaction="${k}">${ic}${Number(r[k]||0)>1?` <b>${r[k]}</b>`:''}</button>`).join('')}</div>`}
@@ -1197,6 +1172,6 @@ document.addEventListener('visibilitychange',()=>{if(!state.bashChatOpen)return;
 window.addEventListener('load',()=>{bbbChatStartRealtime();bbbChatLoad(true)});
 
 // v61 shared Bash Board sync
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.route==='bash'){bbbPostsLoad(true);if(!bbbPostsChannel)bbbPostsStartRealtime()}});
-window.addEventListener('focus',()=>{if(state.route==='bash'){bbbPostsLoad(true);if(!bbbPostsChannel)bbbPostsStartRealtime()}});
-setTimeout(()=>bbbPostsStartPolling(),300);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.route==='bash'){if(!bbbPostsChannel)bbbPostsStartRealtime();bbbPostsLoad(true)}});
+window.addEventListener('focus',()=>{if(state.route==='bash'){if(!bbbPostsChannel)bbbPostsStartRealtime();bbbPostsLoad(true)}});
+setTimeout(()=>bbbPostsStartSync(),300);
