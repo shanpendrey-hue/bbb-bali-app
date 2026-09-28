@@ -1,0 +1,21 @@
+B.B.B v72 Guest Management
+
+Google Sheet: BBB Guest Management, 2027
+Spreadsheet ID: 1lq-6whi6cHXOUIwIyDlOJmg4AJx1vILp9fS3FOwMcTo
+Service account: bbb-media-upload@bbb-bali-app.iam.gserviceaccount.com
+
+The app uses the existing Vercel environment variables:
+- GOOGLE_SERVICE_ACCOUNT_EMAIL
+- GOOGLE_PRIVATE_KEY
+
+The service account must have Editor access to the spreadsheet (confirmed by Shannon).
+Google Sheets API must be enabled for the Google Cloud project behind this service account.
+
+On first successful sync, v72 automatically creates/uses these tabs in the SAME spreadsheet:
+- Guests
+- Made Driver
+- Massages
+- Pizza Party
+- Orders
+
+Existing app design and Bash Board sync are preserved from v71.

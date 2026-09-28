@@ -1,5 +1,5 @@
-const CACHE='bbb-v69-bash-board-live-sync';
-const SHELL=['/','/index.html','/styles.css','/tour.css','/app.js','/tour.js','/manifest.json','/assets/bbb-logo.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png','/assets/icons/icon-maskable-512.png','/assets/icons/apple-touch-icon.png'];
+const CACHE='bbb-v73-guest-management';
+const SHELL=['/','/index.html','/styles.css','/tour.css','/app.js','/tour.js','/manifest.json','/assets/bbb-logo.png','/assets/sunset-beanbags.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png','/assets/icons/icon-maskable-512.png','/assets/icons/apple-touch-icon.png'];
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).catch(()=>{}))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{const u=new URL(event.request.url);if(u.origin!==location.origin||u.pathname.startsWith('/api/'))return;event.respondWith(fetch(event.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(event.request,copy)).catch(()=>{});return r}).catch(()=>caches.match(event.request)))});
