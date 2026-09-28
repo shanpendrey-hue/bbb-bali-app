@@ -1208,14 +1208,22 @@ function bashPinChatToBottom(){const l=qs('#bashMessageList');if(!l)return;const
 function bashSyncVisualViewport(){const vv=window.visualViewport;if(!vv)return;document.documentElement.style.setProperty('--bash-vvh',vv.height+'px');document.documentElement.style.setProperty('--bash-vvo',vv.offsetTop+'px');document.documentElement.style.setProperty('--bash-vvc',(vv.offsetTop+vv.height/2)+'px');if(document.body.classList.contains('bash-chat-open')){const l=qs('#bashMessageList');if(l)requestAnimationFrame(()=>bashPinChatToBottom())}}
 if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSyncVisualViewport);window.visualViewport.addEventListener('scroll',bashSyncVisualViewport)}
 
-/* V25 — installable B.B.B Home Screen experience */
+/* V89 — adaptive B.B.B install experience for Safari, Chrome, Edge and Firefox */
 (()=>{
   const LOGO='/assets/bbb-logo.png';
+  const ua=navigator.userAgent||'';
   const installed=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  const ios=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
-  const android=()=>/android/i.test(navigator.userAgent);
+  const ios=()=>/iphone|ipad|ipod/i.test(ua);
+  const android=()=>/android/i.test(ua);
   const mobile=()=>ios()||android();
-  const iosBrowser=()=>{const u=navigator.userAgent;if(/CriOS/i.test(u))return'Chrome';if(/FxiOS/i.test(u))return'Firefox';if(/EdgiOS/i.test(u))return'Edge';return'Safari'};
+  const browser=()=>{
+    if(/EdgiOS|EdgA|Edg\//i.test(ua))return'Edge';
+    if(/FxiOS|Firefox\//i.test(ua))return'Firefox';
+    if(/CriOS|Chrome\//i.test(ua)&&!/Edg/i.test(ua))return'Chrome';
+    if(/Safari\//i.test(ua)&&!/Chrome|CriOS|Edg|FxiOS/i.test(ua))return'Safari';
+    return'Browser';
+  };
+  const device=()=>ios()?'iPhone / iPad':android()?'Android':'Device';
   let deferredInstall=null;
   if(installed())document.documentElement.classList.add('bbb-standalone');
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;showNudge(true)});
@@ -1224,26 +1232,38 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   function showNudge(force=false){
     if(installed()||!mobile()||document.querySelector('.bbb-install-nudge'))return;
     if(!force&&sessionStorage.getItem('bbbInstallDismissed')==='1')return;
-    document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Install B.B.B Bali"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Put B.B.B on your phone</b><small>One tap from your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>GET THE APP</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
+    document.body.insertAdjacentHTML('beforeend',`<aside class="bbb-install-nudge" aria-label="Add B.B.B Bali to your phone"><img src="${LOGO}" alt="B.B.B Bali"><div class="bbb-install-nudge-copy"><b>Keep B.B.B handy</b><small>${browser()} · add it to your Home Screen 🌴</small></div><button class="bbb-install-go" data-bbb-install>SHOW ME</button><button class="bbb-install-x" data-bbb-install-dismiss aria-label="Not now">×</button></aside>`)
+  }
+  function manualInstructions(){
+    const b=browser();
+    if(ios()){
+      return {
+        intro:`You're using ${b} on ${device()}. Keep B.B.B one tap away by adding it to your Home Screen.`,
+        steps:`<div class="bbb-install-step"><i>1</i><div><b>Open Share</b><span>Tap the Share button in ${b}.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose “Add to Home Screen”</b><span>Scroll through the Share options if you don't see it straight away.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Tap Add</b><span>Keep the name B.B.B Bali, then tap Add.</span></div></div>`
+      };
+    }
+    if(b==='Firefox'){
+      return {
+        intro:`You're using Firefox on Android. You can keep B.B.B on your Home Screen like an app.`,
+        steps:`<div class="bbb-install-step"><i>1</i><div><b>Open Firefox's menu</b><span>Tap the ⋮ menu.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose Install or Add to Home screen</b><span>The wording can vary slightly by Firefox version.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Confirm</b><span>Add B.B.B Bali, then open it from the palm-tree icon.</span></div></div>`
+      };
+    }
+    return {
+      intro:`You're using ${b} on Android. Keep B.B.B one tap away by installing it or adding it to your Home Screen.`,
+      steps:`<div class="bbb-install-step"><i>1</i><div><b>Open the ${b} menu</b><span>Tap ⋮ in your browser.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose Install app</b><span>If you don't see Install app, choose “Add to Home screen”.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Confirm B.B.B Bali</b><span>Tap Install / Add, then open B.B.B from the palm-tree icon.</span></div></div>`
+    };
   }
   async function openInstall(){
     if(installed())return;
-    if(android()&&deferredInstall){
+    if(deferredInstall){
       deferredInstall.prompt();
       try{await deferredInstall.userChoice}catch(e){}
       deferredInstall=null;
       return;
     }
     document.querySelectorAll('.bbb-install-backdrop,.bbb-install-sheet').forEach(x=>x.remove());
-    const isIOS=ios();
-    const browser=isIOS?iosBrowser():'';
-    const intro=isIOS
-      ?`You're on iPhone using ${browser}. Apple needs you to confirm adding B.B.B to your Home Screen.`
-      :'Your Android browser will either show an Install prompt or let you add B.B.B from its menu.';
-    const steps=isIOS
-      ?`<div class="bbb-install-step"><i>1</i><div><b>Tap Share</b><span>Tap your browser's Share button (the square with the ↑ arrow).</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Choose “Add to Home Screen”</b><span>Scroll through the Share options if you don't see it straight away.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Tap Add</b><span>Keep the name B.B.B Bali, then tap Add.</span></div></div>`
-      :`<div class="bbb-install-step"><i>1</i><div><b>Open your browser menu</b><span>Tap ⋮ and choose “Install app” or “Add to Home screen”.</span></div></div><div class="bbb-install-step"><i>2</i><div><b>Confirm B.B.B Bali</b><span>Tap Install / Add when your phone asks.</span></div></div><div class="bbb-install-step"><i>3</i><div><b>Open B.B.B</b><span>Look for the Nicolle's 50th palm-tree icon on your Home Screen.</span></div></div>`;
-    document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop" data-bbb-install-close></div><section class="bbb-install-sheet" role="dialog" aria-modal="true"><button class="bbb-install-sheet-close" data-bbb-install-close aria-label="Close">×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">Nicolle's 50th · Bali 2027</div><h2>Get the B.B.B app</h2></div></div><p>${intro}</p><div class="bbb-device-pill">${isIOS?'iPhone · '+browser:'Android'}</div><div class="bbb-install-steps">${steps}</div><button class="bbb-install-primary" data-bbb-install-close>Got it</button><p class="bbb-install-note">When installed, B.B.B opens from this exact palm-tree icon like an app.</p></section>`)
+    const info=manualInstructions();
+    document.body.insertAdjacentHTML('beforeend',`<div class="bbb-install-backdrop" data-bbb-install-close></div><section class="bbb-install-sheet" role="dialog" aria-modal="true"><button class="bbb-install-sheet-close" data-bbb-install-close aria-label="Close">×</button><div class="bbb-install-sheet-head"><img src="${LOGO}" alt="B.B.B Bali"><div><div class="eyebrow">Nicolle's 50th · Bali 2027</div><h2>Keep B.B.B handy</h2></div></div><p>${info.intro}</p><div class="bbb-device-pill">${device()} · ${browser()}</div><div class="bbb-install-steps">${info.steps}</div><button class="bbb-install-primary" data-bbb-install-close>Got it</button><p class="bbb-install-note">You can still use B.B.B normally in ${browser()} without adding it to your Home Screen.</p></section>`)
   }
   async function enableNotifications(){
     if(!('Notification'in window)){return}
@@ -1266,17 +1286,8 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
     if(e.target.closest('[data-bbb-notify-close]'))document.querySelectorAll('.bbb-notify-sheet,.bbb-notify-backdrop').forEach(x=>x.remove());
     if(e.target.closest('[data-bbb-notify-enable]'))enableNotifications();
   });
-  function maybePizzaPaymentReminder(){
-    const p=state.plans?.find(x=>x.type==='pizza'&&!x.paymentMarked&&x.pay!=='paid');
-    if(!p||!installed()||!('Notification'in window)||Notification.permission!=='granted')return;
-    const last=Number(localStorage.getItem('bbbPizzaReminderAt')||0),week=7*24*60*60*1000;
-    if(Date.now()-last<week)return;
-    localStorage.setItem('bbbPizzaReminderAt',String(Date.now()));
-    const people=Math.max(1,Number(p.people||1)),total=people*249000;
-    navigator.serviceWorker?.ready.then(reg=>reg.showNotification('Pizza Party payment reminder 🍕',{body:`Your ${people}-person booking is still marked unpaid. ${pizzaMoney(total)} is due to Nicolle ASAP.`,icon:'/assets/icons/icon-192.png',badge:'/assets/icons/icon-192.png',tag:'bbb-pizza-payment',data:{url:'/#/profile'}})).catch(()=>{});
-  }
   function bootInstallExperience(){
-    if(installed()){maybeNotifyPrompt();setTimeout(maybePizzaPaymentReminder,2200);return}
+    if(installed()){maybeNotifyPrompt();return}
     setTimeout(()=>{
       showNudge(true);
       if(!sessionStorage.getItem('bbbInstallIntroShown')){
@@ -1289,7 +1300,6 @@ if(window.visualViewport){window.visualViewport.addEventListener('resize',bashSy
   else bootInstallExperience();
   window.addEventListener('pageshow',()=>{if(!installed()&&!document.querySelector('.bbb-install-nudge'))setTimeout(()=>showNudge(true),350)});
 })();
-
 
 // v87: startup/visibility lifecycle is registered inside the main app closure above.
 
