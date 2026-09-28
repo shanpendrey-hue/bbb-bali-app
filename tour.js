@@ -11,10 +11,10 @@ const steps=[
  {route:'home',target:'.hero',title:'Hey! I’m Nicky 👋',text:'I’m your B.B.B Bali guru. Let me show you around — I’ll take you to the important bits and you just tap Next when you’re ready.'},
  {route:'home',target:'.sunset-card',title:'Your home base',text:'Home keeps the important stuff easy to find. Next Up shows what’s coming, and your trip shortcuts live here too.'},
  {route:'bbb',target:'.bbb-hero',title:'The B.B.B 🎂',text:'This is where the Big Bali Bash lives — the birthday plans, what’s happening and all the fun stuff for Nicolle’s 50th.'},
- {route:'bbb',target:'.itinerary-head',title:'The itinerary',text:'I’ll automatically scroll you to the next thing. Your B.B.B itinerary has the times and plans for the day — no group-chat archaeology required.'},
+ {route:'bbb',target:'.itinerary-head',closest:'.section',place:'top',title:'The itinerary',text:'I’ll automatically scroll you to the next thing. Your B.B.B itinerary has the times and plans for the day — no group-chat archaeology required.'},
  {route:'bbb',target:'.cocktail-grid .cocktail:first-child',title:'Cocktails 🍸',text:'Browse the B.B.B cocktail menu, choose your drinks and build your order. You can have a practice before the big day too.'},
- {route:'bbb',action:'drink-order',target:'.drink-drawer .section-head',title:'My Order',text:'Your drinks collect here. When the B.B.B Bar is open on the day, Send order to the bar sends your order directly to our B.B.B bartenders. Until then, you can practise — I just won’t let you send it.'},
- {route:'bbb',target:'.bbb-photo-card',title:'The B.B.B Media Roll 📸',text:'Please share your photos! B.B.B photos are collected in our private B.B.B Google Drive so Nicolle can keep the memories together and everyone can view the collection later.'},
+ {route:'bbb',action:'drink-order',target:'.drink-drawer',place:'top',spot:'drawer',title:'My Order',text:'Your drinks collect here. When the B.B.B Bar is open on the day, Send order to the bar sends your order directly to our B.B.B bartenders. Until then, you can practise — I just won’t let you send it.'},
+ {route:'bbb',target:'.bbb-photo-card',place:'top',title:'The B.B.B Media Roll 📸',text:'Please share your photos! B.B.B photos are collected in our private B.B.B Google Drive so Nicolle can keep the memories together and everyone can view the collection later.'},
  {route:'bash',target:'.bash-board-top',title:'The Bash Board',text:'Think of this as our little B.B.B Facebook feed. See what everyone’s up to, post updates and keep the trip chatter together.'},
  {route:'bash',target:'.bash-quick-compose',title:'Create a post',text:'Tap “What’s happening?” to post to the crew. You can add photos, check in somewhere or add how you’re feeling.'},
  {route:'bash',action:'chat',target:'.bash-chat-top',title:'B.B.B Group Chat 💬',text:'This is the crew chat. Send messages, reply and react. It’s the quick place to keep everyone together.'},
@@ -22,12 +22,12 @@ const steps=[
  {route:'travel',target:'.pagehead',title:'Travel ✈️',text:'Before Bali, this is an important one. Your flights, airport pickup and villa information all live in the Travel area.'},
  {route:'ready',target:'.pagehead',title:'Bali Ready',text:'Use Bali Ready for your visa, tourist levy, arrival declaration, insurance, passport and saved flight details. Work through it before you fly.'},
  {route:'travel',target:'.pickup-card, [class*="pickup-card"]',title:'Airport pickup',text:'Need a lift from the airport? Your Made airport pickup can be organised and managed here, along with your arrival details.'},
- {route:'travel',target:'.villa-actions',title:'Chandra Villas',text:'Your Bali base is easy to find — open it in Maps, jump to the Chandra website or call from here.'},
- {route:'bali',target:'.section-head',findText:'The Bali Guide',title:'The Bali Guide 🌴',text:'Food, drinks, practical Bali info and Shannon’s recommendations are all here. Open a guide whenever you need it.'},
+ {route:'travel',target:'.villa-actions',closest:'.card',place:'top',title:'Chandra Villas',text:'Your Bali base is easy to find — open it in Maps, jump to the Chandra website or call from here.'},
+ {route:'bali',target:'.section-head',findText:'The Bali Guide',closest:'.section',place:'top',title:'The Bali Guide 🌴',text:'Food, drinks, practical Bali info and Shannon’s recommendations are all here. Open a guide whenever you need it.'},
  {route:'profile',target:'.pagehead',title:'Your Profile 👤',text:'This bit is all about YOU. Your profile is where you’ll find everything you’ve organised for the trip.'},
- {route:'profile',target:'.section',findHeading:'My Plans',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
- {route:'profile',target:'#nicky-tour-profile-card [data-nicky-tour-start]',title:'Need the tour again?',text:'Haven’t had a chance to explore properly — or want another look? Come back to Profile and tap Take the tour with Nicky. I’ll start this walkthrough again anytime.'},
- {route:'home',target:'.nicky-launcher',title:'If you’re not sure… Ask Nicky! ✨',text:'I’m your number one B.B.B Bali guru. Ask me about the trip, itinerary, villa, Bali, where to go or what you’ve booked. I’m always hanging out here in the corner — tap me and chat whenever you need me.',finish:true}
+ {route:'profile',target:'.section',findHeading:'My Plans',place:'top',title:'All your plans',text:'Your bookings and plans will appear here. If plans change and you need to reschedule, edit or cancel something, head back to your Profile and manage it here.'},
+ {route:'profile',target:'#nicky-tour-profile-card',place:'bottom',title:'Need the tour again?',text:'Haven’t had a chance to explore properly — or want another look? Come back to Profile and tap Take the tour with Nicky. I’ll start this walkthrough again anytime.'},
+ {route:'home',target:'.nicky-launcher',place:'top',spot:'tight',title:'If you’re not sure… Ask Nicky! ✨',text:'I’m your number one B.B.B Bali guru. Ask me about the trip, itinerary, villa, Bali, where to go or what you’ve booked. I’m always hanging out here in the corner — tap me and chat whenever you need me.',finish:true}
 ];
 
 function addProfileCard(){
@@ -51,7 +51,9 @@ function findTarget(step){
  let els=[...document.querySelectorAll(step.target||'')];
  if(step.findHeading) els=els.filter(el=>[...el.querySelectorAll('h1,h2,h3,.section-title')].some(h=>h.textContent.trim()===step.findHeading));
  if(step.findText) els=els.filter(el=>el.textContent.includes(step.findText));
- return els[0]||null;
+ let el=els[0]||null;
+ if(el&&step.closest) el=el.closest(step.closest)||el;
+ return el;
 }
 async function waitForTarget(step,timeout=1200){
  const started=Date.now(); let t=null;
@@ -95,7 +97,10 @@ function placeCard(target){
  const above=Math.max(0,r.top-gap-edge);
  const below=Math.max(0,innerHeight-r.bottom-gap-edge);
  let top;
- if(below>=h) { top=Math.min(innerHeight-h-edge,r.bottom+gap); card.classList.add('place-bottom'); }
+ const forced=steps[index]?.place;
+ if(forced==='top' && above>=Math.min(h,170)){top=Math.max(edge,r.top-gap-h);card.classList.add('place-top');}
+ else if(forced==='bottom' && below>=Math.min(h,170)){top=Math.min(innerHeight-h-edge,r.bottom+gap);card.classList.add('place-bottom');}
+ else if(below>=h) { top=Math.min(innerHeight-h-edge,r.bottom+gap); card.classList.add('place-bottom'); }
  else if(above>=h) { top=Math.max(edge,r.top-gap-h); card.classList.add('place-top'); }
  else {
    // Neither side fits perfectly: use the larger clear area and keep the bubble on-screen.
@@ -107,7 +112,15 @@ function placeCard(target){
 function position(target){
  clearTarget(); if(!target){placeCard(null);return;}
  currentTarget=target; target.classList.add('nicky-tour-target');
- const r=target.getBoundingClientRect(),pad=Math.min(10,Math.max(6,r.width*.02));
+ let r=target.getBoundingClientRect();
+ const step=steps[index]||{};
+ if(step.spot==='drawer'){
+   const head=target.querySelector('.section-head');
+   const first=target.querySelector('.drink-profile, .drink-order-line, .drink-empty');
+   const hr=head?.getBoundingClientRect(),fr=first?.getBoundingClientRect();
+   if(hr) r={left:r.left,right:r.right,top:hr.top,bottom:Math.min(innerHeight-12,(fr?.bottom||hr.bottom+170)),width:r.width,height:Math.min(innerHeight-12,(fr?.bottom||hr.bottom+170))-hr.top};
+ }
+ const pad=step.spot==='tight'?4:Math.min(10,Math.max(6,r.width*.02));
  const left=Math.max(8,r.left-pad),top=Math.max(8,r.top-pad);
  const right=Math.min(innerWidth-8,r.right+pad),bottom=Math.min(innerHeight-8,r.bottom+pad);
  mark.style.left=left+'px'; mark.style.top=top+'px'; mark.style.width=Math.max(20,right-left)+'px'; mark.style.height=Math.max(20,bottom-top)+'px';
@@ -119,13 +132,20 @@ async function revealTarget(target,step){
  const cardH=Math.max(190,card?.offsetHeight||235),gap=18,topSafe=18,bottomSafe=18;
  let r=target.getBoundingClientRect();
  let desiredTop;
- // Purpose-built positions for the awkward mobile UI steps.
- if(step?.action==='drink-order') desiredTop=Math.max(topSafe,Math.min(92,innerHeight*.12));
- else if(step?.target==='.bash-chat-compose') desiredTop=Math.max(topSafe,innerHeight-cardH-r.height-gap-bottomSafe);
- else {
-   const roomAbove=Math.max(0,r.top-topSafe),roomBelow=Math.max(0,innerHeight-r.bottom-bottomSafe);
-   if(roomBelow>=cardH+gap) desiredTop=Math.max(topSafe,Math.min(r.top,innerHeight-cardH-r.height-gap-bottomSafe));
-   else desiredTop=Math.max(topSafe,Math.min(innerHeight-r.height-bottomSafe,r.top));
+ if(step?.action==='drink-order'){
+   // Keep the actual order drawer visible below Nicky instead of hiding it behind the bubble.
+   desiredTop=Math.max(cardH+34,Math.min(innerHeight*.48,r.top));
+ } else if(step?.target==='.bash-chat-compose'){
+   desiredTop=Math.max(topSafe,innerHeight-cardH-r.height-gap-bottomSafe);
+ } else if(step?.place==='top'){
+   // Bubble above: move the feature into the lower half so the whole feature can be seen.
+   desiredTop=Math.max(cardH+gap+topSafe,Math.min(innerHeight-r.height-bottomSafe,innerHeight*.52));
+ } else if(step?.place==='bottom'){
+   // Bubble below: keep the feature high and unobscured.
+   desiredTop=Math.max(topSafe,Math.min(92,innerHeight*.12));
+ } else {
+   const roomBelow=Math.max(0,innerHeight-r.bottom-bottomSafe);
+   desiredTop=roomBelow>=cardH+gap?Math.max(topSafe,Math.min(r.top,innerHeight-cardH-r.height-gap-bottomSafe)):Math.max(topSafe,Math.min(innerHeight-r.height-bottomSafe,r.top));
  }
  const delta=r.top-desiredTop;
  if(Math.abs(delta)>8){window.scrollBy({top:delta,behavior:'smooth'});await waitForScroll();}
